@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format, differenceInDays } from 'date-fns';
-import { AlertCircle, Clock, Wrench } from 'lucide-react';
+import { Clock, Wrench } from 'lucide-react';
 
 export default function UpcomingMaintenance({ intervals, vehicles }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
