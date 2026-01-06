@@ -6,9 +6,9 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, AlertCircle, Wrench, DollarSign, Calendar, Plus } from 'lucide-react';
-import DashboardStats from '../components/dashboard/DashboardStats';
-import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
-import RecentExpenses from '../components/dashboard/RecentExpenses';
+import DashboardStats from '../components/dashboard/DashboardStats.js';
+import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance.js';
+import RecentExpenses from '../components/dashboard/RecentExpenses.js';
 
 export default function Dashboard() {
   const { data: vehicles = [] } = useQuery({
