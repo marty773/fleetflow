@@ -4,8 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
-import VehicleForm from '../components/vehicles/VehicleForm';
-import VehicleCard from '../components/vehicles/VehicleCard';
+import VehicleForm from '../components/vehicles/VehicleForm.js';
+import VehicleCard from '../components/vehicles/VehicleCard.js';
 
 export default function Vehicles() {
   const [showForm, setShowForm] = useState(false);

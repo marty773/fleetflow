@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Wrench } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import MaintenanceForm from '../components/maintenance/MaintenanceForm';
-import MaintenanceList from '../components/maintenance/MaintenanceList';
-import IntervalForm from '../components/maintenance/IntervalForm';
-import IntervalList from '../components/maintenance/IntervalList';
+import MaintenanceForm from '../components/maintenance/MaintenanceForm.js';
+import MaintenanceList from '../components/maintenance/MaintenanceList.js';
+import IntervalForm from '../components/maintenance/IntervalForm.js';
+import IntervalList from '../components/maintenance/IntervalList.js';
 
 export default function Maintenance() {
   const [showRecordForm, setShowRecordForm] = useState(false);
