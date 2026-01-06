@@ -3,6 +3,7 @@ import Vehicles from './pages/Vehicles';
 import Bills from './pages/Bills';
 import Maintenance from './pages/Maintenance';
 import Calendar from './pages/Calendar';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -16,4 +17,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Dashboard",
     Pages: PAGES,
+    Layout: __Layout,
 };
