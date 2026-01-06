@@ -2,6 +2,7 @@ import Dashboard from './pages/Dashboard';
 import Vehicles from './pages/Vehicles';
 import Bills from './pages/Bills';
 import Maintenance from './pages/Maintenance';
+import Calendar from './pages/Calendar';
 
 
 export const PAGES = {
@@ -9,6 +10,7 @@ export const PAGES = {
     "Vehicles": Vehicles,
     "Bills": Bills,
     "Maintenance": Maintenance,
+    "Calendar": Calendar,
 }
 
 export const pagesConfig = {
