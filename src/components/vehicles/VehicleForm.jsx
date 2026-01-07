@@ -25,7 +25,10 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({
+      ...formData,
+      year: parseInt(formData.year),
+    });
   };
 
   return (
@@ -80,7 +83,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
               <Label htmlFor="model">Model *</Label>
               <Input
                 id="model"
-                placeholder="e.g., FH16"
+                placeholder="e.g., VNL 670"
                 value={formData.model}
                 onChange={(e) => handleChange('model', e.target.value)}
                 required
@@ -93,10 +96,10 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
               <Input
                 id="year"
                 type="number"
-                min="1900"
+                min="1990"
                 max={new Date().getFullYear()}
                 value={formData.year}
-                onChange={(e) => handleChange('year', parseInt(e.target.value))}
+                onChange={(e) => handleChange('year', e.target.value)}
                 required
                 className="mt-2"
               />
@@ -143,7 +146,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !formData.name || !formData.make || !formData.model}
+              disabled={isLoading || !formData.name || !formData.make || !formData.model || !formData.license_plate}
               className="bg-slate-900 hover:bg-slate-800"
             >
               {isLoading ? 'Saving...' : vehicle ? 'Update Vehicle' : 'Add Vehicle'}
