@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Image as ImageIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import BillForm from '../components/bills/BillForm.js';
-import BillList from '../components/bills/BillList.js';
-import BillGallery from '../components/bills/BillGallery.js';
+import BillForm from '../components/bills/BillForm';
+import BillList from '../components/bills/BillList';
+import BillGallery from '../components/bills/BillGallery';
 
 export default function Bills() {
   const [showForm, setShowForm] = useState(false);

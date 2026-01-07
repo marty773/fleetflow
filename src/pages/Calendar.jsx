@@ -37,10 +37,12 @@ export default function Calendar() {
     ? intervals.filter(i => i.is_active)
     : intervals.filter(i => i.is_active && i.vehicle_id === selectedVehicle);
 
+  // Get all days in the current month
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
+  // Get events for each day
   const eventsMap = useMemo(() => {
     const map = {};
     filteredIntervals.forEach(interval => {
@@ -118,6 +120,7 @@ export default function Calendar() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Calendar */}
           <div className="lg:col-span-2">
             <Card className="border-0 shadow-sm">
               <CardHeader className="border-b flex flex-row items-center justify-between">
@@ -132,6 +135,7 @@ export default function Calendar() {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
+                {/* Day labels */}
                 <div className="grid grid-cols-7 gap-2 mb-4">
                   {dayLabels.map(day => (
                     <div key={day} className="text-center font-semibold text-slate-700 text-sm py-2">
@@ -140,6 +144,7 @@ export default function Calendar() {
                   ))}
                 </div>
 
+                {/* Calendar grid */}
                 <div className="grid grid-cols-7 gap-2">
                   {calendarDays.map(day => {
                     const events = getDayEvents(day);
@@ -187,6 +192,7 @@ export default function Calendar() {
             </Card>
           </div>
 
+          {/* Upcoming Events Sidebar */}
           <div>
             <Card className="border-0 shadow-sm">
               <CardHeader className="border-b">

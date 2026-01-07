@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Plus } from 'lucide-react';
-import VehicleForm from '../components/vehicles/VehicleForm.js';
-import VehicleCard from '../components/vehicles/VehicleCard.js';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, Trash2, Edit2 } from 'lucide-react';
+import VehicleForm from '../components/vehicles/VehicleForm';
+import VehicleCard from '../components/vehicles/VehicleCard';
 
 export default function Vehicles() {
   const [showForm, setShowForm] = useState(false);

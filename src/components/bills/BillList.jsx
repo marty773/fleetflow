@@ -1,9 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { Edit2, Trash2, Camera } from 'lucide-react';
 
 export default function BillList({ bills, vehicles, onEdit, onDelete, isDeleting }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
@@ -21,74 +22,80 @@ export default function BillList({ bills, vehicles, onEdit, onDelete, isDeleting
     other: 'bg-slate-100 text-slate-800',
   };
 
+  if (bills.length === 0) {
+    return (
+      <Card className="border-2 border-dashed">
+        <CardContent className="p-12 text-center">
+          <p className="text-slate-600">No bills recorded yet</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      {bills.length > 0 ? (
-        bills.map((bill) => (
-          <Card key={bill.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <CardTitle className="text-lg">{bill.vendor}</CardTitle>
+    <Card className="border-0 shadow-sm">
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50">
+                <TableHead>Vehicle</TableHead>
+                <TableHead>Vendor</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="w-32">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {bills.map((bill) => (
+                <TableRow key={bill.id} className="hover:bg-slate-50">
+                  <TableCell className="font-medium">
+                    {vehicleMap[bill.vehicle_id]?.name || 'Unknown'}
+                  </TableCell>
+                  <TableCell>{bill.vendor}</TableCell>
+                  <TableCell>{format(new Date(bill.bill_date), 'MMM dd, yyyy')}</TableCell>
+                  <TableCell>
                     <Badge className={categoryColors[bill.category]}>
                       {bill.category?.replace('_', ' ')}
                     </Badge>
-                  </div>
-                  <p className="text-sm text-slate-600 mt-1">
-                    {vehicleMap[bill.vehicle_id]?.name}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-slate-900">
+                  </TableCell>
+                  <TableCell className="text-right font-semibold">
                     ${bill.total_amount?.toFixed(2)}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {format(new Date(bill.bill_date), 'MMM dd, yyyy')}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {bill.bill_number && (
-                <p className="text-sm text-slate-600">Bill #: {bill.bill_number}</p>
-              )}
-              {bill.notes && (
-                <p className="text-sm text-slate-600">{bill.notes}</p>
-              )}
-              <div className="flex gap-2 pt-3 border-t">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(bill)}
-                  className="flex-1"
-                >
-                  <Edit2 className="w-4 h-4 mr-1" /> Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm('Delete this bill?')) {
-                      onDelete(bill.id);
-                    }
-                  }}
-                  disabled={isDeleting}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      ) : (
-        <Card className="border-2 border-dashed">
-          <CardContent className="p-12 text-center">
-            <p className="text-slate-600">No bills yet. Create one to get started.</p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {bill.photo_url && (
+                        <Camera className="w-4 h-4 text-amber-600 mr-1" title="Has photo" />
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(bill)}
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm('Delete this bill?')) {
+                            onDelete(bill.id);
+                          }
+                        }}
+                        disabled={isDeleting}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
