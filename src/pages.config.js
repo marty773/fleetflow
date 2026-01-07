@@ -1,19 +1,19 @@
-import Dashboard from './pages/Dashboard';
-import Vehicles from './pages/Vehicles';
 import Bills from './pages/Bills';
-import Maintenance from './pages/Maintenance';
 import Calendar from './pages/Calendar';
+import Dashboard from './pages/Dashboard';
 import ItemGallery from './pages/ItemGallery';
+import Maintenance from './pages/Maintenance';
+import Vehicles from './pages/Vehicles';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Dashboard": Dashboard,
-    "Vehicles": Vehicles,
     "Bills": Bills,
-    "Maintenance": Maintenance,
     "Calendar": Calendar,
+    "Dashboard": Dashboard,
     "ItemGallery": ItemGallery,
+    "Maintenance": Maintenance,
+    "Vehicles": Vehicles,
 }
 
 export const pagesConfig = {

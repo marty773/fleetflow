@@ -14,7 +14,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Bills', path: 'Bills', icon: FileText },
     { name: 'Maintenance', path: 'Maintenance', icon: Wrench },
     { name: 'Calendar', path: 'Calendar', icon: Calendar },
-    { name: 'Items', path: 'ItemGallery', icon: FileText },
+    { name: 'ItemGallery', path: 'ItemGallery', icon: FileText },
   ];
 
   return (
