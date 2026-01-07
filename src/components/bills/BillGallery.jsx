@@ -1,6 +1,6 @@
 import React from 'react';
-import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
 export default function BillGallery({ bills, vehicles }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
@@ -21,26 +21,26 @@ export default function BillGallery({ bills, vehicles }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {bills.map((bill) => (
-        <div key={bill.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-          {bill.photo_url && (
-            <img
-              src={bill.photo_url}
-              alt={`Bill from ${bill.vendor}`}
-              className="w-full h-48 object-cover"
-            />
-          )}
+        <div key={bill.id} className="rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+          <img
+            src={bill.photo_url}
+            alt={bill.vendor}
+            className="w-full h-48 object-cover"
+          />
           <div className="p-4">
-            <h3 className="font-semibold text-slate-900 mb-2">{bill.vendor}</h3>
-            <div className="flex items-center gap-2 mb-3">
+            <h3 className="font-semibold text-slate-900">{bill.vendor}</h3>
+            <p className="text-sm text-slate-600">{vehicleMap[bill.vehicle_id]?.name}</p>
+            <div className="flex items-center justify-between mt-2">
               <Badge className={categoryColors[bill.category]}>
                 {bill.category?.replace('_', ' ')}
               </Badge>
+              <p className="font-bold text-slate-900">
+                ${bill.total_amount?.toFixed(2)}
+              </p>
             </div>
-            <div className="text-sm text-slate-600 space-y-1">
-              <p><span className="font-semibold">Vehicle:</span> {vehicleMap[bill.vehicle_id]?.name}</p>
-              <p><span className="font-semibold">Date:</span> {format(new Date(bill.bill_date), 'MMM dd, yyyy')}</p>
-              <p><span className="font-semibold">Amount:</span> ${bill.total_amount?.toFixed(2)}</p>
-            </div>
+            <p className="text-xs text-slate-500 mt-2">
+              {format(new Date(bill.bill_date), 'MMM dd, yyyy')}
+            </p>
           </div>
         </div>
       ))}
