@@ -16,14 +16,15 @@ import { addMonths, format } from 'date-fns';
 export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(interval || {
     vehicle_id: '',
-    name: '',
+    interval_name: '',
     maintenance_type: 'oil_change',
     interval_months: 6,
     interval_miles: '',
     last_performed_date: new Date().toISOString().split('T')[0],
-    last_odometer: '',
+    last_performed_mileage: '',
     next_due_date: '',
-    is_active: true,
+    next_due_mileage: '',
+    notes: '',
   });
 
   // Calculate next due date
@@ -80,12 +81,12 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
 
             <div>
-              <Label htmlFor="name">Interval Name *</Label>
+              <Label htmlFor="interval_name">Interval Name *</Label>
               <Input
-                id="name"
+                id="interval_name"
                 placeholder="e.g., Oil Change"
-                value={formData.name}
-                onChange={(e) => handleChange('name', e.target.value)}
+                value={formData.interval_name}
+                onChange={(e) => handleChange('interval_name', e.target.value)}
                 required
                 className="mt-2"
               />
@@ -150,13 +151,13 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
 
             <div>
-              <Label htmlFor="last_odometer">Last Odometer Reading</Label>
+              <Label htmlFor="last_performed_mileage">Last Odometer Reading</Label>
               <Input
-                id="last_odometer"
+                id="last_performed_mileage"
                 type="number"
                 placeholder="Miles"
-                value={formData.last_odometer}
-                onChange={(e) => handleChange('last_odometer', e.target.value)}
+                value={formData.last_performed_mileage}
+                onChange={(e) => handleChange('last_performed_mileage', e.target.value)}
                 className="mt-2"
               />
             </div>
@@ -172,6 +173,33 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
               />
               <p className="text-xs text-slate-500 mt-1">Auto-calculated</p>
             </div>
+
+            <div>
+              <Label htmlFor="next_due_mileage">Next Due Mileage</Label>
+              <Input
+                id="next_due_mileage"
+                type="number"
+                placeholder="Calculated from interval"
+                value={formData.next_due_mileage}
+                onChange={(e) => handleChange('next_due_mileage', e.target.value)}
+                className="mt-2"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="notes">Notes</Label>
+            <Input
+              id="notes"
+              placeholder="Additional notes..."
+              value={formData.notes}
+              onChange={(e) => handleChange('notes', e.target.value)}
+              className="mt-2"
+            />
+          </div>
+
+          <div className="hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
