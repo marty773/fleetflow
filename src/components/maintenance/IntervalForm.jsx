@@ -18,6 +18,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     vehicle_id: '',
     interval_name: '',
     maintenance_type: 'oil_change',
+    interval_type: 'months',
     interval_months: 6,
     interval_miles: '',
     last_performed_date: new Date().toISOString().split('T')[0],
@@ -31,7 +32,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
   useEffect(() => {
     const updates = {};
     
-    if (formData.last_performed_date && formData.interval_months) {
+    if (formData.interval_type === 'months' && formData.last_performed_date && formData.interval_months) {
       const nextDate = addMonths(
         new Date(formData.last_performed_date),
         parseInt(formData.interval_months)
@@ -39,14 +40,14 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
       updates.next_due_date = nextDate.toISOString().split('T')[0];
     }
     
-    if (formData.last_performed_mileage && formData.interval_miles) {
+    if (formData.interval_type === 'miles' && formData.last_performed_mileage && formData.interval_miles) {
       updates.next_due_mileage = parseFloat(formData.last_performed_mileage) + parseFloat(formData.interval_miles);
     }
     
     if (Object.keys(updates).length > 0) {
       setFormData(prev => ({ ...prev, ...updates }));
     }
-  }, [formData.last_performed_date, formData.interval_months, formData.last_performed_mileage, formData.interval_miles]);
+  }, [formData.interval_type, formData.last_performed_date, formData.interval_months, formData.last_performed_mileage, formData.interval_miles]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -121,77 +122,108 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
 
             <div>
-              <Label htmlFor="interval_months">Interval (Months) *</Label>
-              <Input
-                id="interval_months"
-                type="number"
-                min="1"
-                value={formData.interval_months}
-                onChange={(e) => handleChange('interval_months', e.target.value)}
-                required
-                className="mt-2"
-              />
+              <Label htmlFor="interval_type">Interval Based On *</Label>
+              <Select
+                value={formData.interval_type}
+                onValueChange={(value) => handleChange('interval_type', value)}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="months">Time (Months)</SelectItem>
+                  <SelectItem value="miles">Mileage (Miles)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <Label htmlFor="interval_miles">Interval (Miles)</Label>
-              <Input
-                id="interval_miles"
-                type="number"
-                placeholder="Optional"
-                value={formData.interval_miles}
-                onChange={(e) => handleChange('interval_miles', e.target.value)}
-                className="mt-2"
-              />
-            </div>
+            {formData.interval_type === 'months' && (
+              <div>
+                <Label htmlFor="interval_months">Interval (Months) *</Label>
+                <Input
+                  id="interval_months"
+                  type="number"
+                  min="1"
+                  value={formData.interval_months}
+                  onChange={(e) => handleChange('interval_months', e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              </div>
+            )}
 
-            <div>
-              <Label htmlFor="last_performed_date">Last Performed *</Label>
-              <Input
-                id="last_performed_date"
-                type="date"
-                value={formData.last_performed_date}
-                onChange={(e) => handleChange('last_performed_date', e.target.value)}
-                required
-                className="mt-2"
-              />
-            </div>
+            {formData.interval_type === 'miles' && (
+              <div>
+                <Label htmlFor="interval_miles">Interval (Miles) *</Label>
+                <Input
+                  id="interval_miles"
+                  type="number"
+                  min="1"
+                  value={formData.interval_miles}
+                  onChange={(e) => handleChange('interval_miles', e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              </div>
+            )}
 
-            <div>
-              <Label htmlFor="last_performed_mileage">Last Odometer Reading</Label>
-              <Input
-                id="last_performed_mileage"
-                type="number"
-                placeholder="Miles"
-                value={formData.last_performed_mileage}
-                onChange={(e) => handleChange('last_performed_mileage', e.target.value)}
-                className="mt-2"
-              />
-            </div>
+            {formData.interval_type === 'months' && (
+              <div>
+                <Label htmlFor="last_performed_date">Last Performed *</Label>
+                <Input
+                  id="last_performed_date"
+                  type="date"
+                  value={formData.last_performed_date}
+                  onChange={(e) => handleChange('last_performed_date', e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              </div>
+            )}
 
-            <div>
-              <Label htmlFor="next_due_date">Next Due Date</Label>
-              <Input
-                id="next_due_date"
-                type="date"
-                value={formData.next_due_date}
-                disabled
-                className="mt-2 bg-slate-50"
-              />
-              <p className="text-xs text-slate-500 mt-1">Auto-calculated</p>
-            </div>
+            {formData.interval_type === 'miles' && (
+              <div>
+                <Label htmlFor="last_performed_mileage">Last Odometer Reading *</Label>
+                <Input
+                  id="last_performed_mileage"
+                  type="number"
+                  placeholder="Miles"
+                  value={formData.last_performed_mileage}
+                  onChange={(e) => handleChange('last_performed_mileage', e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              </div>
+            )}
 
-            <div>
-              <Label htmlFor="next_due_mileage">Next Due Mileage</Label>
-              <Input
-                id="next_due_mileage"
-                type="number"
-                placeholder="Calculated from interval"
-                value={formData.next_due_mileage}
-                onChange={(e) => handleChange('next_due_mileage', e.target.value)}
-                className="mt-2"
-              />
-            </div>
+            {formData.interval_type === 'months' && (
+              <div>
+                <Label htmlFor="next_due_date">Next Due Date</Label>
+                <Input
+                  id="next_due_date"
+                  type="date"
+                  value={formData.next_due_date}
+                  disabled
+                  className="mt-2 bg-slate-50"
+                />
+                <p className="text-xs text-slate-500 mt-1">Auto-calculated</p>
+              </div>
+            )}
+
+            {formData.interval_type === 'miles' && (
+              <div>
+                <Label htmlFor="next_due_mileage">Next Due Mileage</Label>
+                <Input
+                  id="next_due_mileage"
+                  type="number"
+                  placeholder="Calculated from interval"
+                  value={formData.next_due_mileage}
+                  disabled
+                  className="mt-2 bg-slate-50"
+                />
+                <p className="text-xs text-slate-500 mt-1">Auto-calculated</p>
+              </div>
+            )}
           </div>
 
           <div>
