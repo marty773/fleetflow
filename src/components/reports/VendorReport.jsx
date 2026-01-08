@@ -43,6 +43,7 @@ export default function VendorReport() {
       total,
       transactions: [
         ...vendorBills.map(b => ({
+          id: b.id,
           type: 'bill',
           date: b.bill_date,
           amount: b.total_amount,
@@ -50,6 +51,7 @@ export default function VendorReport() {
           category: b.category,
         })),
         ...vendorMaintenance.map(m => ({
+          id: m.id,
           type: 'maintenance',
           date: m.performed_date,
           amount: m.total_cost,
