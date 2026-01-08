@@ -20,6 +20,11 @@ export default function Bills() {
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
+  const { data: items = [] } = useQuery({
+    queryKey: ['items'],
+    queryFn: () => base44.entities.Item.list(),
+  });
+
   const { data: bills = [] } = useQuery({
     queryKey: ['bills'],
     queryFn: () => base44.entities.Bill.list(),
@@ -51,7 +56,24 @@ export default function Bills() {
     },
   });
 
-  const handleSubmit = (data) => {
+  const handleSubmit = async (data) => {
+    // Update item quantities from line items
+    const itemUpdates = data.line_items
+      .filter(item => item.item_id && item.item_quantity > 0)
+      .map(item => ({
+        item_id: item.item_id,
+        quantity_to_add: item.item_quantity,
+      }));
+
+    // Update inventory
+    for (const update of itemUpdates) {
+      const currentItem = items.find(i => i.id === update.item_id);
+      if (currentItem) {
+        const newQty = (currentItem.quantity_on_hand || 0) + update.quantity_to_add;
+        base44.entities.Item.update(update.item_id, { quantity_on_hand: newQty });
+      }
+    }
+
     if (editingBill) {
       updateMutation.mutate({ id: editingBill.id, data });
     } else {
@@ -89,6 +111,7 @@ export default function Bills() {
           <BillForm
             bill={editingBill}
             vehicles={vehicles}
+            items={items}
             onSubmit={handleSubmit}
             onCancel={() => {
               setShowForm(false);
