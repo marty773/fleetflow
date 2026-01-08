@@ -4,9 +4,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { Edit2, Trash2, Camera } from 'lucide-react';
+import { Eye, Edit2, Trash2, Camera } from 'lucide-react';
 
-export default function BillList({ bills, vehicles, onEdit, onDelete, isDeleting }) {
+export default function BillList({ bills, vehicles, items, onView, onEdit, onDelete, isDeleting }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
@@ -44,7 +44,7 @@ export default function BillList({ bills, vehicles, onEdit, onDelete, isDeleting
                 <TableHead>Date</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="w-32">Actions</TableHead>
+                <TableHead className="w-40">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -64,10 +64,17 @@ export default function BillList({ bills, vehicles, onEdit, onDelete, isDeleting
                     ${bill.total_amount?.toFixed(2)}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       {bill.photo_url && (
                         <Camera className="w-4 h-4 text-amber-600 mr-1" title="Has photo" />
                       )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onView(bill)}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

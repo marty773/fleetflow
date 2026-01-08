@@ -3,8 +3,8 @@ import Calendar from './pages/Calendar';
 import Dashboard from './pages/Dashboard';
 import Items from './pages/Items';
 import Maintenance from './pages/Maintenance';
-import VehicleCosts from './pages/VehicleCosts';
 import Vehicles from './pages/Vehicles';
+import Reports from './pages/Reports';
 import __Layout from './Layout.jsx';
 
 
@@ -14,8 +14,8 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Items": Items,
     "Maintenance": Maintenance,
-    "VehicleCosts": VehicleCosts,
     "Vehicles": Vehicles,
+    "Reports": Reports,
 }
 
 export const pagesConfig = {

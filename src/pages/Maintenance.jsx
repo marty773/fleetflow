@@ -5,16 +5,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Wrench } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import MaintenanceForm from '../components/maintenance/MaintenanceForm';
 import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalForm from '../components/maintenance/IntervalForm';
 import IntervalList from '../components/maintenance/IntervalList';
+import { format } from 'date-fns';
 
 export default function Maintenance() {
   const [showRecordForm, setShowRecordForm] = useState(false);
   const [showIntervalForm, setShowIntervalForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [editingInterval, setEditingInterval] = useState(null);
+  const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('records');
   const queryClient = useQueryClient();
 
@@ -148,6 +157,8 @@ export default function Maintenance() {
             <MaintenanceList
               records={records}
               vehicles={vehicles}
+              items={items}
+              onView={setViewingRecord}
               onEdit={(record) => {
                 setEditingRecord(record);
                 setShowRecordForm(true);
@@ -194,8 +205,98 @@ export default function Maintenance() {
               isDeleting={deleteIntervalMutation.isPending}
             />
           </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
+          </Tabs>
+
+          {/* View Maintenance Dialog */}
+          {viewingRecord && (
+          <Dialog open={!!viewingRecord} onOpenChange={() => setViewingRecord(null)}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Maintenance Record Details</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-slate-500">Vehicle</Label>
+                    <p className="font-medium">{vehicles.find(v => v.id === viewingRecord.vehicle_id)?.name}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500">Type</Label>
+                    <p className="font-medium capitalize">{viewingRecord.maintenance_type?.replace('_', ' ')}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500">Title</Label>
+                    <p className="font-medium">{viewingRecord.title}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500">Date</Label>
+                    <p className="font-medium">{format(new Date(viewingRecord.performed_date), 'MMM dd, yyyy')}</p>
+                  </div>
+                  {viewingRecord.vendor && (
+                    <div>
+                      <Label className="text-slate-500">Service Provider</Label>
+                      <p className="font-medium">{viewingRecord.vendor}</p>
+                    </div>
+                  )}
+                  {viewingRecord.odometer_reading && (
+                    <div>
+                      <Label className="text-slate-500">Odometer</Label>
+                      <p className="font-medium">{viewingRecord.odometer_reading} miles</p>
+                    </div>
+                  )}
+                </div>
+                {viewingRecord.work_items && viewingRecord.work_items.length > 0 && (
+                  <div>
+                    <Label className="text-slate-500 mb-2 block">Work Performed</Label>
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-slate-50">
+                          <tr>
+                            <th className="text-left p-2">Description</th>
+                            <th className="text-center p-2">Qty</th>
+                            <th className="text-right p-2">Price</th>
+                            <th className="text-right p-2">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {viewingRecord.work_items.map((item, idx) => (
+                            <tr key={idx} className="border-t">
+                              <td className="p-2">{item.description}</td>
+                              <td className="text-center p-2">{item.quantity}</td>
+                              <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                              <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                          <tr className="border-t bg-slate-50 font-semibold">
+                            <td colSpan={3} className="p-2 text-right">Total:</td>
+                            <td className="text-right p-2">${viewingRecord.total_cost?.toFixed(2)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                {viewingRecord.notes && (
+                  <div>
+                    <Label className="text-slate-500">Notes</Label>
+                    <p className="text-sm mt-1">{viewingRecord.notes}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setViewingRecord(null)}>Close</Button>
+                <Button onClick={() => {
+                  setEditingRecord(viewingRecord);
+                  setViewingRecord(null);
+                  setShowRecordForm(true);
+                }}>
+                  Edit Record
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          )}
+          </div>
+          </div>
+          );
+          }

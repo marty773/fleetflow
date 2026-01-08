@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { Edit2, Trash2, Wrench } from 'lucide-react';
+import { Eye, Edit2, Trash2, Wrench } from 'lucide-react';
 
-export default function MaintenanceList({ records, vehicles, onEdit, onDelete, isDeleting }) {
+export default function MaintenanceList({ records, vehicles, items, onView, onEdit, onDelete, isDeleting }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
@@ -81,7 +81,14 @@ export default function MaintenanceList({ records, vehicles, onEdit, onDelete, i
                   </p>
                 )}
               </div>
-              <div className="flex gap-2 ml-4">
+              <div className="flex gap-1 ml-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onView(record)}
+                >
+                  <Eye className="w-4 h-4" />
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"

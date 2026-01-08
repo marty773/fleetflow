@@ -5,13 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Image as ImageIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import BillForm from '../components/bills/BillForm';
 import BillList from '../components/bills/BillList';
 import BillGallery from '../components/bills/BillGallery';
+import { format } from 'date-fns';
 
 export default function Bills() {
   const [showForm, setShowForm] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
+  const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
   const queryClient = useQueryClient();
 
@@ -133,6 +142,8 @@ export default function Bills() {
             <BillList
               bills={bills}
               vehicles={vehicles}
+              items={items}
+              onView={setViewingBill}
               onEdit={handleEdit}
               onDelete={(id) => deleteMutation.mutate(id)}
               isDeleting={deleteMutation.isPending}
@@ -152,6 +163,93 @@ export default function Bills() {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* View Bill Dialog */}
+        {viewingBill && (
+          <Dialog open={!!viewingBill} onOpenChange={() => setViewingBill(null)}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Bill Details</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {viewingBill.photo_url && (
+                  <div className="flex justify-center">
+                    <img
+                      src={viewingBill.photo_url}
+                      alt="Bill"
+                      className="max-h-64 rounded-lg object-cover"
+                    />
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-slate-500">Vendor</Label>
+                    <p className="font-medium">{viewingBill.vendor}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500">Date</Label>
+                    <p className="font-medium">{format(new Date(viewingBill.bill_date), 'MMM dd, yyyy')}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500">Bill Number</Label>
+                    <p className="font-medium">{viewingBill.bill_number || '-'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500">Category</Label>
+                    <p className="font-medium capitalize">{viewingBill.category?.replace('_', ' ')}</p>
+                  </div>
+                </div>
+                {viewingBill.line_items && viewingBill.line_items.length > 0 && (
+                  <div>
+                    <Label className="text-slate-500 mb-2 block">Line Items</Label>
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-slate-50">
+                          <tr>
+                            <th className="text-left p-2">Description</th>
+                            <th className="text-center p-2">Qty</th>
+                            <th className="text-right p-2">Price</th>
+                            <th className="text-right p-2">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {viewingBill.line_items.map((item, idx) => (
+                            <tr key={idx} className="border-t">
+                              <td className="p-2">{item.description}</td>
+                              <td className="text-center p-2">{item.quantity}</td>
+                              <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                              <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                          <tr className="border-t bg-slate-50 font-semibold">
+                            <td colSpan={3} className="p-2 text-right">Total:</td>
+                            <td className="text-right p-2">${viewingBill.total_amount?.toFixed(2)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                {viewingBill.notes && (
+                  <div>
+                    <Label className="text-slate-500">Notes</Label>
+                    <p className="text-sm mt-1">{viewingBill.notes}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setViewingBill(null)}>Close</Button>
+                <Button onClick={() => {
+                  setEditingBill(viewingBill);
+                  setViewingBill(null);
+                  setShowForm(true);
+                }}>
+                  Edit Bill
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );
