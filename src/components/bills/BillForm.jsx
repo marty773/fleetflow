@@ -67,7 +67,7 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
   };
 
   const handleAddItem = () => {
-    if (!newItem.description || newItem.unit_price <= 0) return;
+    if (!newItem.description || newItem.unit_price === 0) return;
     const total = newItem.quantity * newItem.unit_price;
     setFormData(prev => ({
       ...prev,
