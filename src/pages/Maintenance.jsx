@@ -23,6 +23,11 @@ export default function Maintenance() {
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
+  const { data: items = [] } = useQuery({
+    queryKey: ['items'],
+    queryFn: () => base44.entities.Item.list(),
+  });
+
   const { data: records = [] } = useQuery({
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
@@ -81,7 +86,18 @@ export default function Maintenance() {
     },
   });
 
-  const handleSubmitRecord = (data) => {
+  const handleSubmitRecord = async (data) => {
+    // Update item quantities from parts used
+    const partUpdates = data.parts_used || [];
+
+    for (const part of partUpdates) {
+      const currentItem = items.find(i => i.id === part.item_id);
+      if (currentItem) {
+        const newQty = Math.max(0, (currentItem.quantity_on_hand || 0) - part.quantity_used);
+        base44.entities.Item.update(part.item_id, { quantity_on_hand: newQty });
+      }
+    }
+
     if (editingRecord) {
       updateRecordMutation.mutate({ id: editingRecord.id, data });
     } else {
@@ -130,6 +146,7 @@ export default function Maintenance() {
               <MaintenanceForm
                 record={editingRecord}
                 vehicles={vehicles}
+                items={items}
                 onSubmit={handleSubmitRecord}
                 onCancel={() => {
                   setShowRecordForm(false);
