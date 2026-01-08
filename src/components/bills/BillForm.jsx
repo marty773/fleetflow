@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Upload, Trash2, Plus, ChevronDown, Edit } from 'lucide-react';
+import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -53,11 +53,15 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
   const [newItemData, setNewItemData] = useState({
     name: '',
     vendor: '',
-    price: 0,
-    category: 'other',
+    price: '',
+    quantity_on_hand: '0',
+    low_stock_threshold: '2',
+    item_number: '',
     description: '',
+    photo_url: '',
   });
   const [creatingItem, setCreatingItem] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -116,18 +120,33 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
     onSubmit({ ...formData, total_amount: total });
   };
 
+  const handlePhotoUploadNewItem = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPhotoUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setNewItemData(prev => ({ ...prev, photo_url: file_url }));
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   const handleCreateNewItem = async () => {
-    if (!newItemData.name || newItemData.price <= 0) return;
+    if (!newItemData.name || !newItemData.price) return;
     
     setCreatingItem(true);
     try {
       const createdItem = await base44.entities.Item.create({
         name: newItemData.name,
-        vendor: newItemData.vendor || '',
+        vendor: newItemData.vendor || null,
         price: parseFloat(newItemData.price),
-        category: newItemData.category,
-        description: newItemData.description || '',
-        quantity_on_hand: 0,
+        quantity_on_hand: parseFloat(newItemData.quantity_on_hand) || 0,
+        low_stock_threshold: parseFloat(newItemData.low_stock_threshold) || 2,
+        item_number: newItemData.item_number || null,
+        description: newItemData.description || null,
+        photo_url: newItemData.photo_url || null,
       });
       
       // Update items list and select the new item
@@ -140,7 +159,7 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
       });
       
       setShowNewItemDialog(false);
-      setNewItemData({ name: '', vendor: '', price: 0, category: 'other', description: '' });
+      setNewItemData({ name: '', vendor: '', price: '', quantity_on_hand: '0', low_stock_threshold: '2', item_number: '', description: '', photo_url: '' });
     } finally {
       setCreatingItem(false);
     }
@@ -438,82 +457,177 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
 
         {/* New Item Dialog */}
         <Dialog open={showNewItemDialog} onOpenChange={setShowNewItemDialog}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create New Stock Item</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">Add New Item</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="item_name">Item Name *</Label>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleCreateNewItem(); }} className="space-y-5 mt-4">
+              {/* Photo Upload */}
+              <div className="space-y-2">
+                <Label>Photo</Label>
+                <div className="relative">
+                  {newItemData.photo_url ? (
+                    <div className="relative w-full h-48 rounded-xl overflow-hidden bg-slate-100">
+                      <img
+                        src={newItemData.photo_url}
+                        alt="Item preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="destructive"
+                        className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                        onClick={() => setNewItemData(prev => ({ ...prev, photo_url: '' }))}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors">
+                      {photoUploading ? (
+                        <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+                      ) : (
+                        <>
+                          <ImageIcon className="h-10 w-10 text-slate-400 mb-2" />
+                          <span className="text-sm text-slate-600">Click to upload photo</span>
+                          <span className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handlePhotoUploadNewItem}
+                        disabled={photoUploading}
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Name */}
+              <div className="space-y-2">
+                <Label htmlFor="new_item_name">Item Name *</Label>
                 <Input
-                  id="item_name"
-                  placeholder="e.g., Oil Filter"
+                  id="new_item_name"
                   value={newItemData.name}
-                  onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
-                  className="mt-2"
+                  onChange={e => setNewItemData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter item name"
+                  required
+                  className="h-11"
                 />
               </div>
-              <div>
-                <Label htmlFor="item_price">Price *</Label>
+
+              {/* Vendor & Price Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new_item_vendor">Vendor</Label>
+                  <Input
+                    id="new_item_vendor"
+                    value={newItemData.vendor}
+                    onChange={e => setNewItemData(prev => ({ ...prev, vendor: e.target.value }))}
+                    placeholder="Vendor name"
+                    className="h-11"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new_item_price">Price</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                    <Input
+                      id="new_item_price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={newItemData.price}
+                      onChange={e => setNewItemData(prev => ({ ...prev, price: e.target.value }))}
+                      placeholder="0.00"
+                      className="h-11 pl-7"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Starting Inventory & Low Stock Threshold Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new_item_quantity">Starting Inventory</Label>
+                  <Input
+                    id="new_item_quantity"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={newItemData.quantity_on_hand}
+                    onChange={e => setNewItemData(prev => ({ ...prev, quantity_on_hand: e.target.value }))}
+                    placeholder="0"
+                    className="h-11"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new_item_low_stock">Low Stock Alert</Label>
+                  <Input
+                    id="new_item_low_stock"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={newItemData.low_stock_threshold}
+                    onChange={e => setNewItemData(prev => ({ ...prev, low_stock_threshold: e.target.value }))}
+                    placeholder="2"
+                    className="h-11"
+                  />
+                </div>
+              </div>
+
+              {/* Item Number */}
+              <div className="space-y-2">
+                <Label htmlFor="new_item_number">Item Number / SKU</Label>
                 <Input
-                  id="item_price"
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={newItemData.price}
-                  onChange={(e) => setNewItemData({ ...newItemData, price: e.target.value })}
-                  className="mt-2"
+                  id="new_item_number"
+                  value={newItemData.item_number}
+                  onChange={e => setNewItemData(prev => ({ ...prev, item_number: e.target.value }))}
+                  placeholder="e.g. SKU-12345"
+                  className="h-11"
                 />
               </div>
-              <div>
-                <Label htmlFor="item_category">Category</Label>
-                <Select value={newItemData.category} onValueChange={(value) => setNewItemData({ ...newItemData, category: value })}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fuel">Fuel</SelectItem>
-                    <SelectItem value="maintenance">Maintenance</SelectItem>
-                    <SelectItem value="repairs">Repairs</SelectItem>
-                    <SelectItem value="parts">Parts</SelectItem>
-                    <SelectItem value="labor">Labor</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="item_description">Description</Label>
-                <Input
-                  id="item_description"
-                  placeholder="Optional description"
+
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="new_item_description">Description</Label>
+                <Textarea
+                  id="new_item_description"
                   value={newItemData.description}
-                  onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
-                  className="mt-2"
+                  onChange={e => setNewItemData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Item description..."
+                  rows={3}
                 />
               </div>
-              <div>
-                <Label htmlFor="item_vendor">Vendor</Label>
-                <Input
-                  id="item_vendor"
-                  placeholder="Vendor name (optional)"
-                  value={newItemData.vendor}
-                  onChange={(e) => setNewItemData({ ...newItemData, vendor: e.target.value })}
-                  className="mt-2"
-                />
-              </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" onClick={() => setShowNewItemDialog(false)} disabled={creatingItem}>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 h-11"
+                  onClick={() => setShowNewItemDialog(false)}
+                  disabled={creatingItem}
+                >
                   Cancel
                 </Button>
                 <Button
-                  onClick={handleCreateNewItem}
+                  type="submit"
+                  className="flex-1 h-11 bg-amber-600 hover:bg-amber-700"
                   disabled={creatingItem || !newItemData.name || !newItemData.price}
-                  className="bg-slate-900 hover:bg-slate-800"
                 >
-                  {creatingItem ? 'Creating...' : 'Add Item'}
+                  {creatingItem ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Add Item'
+                  )}
                 </Button>
               </div>
-            </div>
+            </form>
           </DialogContent>
         </Dialog>
       </CardContent>
