@@ -138,7 +138,7 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
             </div>
 
             <div>
-              <Label htmlFor="bill_number">Bill Number</Label>
+              <Label htmlFor="bill_number">Invoice Number</Label>
               <Input
                 id="bill_number"
                 placeholder="Invoice #"

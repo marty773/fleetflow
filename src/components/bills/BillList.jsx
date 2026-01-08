@@ -39,7 +39,7 @@ export default function BillList({ bills, vehicles, items, onView, onEdit, onDel
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
-                <TableHead>Vehicle</TableHead>
+                <TableHead>Invoice Number</TableHead>
                 <TableHead>Vendor</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Category</TableHead>
@@ -51,7 +51,7 @@ export default function BillList({ bills, vehicles, items, onView, onEdit, onDel
               {bills.map((bill) => (
                 <TableRow key={bill.id} className="hover:bg-slate-50">
                   <TableCell className="font-medium">
-                    {vehicleMap[bill.vehicle_id]?.name || 'Unknown'}
+                    {bill.bill_number || '-'}
                   </TableCell>
                   <TableCell>{bill.vendor}</TableCell>
                   <TableCell>{format(new Date(bill.bill_date), 'MMM dd, yyyy')}</TableCell>
