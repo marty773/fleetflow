@@ -538,13 +538,29 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="new_item_vendor">Vendor</Label>
-                  <Input
-                    id="new_item_vendor"
-                    value={newItemData.vendor}
-                    onChange={e => setNewItemData(prev => ({ ...prev, vendor: e.target.value }))}
-                    placeholder="Vendor name"
-                    className="h-11"
-                  />
+                  {vendors.length > 0 ? (
+                    <Select value={newItemData.vendor} onValueChange={e => setNewItemData(prev => ({ ...prev, vendor: e }))}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Select vendor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={null}>None</SelectItem>
+                        {vendors.map(v => (
+                          <SelectItem key={v.id} value={v.name}>
+                            {v.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      id="new_item_vendor"
+                      value={newItemData.vendor}
+                      onChange={e => setNewItemData(prev => ({ ...prev, vendor: e.target.value }))}
+                      placeholder="Vendor name"
+                      className="h-11"
+                    />
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="new_item_price">Price</Label>
