@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -39,26 +41,28 @@ export default function RecentExpenses({ bills, vehicles }) {
             <TableBody>
               {recentBills.length > 0 ? (
                 recentBills.map((bill) => (
-                  <TableRow key={bill.id}>
-                    <TableCell className="font-medium">
-                      {bill.bill_number || '-'}
-                    </TableCell>
-                    <TableCell className="text-slate-600">{bill.vendor}</TableCell>
-                    <TableCell>{format(new Date(bill.bill_date), 'MMM dd, yyyy')}</TableCell>
-                    <TableCell>
-                      <Badge className={categoryColors[bill.category]}>
-                        {bill.category?.replace('_', ' ')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-semibold">
-                      ${bill.total_amount?.toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      {bill.photo_url && (
-                        <Camera className="w-4 h-4 text-amber-600" />
-                      )}
-                    </TableCell>
-                  </TableRow>
+                  <Link key={bill.id} to={createPageUrl('Bills') + `?view=${bill.id}`}>
+                    <TableRow className="cursor-pointer hover:bg-slate-50 transition-colors">
+                      <TableCell className="font-medium">
+                        {bill.bill_number || '-'}
+                      </TableCell>
+                      <TableCell className="text-slate-600">{bill.vendor}</TableCell>
+                      <TableCell>{format(new Date(bill.bill_date), 'MMM dd, yyyy')}</TableCell>
+                      <TableCell>
+                        <Badge className={categoryColors[bill.category]}>
+                          {bill.category?.replace('_', ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">
+                        ${bill.total_amount?.toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        {bill.photo_url && (
+                          <Camera className="w-4 h-4 text-amber-600" />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </Link>
                 ))
               ) : (
                 <TableRow>
