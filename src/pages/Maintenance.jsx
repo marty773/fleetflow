@@ -150,15 +150,20 @@ export default function Maintenance() {
   };
 
   const handleSubmitInterval = async (data) => {
+    console.log('handleSubmitInterval called with:', data);
     try {
       if (editingInterval) {
-        await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data });
+        const result = await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data });
+        console.log('Update result:', result);
       } else {
-        await createIntervalMutation.mutateAsync(data);
+        const result = await createIntervalMutation.mutateAsync(data);
+        console.log('Create result:', result);
       }
+      console.log('Interval saved successfully');
     } catch (error) {
       console.error('Failed to save interval:', error);
-      alert('Failed to save interval: ' + (error.message || 'Unknown error'));
+      console.error('Error stack:', error.stack);
+      alert('Failed to save interval: ' + (error.message || JSON.stringify(error)));
     }
   };
 
