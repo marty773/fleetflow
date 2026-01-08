@@ -198,10 +198,6 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             />
           </div>
 
-          <div className="hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          </div>
-
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={onCancel} disabled={isLoading}>
               Cancel
