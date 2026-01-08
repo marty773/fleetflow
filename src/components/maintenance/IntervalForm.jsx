@@ -88,7 +88,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     
     if (data.notes) cleanData.notes = data.notes;
     
-    console.log('Submitting interval data:', cleanData);
+    console.log('Submitting interval data:', JSON.stringify(cleanData, null, 2));
     onSubmit(cleanData);
   };
 
