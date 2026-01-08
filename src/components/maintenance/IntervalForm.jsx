@@ -27,19 +27,26 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     notes: '',
   });
 
-  // Calculate next due date
+  // Calculate next due date and mileage
   useEffect(() => {
+    const updates = {};
+    
     if (formData.last_performed_date && formData.interval_months) {
       const nextDate = addMonths(
         new Date(formData.last_performed_date),
         parseInt(formData.interval_months)
       );
-      setFormData(prev => ({
-        ...prev,
-        next_due_date: nextDate.toISOString().split('T')[0],
-      }));
+      updates.next_due_date = nextDate.toISOString().split('T')[0];
     }
-  }, [formData.last_performed_date, formData.interval_months]);
+    
+    if (formData.last_performed_mileage && formData.interval_miles) {
+      updates.next_due_mileage = parseFloat(formData.last_performed_mileage) + parseFloat(formData.interval_miles);
+    }
+    
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+  }, [formData.last_performed_date, formData.interval_months, formData.last_performed_mileage, formData.interval_miles]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));

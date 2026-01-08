@@ -113,6 +113,34 @@ export default function Maintenance() {
     } else {
       await createRecordMutation.mutateAsync(data);
     }
+
+    // Update related maintenance intervals
+    const relatedIntervals = intervals.filter(
+      interval => interval.vehicle_id === data.vehicle_id && interval.maintenance_type === data.maintenance_type
+    );
+
+    for (const interval of relatedIntervals) {
+      const updateData = {
+        last_performed_date: data.performed_date,
+      };
+
+      if (data.odometer_reading) {
+        updateData.last_performed_mileage = parseFloat(data.odometer_reading);
+        if (interval.interval_miles) {
+          updateData.next_due_mileage = parseFloat(data.odometer_reading) + parseFloat(interval.interval_miles);
+        }
+      }
+
+      if (interval.interval_months) {
+        const nextDate = new Date(data.performed_date);
+        nextDate.setMonth(nextDate.getMonth() + parseInt(interval.interval_months));
+        updateData.next_due_date = nextDate.toISOString().split('T')[0];
+      }
+
+      await base44.entities.MaintenanceInterval.update(interval.id, updateData);
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
   };
 
   const handleSubmitInterval = (data) => {
