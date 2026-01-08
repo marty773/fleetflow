@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
@@ -11,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import VehicleCostChart from './VehicleCostChart';
 
@@ -77,6 +79,7 @@ export default function VehicleCostReport() {
           .filter((bill) => bill.line_items?.some((item) => item.vehicle_id === vehicleId))
           .map((bill) => ({
             type: 'bill',
+            id: bill.id,
             date: bill.bill_date,
             description: `${bill.vendor} - ${bill.category}`,
             amount: bill.line_items
@@ -87,6 +90,7 @@ export default function VehicleCostReport() {
           .filter((m) => m.vehicle_id === vehicleId)
           .map((m) => ({
             type: 'maintenance',
+            id: m.id,
             date: m.performed_date,
             description: m.title,
             amount: m.total_cost || 0,
@@ -200,15 +204,22 @@ export default function VehicleCostReport() {
                                 <h4 className="font-semibold text-sm text-slate-700 mb-3">Transaction Details</h4>
                                 <div className="space-y-2">
                                   {item.transactions.map((transaction, idx) => (
-                                    <div key={idx} className="flex justify-between items-center py-2 px-3 bg-white rounded border border-slate-200">
-                                      <div>
-                                        <p className="text-sm font-medium text-slate-900">{transaction.description}</p>
+                                    <Link
+                                      key={idx}
+                                      to={createPageUrl(transaction.type === 'bill' ? 'Bills' : 'Maintenance') + `?view=${transaction.id}`}
+                                      className="flex justify-between items-center py-2 px-3 bg-white rounded border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors group"
+                                    >
+                                      <div className="flex-1">
+                                        <p className="text-sm font-medium text-slate-900 group-hover:text-blue-600">{transaction.description}</p>
                                         <p className="text-xs text-slate-500">
                                           {format(new Date(transaction.date), 'MMM dd, yyyy')} • {transaction.type === 'bill' ? 'Bill' : 'Maintenance'}
                                         </p>
                                       </div>
-                                      <p className="text-sm font-semibold text-slate-900">${transaction.amount.toFixed(2)}</p>
-                                    </div>
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-sm font-semibold text-slate-900">${transaction.amount.toFixed(2)}</p>
+                                        <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-blue-600" />
+                                      </div>
+                                    </Link>
                                   ))}
                                 </div>
                               </div>

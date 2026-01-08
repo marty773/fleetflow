@@ -27,6 +27,18 @@ export default function Maintenance() {
   const [activeTab, setActiveTab] = useState('records');
   const queryClient = useQueryClient();
 
+  // Check for URL parameter to auto-open a specific record
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get('view');
+    if (viewId && records.length > 0) {
+      const record = records.find(r => r.id === viewId);
+      if (record) {
+        setViewingRecord(record);
+      }
+    }
+  }, [records]);
+
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
