@@ -9,10 +9,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { Upload, X, Loader2, ImageIcon } from 'lucide-react';
 
-export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
+export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendors = [] }) {
   const [formData, setFormData] = useState({
     name: '',
     vendor: '',
@@ -159,13 +166,29 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="vendor">Vendor</Label>
-              <Input
-                id="vendor"
-                value={formData.vendor}
-                onChange={e => setFormData(prev => ({ ...prev, vendor: e.target.value }))}
-                placeholder="Vendor name"
-                className="h-11"
-              />
+              {vendors.length > 0 ? (
+                <Select value={formData.vendor} onValueChange={e => setFormData(prev => ({ ...prev, vendor: e }))}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select vendor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>None</SelectItem>
+                    {vendors.map(v => (
+                      <SelectItem key={v.id} value={v.name}>
+                        {v.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="vendor"
+                  value={formData.vendor}
+                  onChange={e => setFormData(prev => ({ ...prev, vendor: e.target.value }))}
+                  placeholder="Vendor name"
+                  className="h-11"
+                />
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="price">Price</Label>
