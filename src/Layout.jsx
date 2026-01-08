@@ -13,6 +13,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Vehicles', path: 'Vehicles', icon: Truck },
     { name: 'Bills', path: 'Bills', icon: FileText },
     { name: 'Maintenance', path: 'Maintenance', icon: Wrench },
+    { name: 'Items', path: 'Items', icon: Package },
     { name: 'Calendar', path: 'Calendar', icon: Calendar },
   ];
 
