@@ -31,12 +31,23 @@ export default function Items() {
   const [editingItem, setEditingItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [viewingItem, setViewingItem] = useState(null);
+  const [recalculating, setRecalculating] = useState(false);
 
   const queryClient = useQueryClient();
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['items'],
     queryFn: () => base44.entities.Item.list('-created_date'),
+  });
+
+  const { data: bills = [] } = useQuery({
+    queryKey: ['bills'],
+    queryFn: () => base44.entities.Bill.list(),
+  });
+
+  const { data: maintenanceRecords = [] } = useQuery({
+    queryKey: ['maintenanceRecords'],
+    queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
   const deleteMutation = useMutation({
@@ -69,6 +80,59 @@ export default function Items() {
 
   const handleSave = () => {
     queryClient.invalidateQueries({ queryKey: ['items'] });
+  };
+
+  const recalculateInventory = async () => {
+    if (!confirm('This will recalculate all inventory quantities based on bills and maintenance records. Continue?')) {
+      return;
+    }
+
+    setRecalculating(true);
+    try {
+      // Step 1: Reset all item quantities to 0
+      for (const item of items) {
+        await base44.entities.Item.update(item.id, { quantity_on_hand: 0 });
+      }
+
+      // Step 2: Add quantities from bills
+      for (const bill of bills) {
+        if (bill.line_items && bill.line_items.length > 0) {
+          for (const lineItem of bill.line_items) {
+            if (lineItem.item_id && lineItem.item_quantity > 0) {
+              const currentItem = items.find(i => i.id === lineItem.item_id);
+              if (currentItem) {
+                const newQty = lineItem.item_quantity;
+                const existingQty = (await base44.entities.Item.list()).find(i => i.id === lineItem.item_id)?.quantity_on_hand || 0;
+                await base44.entities.Item.update(lineItem.item_id, { quantity_on_hand: existingQty + newQty });
+              }
+            }
+          }
+        }
+      }
+
+      // Step 3: Subtract quantities from maintenance records
+      for (const record of maintenanceRecords) {
+        if (record.parts_used && record.parts_used.length > 0) {
+          for (const part of record.parts_used) {
+            if (part.item_id && part.quantity_used > 0) {
+              const currentItem = items.find(i => i.id === part.item_id);
+              if (currentItem) {
+                const existingQty = (await base44.entities.Item.list()).find(i => i.id === part.item_id)?.quantity_on_hand || 0;
+                await base44.entities.Item.update(part.item_id, { quantity_on_hand: Math.max(0, existingQty - part.quantity_used) });
+              }
+            }
+          }
+        }
+      }
+
+      // Refresh items
+      queryClient.invalidateQueries({ queryKey: ['items'] });
+      alert('Inventory recalculated successfully!');
+    } catch (error) {
+      alert('Error recalculating inventory: ' + error.message);
+    } finally {
+      setRecalculating(false);
+    }
   };
 
   return (
@@ -110,6 +174,22 @@ export default function Items() {
               <List className="h-4 w-4" />
             </Button>
           </div>
+
+          <Button
+            onClick={recalculateInventory}
+            disabled={recalculating}
+            variant="outline"
+            className="h-11"
+          >
+            {recalculating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Recalculating...
+              </>
+            ) : (
+              'Recalculate Inventory'
+            )}
+          </Button>
 
           <Button
             onClick={handleAddNew}
