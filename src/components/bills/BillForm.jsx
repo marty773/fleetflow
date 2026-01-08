@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Upload, Trash2, Plus, ChevronDown } from 'lucide-react';
+import { X, Upload, Trash2, Plus, ChevronDown, Edit } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -63,6 +63,18 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
       ...prev,
       line_items: prev.line_items.filter((_, i) => i !== idx),
     }));
+  };
+
+  const handleEditItem = (idx) => {
+    const item = formData.line_items[idx];
+    setNewItem({
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      vehicle_id: item.vehicle_id || '',
+      item_id: item.item_id || '',
+    });
+    handleRemoveItem(idx);
   };
 
   const handlePhotoUpload = async (e) => {
@@ -284,7 +296,7 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                       <TableHead>Total</TableHead>
                       <TableHead>Vehicle</TableHead>
                       <TableHead>Item</TableHead>
-                      <TableHead className="w-10"></TableHead>
+                      <TableHead className="w-20"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -300,13 +312,22 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                           <TableCell className="text-sm">{linkedVehicle?.name || '-'}</TableCell>
                           <TableCell className="text-sm">{linkedItem ? `${linkedItem.name} (+${item.item_quantity})` : '-'}</TableCell>
                           <TableCell>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveItem(idx)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="flex gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleEditItem(idx)}
+                                className="text-blue-600 hover:text-blue-700"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveItem(idx)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
