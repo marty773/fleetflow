@@ -239,7 +239,15 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select value={newItem.item_id} onValueChange={(value) => setNewItem({ ...newItem, item_id: value })}>
+                  <Select value={newItem.item_id} onValueChange={(value) => {
+                    const selectedItem = items.find(i => i.id === value);
+                    setNewItem({ 
+                      ...newItem, 
+                      item_id: value,
+                      description: selectedItem?.name || newItem.description,
+                      unit_price: selectedItem?.price || newItem.unit_price
+                    });
+                  }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Stock Item (optional)" />
                     </SelectTrigger>

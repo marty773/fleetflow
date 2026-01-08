@@ -39,6 +39,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
     description: '',
     quantity: 1,
     unit_price: 0,
+    item_id: '',
   });
 
   const [selectedPart, setSelectedPart] = useState({
@@ -57,7 +58,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
       ...prev,
       work_items: [...prev.work_items, { ...newItem, total }],
     }));
-    setNewItem({ description: '', quantity: 1, unit_price: 0 });
+    setNewItem({ description: '', quantity: 1, unit_price: 0, item_id: '' });
   };
 
   const handleRemoveItem = (idx) => {
@@ -195,31 +196,53 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
           {/* Work Items */}
           <div>
             <Label className="mb-3 block">Work Performed</Label>
-            <div className="space-y-3 mb-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Work description"
-                  value={newItem.description}
-                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                />
+            <div className="space-y-3 mb-4 p-4 bg-slate-50 rounded-lg">
+              <Input
+                placeholder="Work description"
+                value={newItem.description}
+                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+              />
+              <div className="grid grid-cols-2 gap-2">
                 <Input
                   type="number"
                   placeholder="Qty"
                   value={newItem.quantity}
                   onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
-                  className="w-20"
                 />
                 <Input
                   type="number"
                   placeholder="Price"
                   value={newItem.unit_price}
                   onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
-                  className="w-24"
                 />
-                <Button type="button" onClick={handleAddItem} variant="outline" size="sm">
-                  <Plus className="w-4 h-4" />
-                </Button>
               </div>
+              <div className="border-t pt-3 mt-3">
+                <p className="text-sm font-medium text-slate-700 mb-2">Optional: Select from Stock Items</p>
+                <Select value={newItem.item_id} onValueChange={(value) => {
+                  const selectedItem = items.find(i => i.id === value);
+                  setNewItem({ 
+                    ...newItem, 
+                    item_id: value,
+                    description: selectedItem?.name || newItem.description,
+                    unit_price: selectedItem?.price || newItem.unit_price
+                  });
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Stock Item (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>None</SelectItem>
+                    {items.map(item => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name} - ${item.price?.toFixed(2) || '0.00'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="button" onClick={handleAddItem} variant="outline" size="sm" className="w-full">
+                <Plus className="w-4 h-4 mr-2" /> Add Item
+              </Button>
             </div>
 
             {formData.work_items.length > 0 && (
