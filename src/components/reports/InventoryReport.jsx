@@ -46,7 +46,11 @@ export default function InventoryReport() {
     0
   );
 
-  const lowStockItems = items.filter((item) => (item.quantity_on_hand || 0) < 5);
+  const lowStockItems = items.filter((item) => {
+    const qty = item.quantity_on_hand || 0;
+    const threshold = item.low_stock_threshold || 5;
+    return qty > 0 && qty <= threshold;
+  });
   const outOfStockItems = items.filter((item) => (item.quantity_on_hand || 0) === 0);
 
   const sortedItems = [...items].sort((a, b) => {
@@ -177,7 +181,7 @@ export default function InventoryReport() {
                   if (qty === 0) {
                     status = 'out-of-stock';
                     statusColor = 'bg-red-100 text-red-800';
-                  } else if (qty < 5) {
+                  } else if (qty <= (item.low_stock_threshold || 5)) {
                     status = 'low-stock';
                     statusColor = 'bg-amber-100 text-amber-800';
                   }
