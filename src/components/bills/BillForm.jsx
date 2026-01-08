@@ -28,7 +28,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function BillForm({ bill, vehicles, items = [], onSubmit, onCancel, isLoading }) {
+export default function BillForm({ bill, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(bill || {
     vendor: '',
     bill_date: new Date().toISOString().split('T')[0],
@@ -178,14 +178,29 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="vendor">Vendor *</Label>
-              <Input
-                id="vendor"
-                placeholder="e.g., Joe's Repair Shop"
-                value={formData.vendor}
-                onChange={(e) => handleChange('vendor', e.target.value)}
-                required
-                className="mt-2"
-              />
+              {vendors.length > 0 ? (
+                <Select value={formData.vendor} onValueChange={(value) => handleChange('vendor', value)}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select vendor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {vendors.map(v => (
+                      <SelectItem key={v.id} value={v.name}>
+                        {v.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="vendor"
+                  placeholder="e.g., Joe's Repair Shop"
+                  value={formData.vendor}
+                  onChange={(e) => handleChange('vendor', e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              )}
             </div>
 
             <div>

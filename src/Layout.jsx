@@ -9,14 +9,14 @@ export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
-    { name: 'Dashboard', path: 'Dashboard', icon: Wrench },
-    { name: 'Vehicles', path: 'Vehicles', icon: Truck },
-    { name: 'Bills', path: 'Bills', icon: FileText },
-    { name: 'Maintenance', path: 'Maintenance', icon: Wrench },
-    { name: 'Items', path: 'Items', icon: Package },
-    { name: 'Calendar', path: 'Calendar', icon: Calendar },
-    { name: 'Reports', path: 'Reports', icon: DollarSign },
-  ];
+      { name: 'Dashboard', path: 'Dashboard', icon: Wrench },
+      { name: 'Vehicles', path: 'Vehicles', icon: Truck },
+      { name: 'Bills', path: 'Bills', icon: FileText },
+      { name: 'Maintenance', path: 'Maintenance', icon: Wrench },
+      { name: 'Items', path: 'Items', icon: Package },
+      { name: 'Calendar', path: 'Calendar', icon: Calendar },
+      { name: 'Reports', path: 'Reports', icon: DollarSign },
+    ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
@@ -47,7 +47,7 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           <nav className="space-y-2">
-            {navItems.map(item => {
+                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4)].map(item => {
               const Icon = item.icon;
               const isActive = currentPageName === item.name;
               return (
