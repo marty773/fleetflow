@@ -80,6 +80,8 @@ export default function Maintenance() {
     },
     onError: (error) => {
       console.error('Create interval error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      alert('Failed to create interval: ' + (error?.message || JSON.stringify(error)));
     },
   });
 
