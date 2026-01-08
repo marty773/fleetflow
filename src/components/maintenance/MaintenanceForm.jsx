@@ -29,7 +29,6 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
     performed_date: new Date().toISOString().split('T')[0],
     vendor: '',
     work_items: [],
-    parts_used: [],
     total_cost: 0,
     odometer_reading: '',
     notes: '',
@@ -40,11 +39,6 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
     quantity: 1,
     unit_price: 0,
     item_id: '',
-  });
-
-  const [selectedPart, setSelectedPart] = useState({
-    item_id: '',
-    quantity_used: 1,
   });
 
   const handleChange = (field, value) => {
@@ -65,22 +59,6 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
     setFormData(prev => ({
       ...prev,
       work_items: prev.work_items.filter((_, i) => i !== idx),
-    }));
-  };
-
-  const handleAddPart = () => {
-    if (!selectedPart.item_id || selectedPart.quantity_used <= 0) return;
-    setFormData(prev => ({
-      ...prev,
-      parts_used: [...prev.parts_used, { ...selectedPart }],
-    }));
-    setSelectedPart({ item_id: '', quantity_used: 1 });
-  };
-
-  const handleRemovePart = (idx) => {
-    setFormData(prev => ({
-      ...prev,
-      parts_used: prev.parts_used.filter((_, i) => i !== idx),
     }));
   };
 
@@ -280,76 +258,6 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
                       <TableCell>${calculateTotal().toFixed(2)}</TableCell>
                       <TableCell></TableCell>
                     </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
-
-          {/* Parts Used */}
-          <div>
-            <Label className="mb-3 block">Stock Parts Used</Label>
-            <div className="space-y-3 mb-4 p-4 bg-slate-50 rounded-lg">
-              <div className="grid grid-cols-2 gap-2">
-                <Select value={selectedPart.item_id} onValueChange={(value) => setSelectedPart({ ...selectedPart, item_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select stock item" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={null}>None</SelectItem>
-                    {items.map(item => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.name} ({item.quantity_on_hand || 0} in stock)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="number"
-                  placeholder="Qty used"
-                  value={selectedPart.quantity_used}
-                  onChange={(e) => setSelectedPart({ ...selectedPart, quantity_used: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
-              <Button
-                type="button"
-                onClick={handleAddPart}
-                variant="outline"
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Add Part
-              </Button>
-            </div>
-
-            {formData.parts_used.length > 0 && (
-              <div className="border rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-50">
-                      <TableHead>Item</TableHead>
-                      <TableHead>Qty Used</TableHead>
-                      <TableHead className="w-10"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {formData.parts_used.map((part, idx) => {
-                      const item = items.find(i => i.id === part.item_id);
-                      return (
-                        <TableRow key={idx}>
-                          <TableCell>{item?.name || 'Unknown'}</TableCell>
-                          <TableCell>{part.quantity_used}</TableCell>
-                          <TableCell>
-                            <button
-                              type="button"
-                              onClick={() => handleRemovePart(idx)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
                   </TableBody>
                 </Table>
               </div>

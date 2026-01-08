@@ -87,17 +87,6 @@ export default function Maintenance() {
   });
 
   const handleSubmitRecord = async (data) => {
-    // Update item quantities from parts used
-    const partUpdates = data.parts_used || [];
-
-    for (const part of partUpdates) {
-      const currentItem = items.find(i => i.id === part.item_id);
-      if (currentItem) {
-        const newQty = Math.max(0, (currentItem.quantity_on_hand || 0) - part.quantity_used);
-        base44.entities.Item.update(part.item_id, { quantity_on_hand: newQty });
-      }
-    }
-
     if (editingRecord) {
       updateRecordMutation.mutate({ id: editingRecord.id, data });
     } else {
