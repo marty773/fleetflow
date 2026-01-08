@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Upload, Trash2, Plus } from 'lucide-react';
+import { X, Upload, Trash2, Plus, ChevronDown } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -22,14 +22,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading }) {
+export default function BillForm({ bill, vehicles, items = [], onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(bill || {
-    vehicle_id: '',
     vendor: '',
     bill_date: new Date().toISOString().split('T')[0],
     bill_number: '',
     category: 'maintenance',
-    items: [],
+    line_items: [],
     total_amount: 0,
     photo_url: '',
     notes: '',
@@ -41,6 +40,9 @@ export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading
     description: '',
     quantity: 1,
     unit_price: 0,
+    vehicle_id: '',
+    item_id: '',
+    item_quantity: 0,
   });
 
   const handleChange = (field, value) => {
@@ -52,15 +54,15 @@ export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading
     const total = newItem.quantity * newItem.unit_price;
     setFormData(prev => ({
       ...prev,
-      items: [...prev.items, { ...newItem, total }],
+      line_items: [...prev.line_items, { ...newItem, total }],
     }));
-    setNewItem({ description: '', quantity: 1, unit_price: 0 });
+    setNewItem({ description: '', quantity: 1, unit_price: 0, vehicle_id: '', item_id: '', item_quantity: 0 });
   };
 
   const handleRemoveItem = (idx) => {
     setFormData(prev => ({
       ...prev,
-      items: prev.items.filter((_, i) => i !== idx),
+      line_items: prev.line_items.filter((_, i) => i !== idx),
     }));
   };
 
@@ -79,7 +81,7 @@ export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading
   };
 
   const calculateTotal = () => {
-    return formData.items.reduce((sum, item) => sum + (item.total || 0), 0);
+    return formData.line_items.reduce((sum, item) => sum + (item.total || 0), 0);
   };
 
   const handleSubmit = (e) => {
@@ -101,22 +103,15 @@ export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="vehicle_id">Vehicle *</Label>
-              <Select
-                value={formData.vehicle_id}
-                onValueChange={(value) => handleChange('vehicle_id', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select vehicle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vehicles.map(v => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name} ({v.license_plate})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="vendor">Vendor *</Label>
+              <Input
+                id="vendor"
+                placeholder="e.g., Joe's Repair Shop"
+                value={formData.vendor}
+                onChange={(e) => handleChange('vendor', e.target.value)}
+                required
+                className="mt-2"
+              />
             </div>
 
             <div>
@@ -219,40 +214,82 @@ export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading
           {/* Line Items */}
           <div>
             <Label className="mb-3 block">Line Items</Label>
-            <div className="space-y-3 mb-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Item description"
-                  value={newItem.description}
-                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                />
+            <div className="space-y-3 mb-4 p-4 bg-slate-50 rounded-lg">
+              <Input
+                placeholder="Item description"
+                value={newItem.description}
+                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+              />
+              <div className="grid grid-cols-3 gap-2">
                 <Input
                   type="number"
                   placeholder="Qty"
                   value={newItem.quantity}
-                  onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) })}
-                  className="w-20"
+                  onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
                 />
                 <Input
                   type="number"
-                  placeholder="Price"
+                  placeholder="Unit Price"
                   value={newItem.unit_price}
-                  onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) })}
-                  className="w-24"
+                  onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
                 />
                 <Button
                   type="button"
                   onClick={handleAddItem}
                   variant="outline"
                   size="sm"
+                  className="col-span-3"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4 mr-2" /> Add Item
                 </Button>
+              </div>
+
+              <div className="border-t pt-3 mt-3">
+                <p className="text-sm font-medium text-slate-700 mb-2">Optional: Link to Vehicle or Stock Item</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Select value={newItem.vehicle_id} onValueChange={(value) => setNewItem({ ...newItem, vehicle_id: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Vehicle (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={null}>None</SelectItem>
+                      {vehicles.map(v => (
+                        <SelectItem key={v.id} value={v.id}>
+                          {v.name} ({v.license_plate})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={newItem.item_id} onValueChange={(value) => setNewItem({ ...newItem, item_id: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Stock Item (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={null}>None</SelectItem>
+                      {items.map(item => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {newItem.item_id && (
+                  <div className="mt-2">
+                    <Input
+                      type="number"
+                      placeholder="Qty to add to inventory"
+                      value={newItem.item_quantity}
+                      onChange={(e) => setNewItem({ ...newItem, item_quantity: parseFloat(e.target.value) || 0 })}
+                      className="text-sm"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
-            {formData.items.length > 0 && (
-              <div className="border rounded-lg overflow-hidden">
+            {formData.line_items.length > 0 && (
+              <div className="border rounded-lg overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-slate-50">
@@ -260,31 +297,39 @@ export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading
                       <TableHead>Qty</TableHead>
                       <TableHead>Price</TableHead>
                       <TableHead>Total</TableHead>
+                      <TableHead>Vehicle</TableHead>
+                      <TableHead>Item</TableHead>
                       <TableHead className="w-10"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {formData.items.map((item, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell>{item.description}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell>${item.unit_price.toFixed(2)}</TableCell>
-                        <TableCell>${item.total.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveItem(idx)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {formData.line_items.map((item, idx) => {
+                      const linkedVehicle = vehicles.find(v => v.id === item.vehicle_id);
+                      const linkedItem = items.find(i => i.id === item.item_id);
+                      return (
+                        <TableRow key={idx}>
+                          <TableCell>{item.description}</TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>${item.unit_price.toFixed(2)}</TableCell>
+                          <TableCell>${item.total.toFixed(2)}</TableCell>
+                          <TableCell className="text-sm">{linkedVehicle?.name || '-'}</TableCell>
+                          <TableCell className="text-sm">{linkedItem ? `${linkedItem.name} (+${item.item_quantity})` : '-'}</TableCell>
+                          <TableCell>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveItem(idx)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                     <TableRow className="bg-slate-50 font-semibold">
                       <TableCell colSpan={3}>Total:</TableCell>
                       <TableCell>${calculateTotal().toFixed(2)}</TableCell>
-                      <TableCell></TableCell>
+                      <TableCell colSpan={3}></TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -310,7 +355,7 @@ export default function BillForm({ bill, vehicles, onSubmit, onCancel, isLoading
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !formData.vehicle_id}
+              disabled={isLoading || formData.line_items.length === 0}
               className="bg-amber-500 hover:bg-amber-600"
             >
               {isLoading ? 'Saving...' : 'Save Bill'}
