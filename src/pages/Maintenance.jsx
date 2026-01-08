@@ -76,6 +76,10 @@ export default function Maintenance() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
       setShowIntervalForm(false);
+      setEditingInterval(null);
+    },
+    onError: (error) => {
+      console.error('Create interval error:', error);
     },
   });
 
@@ -143,11 +147,16 @@ export default function Maintenance() {
     queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
   };
 
-  const handleSubmitInterval = (data) => {
-    if (editingInterval) {
-      updateIntervalMutation.mutate({ id: editingInterval.id, data });
-    } else {
-      createIntervalMutation.mutate(data);
+  const handleSubmitInterval = async (data) => {
+    try {
+      if (editingInterval) {
+        await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data });
+      } else {
+        await createIntervalMutation.mutateAsync(data);
+      }
+    } catch (error) {
+      console.error('Failed to save interval:', error);
+      alert('Failed to save interval: ' + (error.message || 'Unknown error'));
     }
   };
 
