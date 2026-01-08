@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { createPageUrl } from '@/utils';
 
 export default function VendorReport() {
   const [expandedVendor, setExpandedVendor] = useState(null);
@@ -162,14 +163,18 @@ export default function VendorReport() {
                     <p className="text-sm font-semibold text-slate-700 mb-3">Recent Transactions</p>
                     <div className="space-y-2">
                       {vendor.transactions.slice(0, 5).map((txn, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 bg-white rounded border">
+                        <a
+                          key={idx}
+                          href={txn.type === 'bill' ? createPageUrl(`Bills?view=${txn.id}`) : createPageUrl(`Maintenance?view=${txn.id}`)}
+                          className="flex items-center justify-between p-2 bg-white rounded border hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
+                        >
                           <div>
                             <Badge className={categoryColors[txn.category]} variant="outline">{txn.type === 'bill' ? 'Bill' : 'Maintenance'}</Badge>
                             <p className="text-sm font-medium mt-1">{txn.description}</p>
                             <p className="text-xs text-slate-500">{format(new Date(txn.date), 'MMM dd, yyyy')}</p>
                           </div>
                           <p className="font-semibold text-slate-900">${txn.amount.toFixed(2)}</p>
-                        </div>
+                        </a>
                       ))}
                     </div>
                   </div>
