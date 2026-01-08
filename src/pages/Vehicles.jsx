@@ -6,10 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
 import VehicleForm from '../components/vehicles/VehicleForm';
 import VehicleCard from '../components/vehicles/VehicleCard';
+import VehicleViewDialog from '../components/vehicles/VehicleViewDialog';
 
 export default function Vehicles() {
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
+  const [viewingVehicle, setViewingVehicle] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: vehicles = [] } = useQuery({
@@ -91,6 +93,7 @@ export default function Vehicles() {
               <VehicleCard
                 key={vehicle.id}
                 vehicle={vehicle}
+                onView={() => setViewingVehicle(vehicle)}
                 onEdit={handleEdit}
                 onDelete={() => deleteMutation.mutate(vehicle.id)}
                 isDeleting={deleteMutation.isPending}
@@ -106,6 +109,16 @@ export default function Vehicles() {
             </div>
           ) : null}
         </div>
+
+        <VehicleViewDialog
+          vehicle={viewingVehicle}
+          open={!!viewingVehicle}
+          onOpenChange={(open) => !open && setViewingVehicle(null)}
+          onEdit={(vehicle) => {
+            setViewingVehicle(null);
+            handleEdit(vehicle);
+          }}
+        />
       </div>
     </div>
   );

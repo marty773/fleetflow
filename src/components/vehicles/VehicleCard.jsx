@@ -2,9 +2,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit2, Trash2, Truck, Package } from 'lucide-react';
+import { Edit2, Trash2, Truck, Package, Eye } from 'lucide-react';
 
-export default function VehicleCard({ vehicle, onEdit, onDelete, isDeleting }) {
+export default function VehicleCard({ vehicle, onView, onEdit, onDelete, isDeleting }) {
   return (
     <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -43,10 +43,17 @@ export default function VehicleCard({ vehicle, onEdit, onDelete, isDeleting }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onEdit(vehicle)}
+            onClick={onView}
             className="flex-1"
           >
-            <Edit2 className="w-4 h-4 mr-1" /> Edit
+            <Eye className="w-4 h-4 mr-1" /> View
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(vehicle)}
+          >
+            <Edit2 className="w-4 h-4" />
           </Button>
           <Button
             variant="outline"
