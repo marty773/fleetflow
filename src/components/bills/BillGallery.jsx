@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { ChevronLeft, ChevronRight, X, FileText, Loader } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, FileText, Loader, Download } from 'lucide-react';
 import { Document, Page } from 'react-pdf';
 
 export default function BillGallery({ bills, vehicles }) {
@@ -34,6 +34,26 @@ export default function BillGallery({ bills, vehicles }) {
 
   const onPdfLoadStart = (idx) => {
     setPdfLoading(prev => ({ ...prev, [idx]: true }));
+  };
+
+  const handleDownload = async (url, filename) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  };
+
+  const getFileName = (bill) => {
+    return `${bill.vendor}_${format(new Date(bill.bill_date), 'yyyy-MM-dd')}_${bill.bill_number || 'bill'}${isPdf(bill.photo_url) ? '.pdf' : '.jpg'}`;
   };
 
   return (
@@ -85,6 +105,12 @@ export default function BillGallery({ bills, vehicles }) {
               className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition"
             >
               <ChevronRight className="w-6 h-6" />
+            </button>
+            <button
+              onClick={() => handleDownload(billsWithPhotos[selectedIdx].photo_url, getFileName(billsWithPhotos[selectedIdx]))}
+              className="absolute top-4 left-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition"
+            >
+              <Download className="w-6 h-6" />
             </button>
             <button
               onClick={() => setSelectedIdx(null)}
