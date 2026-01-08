@@ -55,9 +55,26 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Remove interval_type before submitting as it's not in the entity schema
-    const { interval_type, ...submitData } = formData;
-    onSubmit(submitData);
+    // Remove interval_type and clean up data before submitting
+    const { interval_type, ...data } = formData;
+    
+    // Convert empty strings to null for numeric fields
+    const cleanData = {
+      ...data,
+      interval_months: data.interval_months ? parseFloat(data.interval_months) : null,
+      interval_miles: data.interval_miles ? parseFloat(data.interval_miles) : null,
+      last_performed_mileage: data.last_performed_mileage ? parseFloat(data.last_performed_mileage) : null,
+      next_due_mileage: data.next_due_mileage ? parseFloat(data.next_due_mileage) : null,
+    };
+    
+    // Remove null values
+    Object.keys(cleanData).forEach(key => {
+      if (cleanData[key] === null || cleanData[key] === '') {
+        delete cleanData[key];
+      }
+    });
+    
+    onSubmit(cleanData);
   };
 
   return (
