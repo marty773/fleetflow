@@ -96,10 +96,22 @@ export default function Maintenance() {
   });
 
   const handleSubmitRecord = async (data) => {
+    // Deduct inventory for parts used
+    if (data.parts_used && data.parts_used.length > 0) {
+      for (const part of data.parts_used) {
+        const currentItem = items.find(i => i.id === part.item_id);
+        if (currentItem) {
+          const newQty = (currentItem.quantity_on_hand || 0) - part.quantity_used;
+          await base44.entities.Item.update(part.item_id, { quantity_on_hand: Math.max(0, newQty) });
+        }
+      }
+      queryClient.invalidateQueries({ queryKey: ['items'] });
+    }
+
     if (editingRecord) {
-      updateRecordMutation.mutate({ id: editingRecord.id, data });
+      await updateRecordMutation.mutateAsync({ id: editingRecord.id, data });
     } else {
-      createRecordMutation.mutate(data);
+      await createRecordMutation.mutateAsync(data);
     }
   };
 

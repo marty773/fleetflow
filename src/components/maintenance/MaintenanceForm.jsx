@@ -29,6 +29,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
     performed_date: new Date().toISOString().split('T')[0],
     vendor: '',
     work_items: [],
+    parts_used: [],
     total_cost: 0,
     odometer_reading: '',
     notes: '',
@@ -80,7 +81,13 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
   const handleSubmit = (e) => {
     e.preventDefault();
     const total = calculateTotal();
-    onSubmit({ ...formData, total_cost: total });
+    
+    // Build parts_used from work_items that have item_id
+    const partsUsedForSubmission = formData.work_items
+      .filter(item => item.item_id && item.quantity > 0)
+      .map(item => ({ item_id: item.item_id, quantity_used: item.quantity }));
+
+    onSubmit({ ...formData, total_cost: total, parts_used: partsUsedForSubmission });
   };
 
   return (

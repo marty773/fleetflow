@@ -79,14 +79,18 @@ export default function Bills() {
       const currentItem = items.find(i => i.id === update.item_id);
       if (currentItem) {
         const newQty = (currentItem.quantity_on_hand || 0) + update.quantity_to_add;
-        base44.entities.Item.update(update.item_id, { quantity_on_hand: newQty });
+        await base44.entities.Item.update(update.item_id, { quantity_on_hand: newQty });
       }
+    }
+    
+    if (itemUpdates.length > 0) {
+      queryClient.invalidateQueries({ queryKey: ['items'] });
     }
 
     if (editingBill) {
-      updateMutation.mutate({ id: editingBill.id, data });
+      await updateMutation.mutateAsync({ id: editingBill.id, data });
     } else {
-      createMutation.mutate(data);
+      await createMutation.mutateAsync(data);
     }
   };
 
