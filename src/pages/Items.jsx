@@ -13,6 +13,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Plus, Search, Package, Grid3X3, List, Loader2 } from 'lucide-react';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
@@ -23,6 +30,7 @@ export default function Items() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [viewingItem, setViewingItem] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -144,6 +152,7 @@ export default function Items() {
             <ItemCard
               key={item.id}
               item={item}
+              onView={() => setViewingItem(item)}
               onEdit={handleEdit}
               onDelete={setDeleteItem}
             />
@@ -215,6 +224,64 @@ export default function Items() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* View Item Dialog */}
+      <Dialog open={!!viewingItem} onOpenChange={() => setViewingItem(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Item Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {viewingItem?.photo_url && (
+              <div className="flex justify-center">
+                <img
+                  src={viewingItem.photo_url}
+                  alt={viewingItem.name}
+                  className="max-h-64 rounded-lg object-cover"
+                />
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-slate-500">Name</Label>
+                <p className="font-medium">{viewingItem?.name}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Price</Label>
+                <p className="font-medium">${viewingItem?.price?.toFixed(2) || '0.00'}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Item Number</Label>
+                <p className="font-medium">{viewingItem?.item_number || '-'}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Quantity on Hand</Label>
+                <p className="font-medium">{viewingItem?.quantity_on_hand || 0}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Vendor</Label>
+                <p className="font-medium">{viewingItem?.vendor || '-'}</p>
+              </div>
+            </div>
+            {viewingItem?.description && (
+              <div>
+                <Label className="text-slate-500">Description</Label>
+                <p className="text-sm mt-1">{viewingItem.description}</p>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setViewingItem(null)}>Close</Button>
+            <Button onClick={() => {
+              setEditingItem(viewingItem);
+              setViewingItem(null);
+              setFormOpen(true);
+            }}>
+              Edit Item
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -4,9 +4,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, Package, DollarSign, Store } from 'lucide-react';
 
-export default function ItemCard({ item, onEdit, onDelete }) {
+export default function ItemCard({ item, onView, onEdit, onDelete }) {
   return (
-    <Card className="group overflow-hidden bg-white border-0 shadow-sm hover:shadow-lg transition-all duration-300">
+    <Card className="group overflow-hidden bg-white border-0 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => onView(item)}>
       {/* Image Section */}
       <div className="relative aspect-square bg-gradient-to-br from-slate-100 to-slate-50 overflow-hidden">
         {item.photo_url ? (
@@ -27,7 +27,10 @@ export default function ItemCard({ item, onEdit, onDelete }) {
             size="icon"
             variant="secondary"
             className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
-            onClick={() => onEdit(item)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(item);
+            }}
           >
             <Pencil className="h-4 w-4 text-slate-700" />
           </Button>
@@ -35,7 +38,10 @@ export default function ItemCard({ item, onEdit, onDelete }) {
             size="icon"
             variant="secondary"
             className="h-10 w-10 rounded-full bg-white/90 hover:bg-red-50 shadow-lg"
-            onClick={() => onDelete(item)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(item);
+            }}
           >
             <Trash2 className="h-4 w-4 text-red-500" />
           </Button>
