@@ -170,17 +170,29 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
             </div>
           </div>
 
-          {/* Photo Upload */}
+          {/* Photo/PDF Upload */}
           <div>
-            <Label>Bill Photo</Label>
+            <Label>Bill Photo or PDF</Label>
             <div className="mt-2">
               {photoPreview ? (
                 <div className="relative inline-block">
-                  <img
-                    src={photoPreview}
-                    alt="Bill preview"
-                    className="h-40 rounded-lg object-cover border"
-                  />
+                  {photoPreview.toLowerCase().endsWith('.pdf') ? (
+                    <a
+                      href={photoPreview}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 h-40 px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-blue-600 hover:bg-slate-100"
+                    >
+                      <Upload className="w-5 h-5" />
+                      <span className="font-medium">View PDF</span>
+                    </a>
+                  ) : (
+                    <img
+                      src={photoPreview}
+                      alt="Bill preview"
+                      className="h-40 rounded-lg object-cover border"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -196,11 +208,11 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                 <label className="flex items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-slate-50">
                   <div className="text-center">
                     <Upload className="w-6 h-6 mx-auto text-slate-400 mb-2" />
-                    <span className="text-sm text-slate-600">Click to upload bill photo</span>
+                    <span className="text-sm text-slate-600">Click to upload bill photo or PDF</span>
                   </div>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,.pdf,application/pdf"
                     onChange={handlePhotoUpload}
                     disabled={photoUploading}
                     className="hidden"
