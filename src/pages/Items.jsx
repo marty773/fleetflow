@@ -50,6 +50,11 @@ export default function Items() {
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
+  const { data: vendors = [] } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => base44.entities.Vendor.list(),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Item.delete(id),
     onSuccess: () => {
@@ -282,6 +287,7 @@ export default function Items() {
         onOpenChange={setFormOpen}
         item={editingItem}
         onSave={handleSave}
+        vendors={vendors}
       />
 
       {/* Delete Confirmation */}
