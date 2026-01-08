@@ -5,6 +5,7 @@ import Items from './pages/Items';
 import Maintenance from './pages/Maintenance';
 import Reports from './pages/Reports';
 import Vehicles from './pages/Vehicles';
+import Vendors from './pages/Vendors';
 import __Layout from './Layout.jsx';
 
 
@@ -16,6 +17,7 @@ export const PAGES = {
     "Maintenance": Maintenance,
     "Reports": Reports,
     "Vehicles": Vehicles,
+    "Vendors": Vendors,
 }
 
 export const pagesConfig = {
