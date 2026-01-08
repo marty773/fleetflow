@@ -115,18 +115,6 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
             </div>
 
             <div>
-              <Label htmlFor="vendor">Vendor *</Label>
-              <Input
-                id="vendor"
-                placeholder="e.g., Joe's Repair Shop"
-                value={formData.vendor}
-                onChange={(e) => handleChange('vendor', e.target.value)}
-                required
-                className="mt-2"
-              />
-            </div>
-
-            <div>
               <Label htmlFor="bill_date">Bill Date *</Label>
               <Input
                 id="bill_date"
