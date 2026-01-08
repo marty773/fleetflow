@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Wrench, FileText, Calendar, Truck, Menu, X, Package } from 'lucide-react';
+import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Layout({ children, currentPageName }) {
@@ -15,6 +15,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Maintenance', path: 'Maintenance', icon: Wrench },
     { name: 'Items', path: 'Items', icon: Package },
     { name: 'Calendar', path: 'Calendar', icon: Calendar },
+    { name: 'Vehicle Costs', path: 'VehicleCosts', icon: DollarSign },
   ];
 
   return (
