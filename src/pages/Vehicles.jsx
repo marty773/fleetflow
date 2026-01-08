@@ -57,9 +57,9 @@ export default function Vehicles() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-5xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900">Fleet Vehicles</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Fleet Vehicles</h1>
             <p className="text-slate-600 mt-2">Manage your trucks and trailers</p>
           </div>
           <Button
@@ -67,7 +67,7 @@ export default function Vehicles() {
               setEditingVehicle(null);
               setShowForm(!showForm);
             }}
-            className="bg-slate-900 hover:bg-slate-800"
+            className="bg-slate-900 hover:bg-slate-800 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Vehicle
           </Button>

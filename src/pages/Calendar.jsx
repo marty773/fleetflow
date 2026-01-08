@@ -99,13 +99,13 @@ export default function Calendar() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900">Maintenance Calendar</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance Calendar</h1>
             <p className="text-slate-600 mt-2">Schedule and track upcoming maintenance</p>
           </div>
           <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

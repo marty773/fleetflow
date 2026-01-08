@@ -66,8 +66,8 @@ export default function Items() {
   return (
     <div className="min-h-screen p-4 md:p-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Item Gallery</h1>
+      <div className="mb-8 pt-14 lg:pt-0">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Item Gallery</h1>
         <p className="text-slate-600">Manage your inventory items for bills and maintenance records</p>
       </div>
 

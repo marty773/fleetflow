@@ -100,9 +100,9 @@ export default function Maintenance() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-8 pt-14 lg:pt-0">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900">Maintenance</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance</h1>
             <p className="text-slate-600 mt-2">Track maintenance records and scheduled intervals</p>
           </div>
         </div>
