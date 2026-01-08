@@ -37,6 +37,7 @@ export default function Reports() {
 
         {selectedReport === 'vehicle-costs' && <VehicleCostReport />}
         {selectedReport === 'inventory' && <InventoryReport />}
+      {selectedReport === 'vendors' && <VendorReport />}
       </div>
     </div>
   );
