@@ -37,6 +37,11 @@ export default function Maintenance() {
     queryFn: () => base44.entities.Item.list(),
   });
 
+  const { data: vendors = [] } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => base44.entities.Vendor.list(),
+  });
+
   const { data: records = [] } = useQuery({
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
@@ -213,6 +218,7 @@ export default function Maintenance() {
                 record={editingRecord}
                 vehicles={vehicles}
                 items={items}
+                vendors={vendors}
                 onSubmit={handleSubmitRecord}
                 onCancel={() => {
                   setShowRecordForm(false);
