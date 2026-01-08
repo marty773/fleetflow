@@ -24,6 +24,18 @@ export default function Bills() {
   const [activeTab, setActiveTab] = useState('list');
   const queryClient = useQueryClient();
 
+  // Check for URL parameter to auto-open a specific bill
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get('view');
+    if (viewId && bills.length > 0) {
+      const bill = bills.find(b => b.id === viewId);
+      if (bill) {
+        setViewingBill(bill);
+      }
+    }
+  }, [bills]);
+
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
