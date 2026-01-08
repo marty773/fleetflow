@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Wrench, FileText, Calendar, Truck, Menu, X } from 'lucide-react';
+import { Wrench, FileText, Calendar, Truck, Menu, X, Package } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Layout({ children, currentPageName }) {
