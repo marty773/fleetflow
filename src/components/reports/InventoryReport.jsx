@@ -48,7 +48,7 @@ export default function InventoryReport() {
 
   const lowStockItems = items.filter((item) => {
     const qty = item.quantity_on_hand || 0;
-    const threshold = item.low_stock_threshold || 5;
+    const threshold = item.low_stock_threshold || 2;
     return qty > 0 && qty <= threshold;
   });
   const outOfStockItems = items.filter((item) => (item.quantity_on_hand || 0) === 0);
@@ -181,7 +181,7 @@ export default function InventoryReport() {
                   if (qty === 0) {
                     status = 'out-of-stock';
                     statusColor = 'bg-red-100 text-red-800';
-                  } else if (qty <= (item.low_stock_threshold || 5)) {
+                  } else if (qty <= (item.low_stock_threshold || 2)) {
                     status = 'low-stock';
                     statusColor = 'bg-amber-100 text-amber-800';
                   }

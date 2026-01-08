@@ -18,7 +18,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
     vendor: '',
     price: '',
     quantity_on_hand: '',
-    low_stock_threshold: '5',
+    low_stock_threshold: '2',
     item_number: '',
     description: '',
     photo_url: '',
@@ -33,7 +33,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
         vendor: item.vendor || '',
         price: item.price?.toString() || '',
         quantity_on_hand: item.quantity_on_hand?.toString() || '0',
-        low_stock_threshold: item.low_stock_threshold?.toString() || '5',
+        low_stock_threshold: item.low_stock_threshold?.toString() || '2',
         item_number: item.item_number || '',
         description: item.description || '',
         photo_url: item.photo_url || '',
@@ -44,7 +44,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
         vendor: '',
         price: '',
         quantity_on_hand: '0',
-        low_stock_threshold: '5',
+        low_stock_threshold: '2',
         item_number: '',
         description: '',
         photo_url: '',
@@ -71,7 +71,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
       vendor: formData.vendor || null,
       price: formData.price ? parseFloat(formData.price) : null,
       quantity_on_hand: formData.quantity_on_hand ? parseFloat(formData.quantity_on_hand) : 0,
-      low_stock_threshold: formData.low_stock_threshold ? parseFloat(formData.low_stock_threshold) : 5,
+      low_stock_threshold: formData.low_stock_threshold ? parseFloat(formData.low_stock_threshold) : 2,
       item_number: formData.item_number || null,
       description: formData.description || null,
       photo_url: formData.photo_url || null,
@@ -90,7 +90,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             {item ? 'Edit Item' : 'Add New Item'}
@@ -209,7 +209,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
                 step="1"
                 value={formData.low_stock_threshold}
                 onChange={e => setFormData(prev => ({ ...prev, low_stock_threshold: e.target.value }))}
-                placeholder="5"
+                placeholder="2"
                 className="h-11"
               />
             </div>
