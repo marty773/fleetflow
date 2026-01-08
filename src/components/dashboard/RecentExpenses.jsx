@@ -8,11 +8,6 @@ import { Camera } from 'lucide-react';
 export default function RecentExpenses({ bills, vehicles }) {
   const recentBills = bills.slice(0, 5);
 
-  const vehicleMap = vehicles.reduce((acc, v) => {
-    acc[v.id] = v;
-    return acc;
-  }, {});
-
   const categoryColors = {
     fuel: 'bg-blue-100 text-blue-800',
     maintenance: 'bg-yellow-100 text-yellow-800',
@@ -33,7 +28,7 @@ export default function RecentExpenses({ bills, vehicles }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
-                <TableHead>Vehicle</TableHead>
+                <TableHead>Invoice #</TableHead>
                 <TableHead>Vendor</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Category</TableHead>
@@ -46,7 +41,7 @@ export default function RecentExpenses({ bills, vehicles }) {
                 recentBills.map((bill) => (
                   <TableRow key={bill.id}>
                     <TableCell className="font-medium">
-                      {vehicleMap[bill.vehicle_id]?.name || 'Unknown'}
+                      {bill.bill_number || '-'}
                     </TableCell>
                     <TableCell className="text-slate-600">{bill.vendor}</TableCell>
                     <TableCell>{format(new Date(bill.bill_date), 'MMM dd, yyyy')}</TableCell>
