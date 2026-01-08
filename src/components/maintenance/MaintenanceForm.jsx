@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export default function MaintenanceForm({ record, vehicles, items = [], onSubmit, onCancel, isLoading }) {
+export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(record || {
     vehicle_id: '',
     maintenance_type: 'oil_change',
@@ -167,13 +167,29 @@ export default function MaintenanceForm({ record, vehicles, items = [], onSubmit
 
             <div>
               <Label htmlFor="vendor">Service Provider</Label>
-              <Input
-                id="vendor"
-                placeholder="Shop name"
-                value={formData.vendor}
-                onChange={(e) => handleChange('vendor', e.target.value)}
-                className="mt-2"
-              />
+              {vendors.length > 0 ? (
+                <Select value={formData.vendor} onValueChange={(value) => handleChange('vendor', value)}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select service provider" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>None</SelectItem>
+                    {vendors.map(v => (
+                      <SelectItem key={v.id} value={v.name}>
+                        {v.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="vendor"
+                  placeholder="Shop name"
+                  value={formData.vendor}
+                  onChange={(e) => handleChange('vendor', e.target.value)}
+                  className="mt-2"
+                />
+              )}
             </div>
 
             <div>
