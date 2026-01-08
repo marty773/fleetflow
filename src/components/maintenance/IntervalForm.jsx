@@ -55,25 +55,27 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     // Remove interval_type and clean up data before submitting
     const { interval_type, ...data } = formData;
     
-    // Convert empty strings to null for numeric fields
+    // Build clean data object
     const cleanData = {
-      ...data,
-      interval_months: data.interval_months ? parseFloat(data.interval_months) : null,
-      interval_miles: data.interval_miles ? parseFloat(data.interval_miles) : null,
-      last_performed_mileage: data.last_performed_mileage ? parseFloat(data.last_performed_mileage) : null,
-      next_due_mileage: data.next_due_mileage ? parseFloat(data.next_due_mileage) : null,
+      vehicle_id: data.vehicle_id,
+      interval_name: data.interval_name,
+      maintenance_type: data.maintenance_type,
     };
     
-    // Remove null values
-    Object.keys(cleanData).forEach(key => {
-      if (cleanData[key] === null || cleanData[key] === '') {
-        delete cleanData[key];
-      }
-    });
+    // Add fields based on what has values
+    if (data.interval_months) cleanData.interval_months = parseFloat(data.interval_months);
+    if (data.interval_miles) cleanData.interval_miles = parseFloat(data.interval_miles);
+    if (data.last_performed_date) cleanData.last_performed_date = data.last_performed_date;
+    if (data.last_performed_mileage) cleanData.last_performed_mileage = parseFloat(data.last_performed_mileage);
+    if (data.next_due_date) cleanData.next_due_date = data.next_due_date;
+    if (data.next_due_mileage) cleanData.next_due_mileage = parseFloat(data.next_due_mileage);
+    if (data.notes) cleanData.notes = data.notes;
     
+    console.log('Submitting interval data:', cleanData);
     onSubmit(cleanData);
   };
 
