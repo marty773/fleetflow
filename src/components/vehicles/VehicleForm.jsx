@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { X } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(vehicle || {
@@ -23,6 +24,11 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
     vin: '',
     purchase_date: '',
     is_active: true,
+    hydraulic_dump: false,
+    chain_drive: false,
+    center_tie_down_only: false,
+    three_tie_down_bars: false,
+    front_load_extension: false,
   });
 
   const handleChange = (field, value) => {
@@ -110,13 +116,12 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
             </div>
 
             <div>
-              <Label htmlFor="license_plate">License Plate *</Label>
+              <Label htmlFor="license_plate">License Plate</Label>
               <Input
                 id="license_plate"
                 placeholder="e.g., ABC-1234"
                 value={formData.license_plate}
                 onChange={(e) => handleChange('license_plate', e.target.value)}
-                required
                 className="mt-2"
               />
             </div>
@@ -142,9 +147,82 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 className="mt-2"
               />
             </div>
-          </div>
+            </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
+            {formData.type === 'trailer' && (
+            <div className="border-t pt-6">
+              <Label className="text-base mb-4 block">Trailer Features</Label>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hydraulic_dump"
+                    checked={formData.hydraulic_dump}
+                    onCheckedChange={(checked) => handleChange('hydraulic_dump', checked)}
+                  />
+                  <label
+                    htmlFor="hydraulic_dump"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Hydraulic Dump
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="chain_drive"
+                    checked={formData.chain_drive}
+                    onCheckedChange={(checked) => handleChange('chain_drive', checked)}
+                  />
+                  <label
+                    htmlFor="chain_drive"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Chain Drive
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="center_tie_down_only"
+                    checked={formData.center_tie_down_only}
+                    onCheckedChange={(checked) => handleChange('center_tie_down_only', checked)}
+                  />
+                  <label
+                    htmlFor="center_tie_down_only"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Center Tie Down Only
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="three_tie_down_bars"
+                    checked={formData.three_tie_down_bars}
+                    onCheckedChange={(checked) => handleChange('three_tie_down_bars', checked)}
+                  />
+                  <label
+                    htmlFor="three_tie_down_bars"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Three Tie Down Bars
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="front_load_extension"
+                    checked={formData.front_load_extension}
+                    onCheckedChange={(checked) => handleChange('front_load_extension', checked)}
+                  />
+                  <label
+                    htmlFor="front_load_extension"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Front Load Extension
+                  </label>
+                </div>
+              </div>
+            </div>
+            )}
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={onCancel} disabled={isLoading}>
               Cancel
             </Button>
