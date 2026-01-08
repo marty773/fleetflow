@@ -56,23 +56,34 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Remove interval_type and clean up data before submitting
     const { interval_type, ...data } = formData;
     
-    // Build clean data object
+    // Build clean data object based on interval_type
     const cleanData = {
       vehicle_id: data.vehicle_id,
       interval_name: data.interval_name,
       maintenance_type: data.maintenance_type,
     };
     
-    // Add fields based on what has values
-    if (data.interval_months) cleanData.interval_months = parseFloat(data.interval_months);
-    if (data.interval_miles) cleanData.interval_miles = parseFloat(data.interval_miles);
-    if (data.last_performed_date) cleanData.last_performed_date = data.last_performed_date;
-    if (data.last_performed_mileage) cleanData.last_performed_mileage = parseFloat(data.last_performed_mileage);
-    if (data.next_due_date) cleanData.next_due_date = data.next_due_date;
-    if (data.next_due_mileage) cleanData.next_due_mileage = parseFloat(data.next_due_mileage);
+    // Only include fields relevant to the selected interval_type
+    if (interval_type === 'months') {
+      if (data.interval_months && data.interval_months !== '') {
+        cleanData.interval_months = parseFloat(data.interval_months);
+      }
+      if (data.last_performed_date) cleanData.last_performed_date = data.last_performed_date;
+      if (data.next_due_date) cleanData.next_due_date = data.next_due_date;
+    } else if (interval_type === 'miles') {
+      if (data.interval_miles && data.interval_miles !== '') {
+        cleanData.interval_miles = parseFloat(data.interval_miles);
+      }
+      if (data.last_performed_mileage && data.last_performed_mileage !== '') {
+        cleanData.last_performed_mileage = parseFloat(data.last_performed_mileage);
+      }
+      if (data.next_due_mileage && data.next_due_mileage !== '') {
+        cleanData.next_due_mileage = parseFloat(data.next_due_mileage);
+      }
+    }
+    
     if (data.notes) cleanData.notes = data.notes;
     
     console.log('Submitting interval data:', cleanData);
