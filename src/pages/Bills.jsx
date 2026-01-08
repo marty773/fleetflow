@@ -34,6 +34,11 @@ export default function Bills() {
     queryFn: () => base44.entities.Item.list(),
   });
 
+  const { data: vendors = [] } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => base44.entities.Vendor.list(),
+  });
+
   const { data: bills = [] } = useQuery({
     queryKey: ['bills'],
     queryFn: () => base44.entities.Bill.list(),
@@ -137,6 +142,7 @@ export default function Bills() {
             bill={editingBill}
             vehicles={vehicles}
             items={items}
+            vendors={vendors}
             onSubmit={handleSubmit}
             onCancel={() => {
               setShowForm(false);
