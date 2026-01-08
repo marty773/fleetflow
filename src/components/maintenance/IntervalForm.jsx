@@ -65,23 +65,25 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
       maintenance_type: data.maintenance_type,
     };
     
+    // Helper to safely add numeric fields
+    const addNumeric = (key, value) => {
+      if (value !== '' && value !== null && value !== undefined) {
+        const parsed = parseFloat(value);
+        if (!isNaN(parsed)) {
+          cleanData[key] = parsed;
+        }
+      }
+    };
+    
     // Only include fields relevant to the selected interval_type
     if (interval_type === 'months') {
-      if (data.interval_months && data.interval_months !== '') {
-        cleanData.interval_months = parseFloat(data.interval_months);
-      }
+      addNumeric('interval_months', data.interval_months);
       if (data.last_performed_date) cleanData.last_performed_date = data.last_performed_date;
       if (data.next_due_date) cleanData.next_due_date = data.next_due_date;
     } else if (interval_type === 'miles') {
-      if (data.interval_miles && data.interval_miles !== '') {
-        cleanData.interval_miles = parseFloat(data.interval_miles);
-      }
-      if (data.last_performed_mileage && data.last_performed_mileage !== '') {
-        cleanData.last_performed_mileage = parseFloat(data.last_performed_mileage);
-      }
-      if (data.next_due_mileage && data.next_due_mileage !== '') {
-        cleanData.next_due_mileage = parseFloat(data.next_due_mileage);
-      }
+      addNumeric('interval_miles', data.interval_miles);
+      addNumeric('last_performed_mileage', data.last_performed_mileage);
+      addNumeric('next_due_mileage', data.next_due_mileage);
     }
     
     if (data.notes) cleanData.notes = data.notes;
