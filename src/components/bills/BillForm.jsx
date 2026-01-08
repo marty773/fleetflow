@@ -54,6 +54,8 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
     name: '',
     vendor: '',
     price: 0,
+    category: 'other',
+    description: '',
   });
   const [creatingItem, setCreatingItem] = useState(false);
 
@@ -122,7 +124,9 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
       const createdItem = await base44.entities.Item.create({
         name: newItemData.name,
         vendor: newItemData.vendor || '',
-        price: newItemData.price,
+        price: parseFloat(newItemData.price),
+        category: newItemData.category,
+        description: newItemData.description || '',
         quantity_on_hand: 0,
       });
       
@@ -136,7 +140,7 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
       });
       
       setShowNewItemDialog(false);
-      setNewItemData({ name: '', vendor: '', price: 0 });
+      setNewItemData({ name: '', vendor: '', price: 0, category: 'other', description: '' });
     } finally {
       setCreatingItem(false);
     }
@@ -434,7 +438,7 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
 
         {/* New Item Dialog */}
         <Dialog open={showNewItemDialog} onOpenChange={setShowNewItemDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Create New Stock Item</DialogTitle>
             </DialogHeader>
@@ -443,9 +447,47 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                 <Label htmlFor="item_name">Item Name *</Label>
                 <Input
                   id="item_name"
-                  placeholder="e.g., Engine Oil 5L"
+                  placeholder="e.g., Oil Filter"
                   value={newItemData.name}
                   onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="item_price">Price *</Label>
+                <Input
+                  id="item_price"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={newItemData.price}
+                  onChange={(e) => setNewItemData({ ...newItemData, price: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="item_category">Category</Label>
+                <Select value={newItemData.category} onValueChange={(value) => setNewItemData({ ...newItemData, category: value })}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fuel">Fuel</SelectItem>
+                    <SelectItem value="maintenance">Maintenance</SelectItem>
+                    <SelectItem value="repairs">Repairs</SelectItem>
+                    <SelectItem value="parts">Parts</SelectItem>
+                    <SelectItem value="labor">Labor</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="item_description">Description</Label>
+                <Input
+                  id="item_description"
+                  placeholder="Optional description"
+                  value={newItemData.description}
+                  onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
                   className="mt-2"
                 />
               </div>
@@ -459,27 +501,16 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                   className="mt-2"
                 />
               </div>
-              <div>
-                <Label htmlFor="item_price">Price *</Label>
-                <Input
-                  id="item_price"
-                  type="number"
-                  placeholder="0.00"
-                  value={newItemData.price}
-                  onChange={(e) => setNewItemData({ ...newItemData, price: parseFloat(e.target.value) || 0 })}
-                  className="mt-2"
-                />
-              </div>
-              <div className="flex justify-end gap-3">
+              <div className="flex justify-end gap-3 pt-2">
                 <Button variant="outline" onClick={() => setShowNewItemDialog(false)} disabled={creatingItem}>
                   Cancel
                 </Button>
                 <Button
                   onClick={handleCreateNewItem}
-                  disabled={creatingItem || !newItemData.name || newItemData.price <= 0}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={creatingItem || !newItemData.name || !newItemData.price}
+                  className="bg-slate-900 hover:bg-slate-800"
                 >
-                  {creatingItem ? 'Creating...' : 'Create Item'}
+                  {creatingItem ? 'Creating...' : 'Add Item'}
                 </Button>
               </div>
             </div>
