@@ -22,6 +22,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
     year: new Date().getFullYear(),
     license_plate: '',
     vin: '',
+    gvw: '',
     purchase_date: '',
     is_active: true,
     hydraulic_dump: false,
@@ -126,13 +127,25 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
               />
             </div>
 
-            <div className="md:col-span-2">
+            <div>
               <Label htmlFor="vin">VIN</Label>
               <Input
                 id="vin"
                 placeholder="Vehicle Identification Number"
                 value={formData.vin}
                 onChange={(e) => handleChange('vin', e.target.value)}
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="gvw">GVW (lbs)</Label>
+              <Input
+                id="gvw"
+                type="number"
+                placeholder="Gross Vehicle Weight"
+                value={formData.gvw}
+                onChange={(e) => handleChange('gvw', e.target.value)}
                 className="mt-2"
               />
             </div>
