@@ -208,7 +208,7 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                 value={newItem.description}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
               />
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <Input
                   type="number"
                   placeholder="Qty"
@@ -221,15 +221,6 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                   value={newItem.unit_price}
                   onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
                 />
-                <Button
-                  type="button"
-                  onClick={handleAddItem}
-                  variant="outline"
-                  size="sm"
-                  className="col-span-3"
-                >
-                  <Plus className="w-4 h-4 mr-2" /> Add Item
-                </Button>
               </div>
 
               <div className="border-t pt-3 mt-3">
@@ -274,6 +265,16 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                   </div>
                 )}
               </div>
+
+              <Button
+                type="button"
+                onClick={handleAddItem}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                <Plus className="w-4 h-4 mr-2" /> Add Item
+              </Button>
             </div>
 
             {formData.line_items.length > 0 && (
