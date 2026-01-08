@@ -42,7 +42,6 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
     unit_price: 0,
     vehicle_id: '',
     item_id: '',
-    item_quantity: 0,
   });
 
   const handleChange = (field, value) => {
@@ -54,9 +53,9 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
     const total = newItem.quantity * newItem.unit_price;
     setFormData(prev => ({
       ...prev,
-      line_items: [...prev.line_items, { ...newItem, total }],
+      line_items: [...prev.line_items, { ...newItem, total, item_quantity: newItem.quantity }],
     }));
-    setNewItem({ description: '', quantity: 1, unit_price: 0, vehicle_id: '', item_id: '', item_quantity: 0 });
+    setNewItem({ description: '', quantity: 1, unit_price: 0, vehicle_id: '', item_id: '' });
   };
 
   const handleRemoveItem = (idx) => {
@@ -261,17 +260,6 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                     </SelectContent>
                   </Select>
                 </div>
-                {newItem.item_id && (
-                  <div className="mt-2">
-                    <Input
-                      type="number"
-                      placeholder="Qty to add to inventory"
-                      value={newItem.item_quantity}
-                      onChange={(e) => setNewItem({ ...newItem, item_quantity: parseFloat(e.target.value) || 0 })}
-                      className="text-sm"
-                    />
-                  </div>
-                )}
               </div>
 
               <Button
