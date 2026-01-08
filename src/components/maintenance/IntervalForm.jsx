@@ -55,7 +55,9 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Remove interval_type before submitting as it's not in the entity schema
+    const { interval_type, ...submitData } = formData;
+    onSubmit(submitData);
   };
 
   return (
@@ -243,7 +245,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !formData.vehicle_id}
+              disabled={isLoading || !formData.vehicle_id || !formData.interval_name}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {isLoading ? 'Saving...' : 'Save Interval'}
