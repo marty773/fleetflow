@@ -61,19 +61,19 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex justify-between items-start mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">Fleet Dashboard</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Fleet Dashboard</h1>
             <p className="text-slate-600">Manage your truck and trailer fleet</p>
           </div>
-          <div className="flex gap-3">
-            <Link to={createPageUrl('Bills')}>
-              <Button className="bg-amber-500 hover:bg-amber-600">
+          <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+            <Link to={createPageUrl('Bills')} className="flex-1 sm:flex-none">
+              <Button className="bg-amber-500 hover:bg-amber-600 w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" /> New Bill
               </Button>
             </Link>
-            <Link to={createPageUrl('Maintenance')}>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+            <Link to={createPageUrl('Maintenance')} className="flex-1 sm:flex-none">
+              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" /> New Maintenance
               </Button>
             </Link>
