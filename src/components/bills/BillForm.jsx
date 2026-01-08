@@ -61,7 +61,6 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
     photo_url: '',
   });
   const [creatingItem, setCreatingItem] = useState(false);
-  const [photoUploading, setPhotoUploading] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
