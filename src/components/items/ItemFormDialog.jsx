@@ -17,6 +17,8 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
     name: '',
     vendor: '',
     price: '',
+    quantity_on_hand: '',
+    low_stock_threshold: '5',
     item_number: '',
     description: '',
     photo_url: '',
@@ -30,6 +32,8 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
         name: item.name || '',
         vendor: item.vendor || '',
         price: item.price?.toString() || '',
+        quantity_on_hand: item.quantity_on_hand?.toString() || '0',
+        low_stock_threshold: item.low_stock_threshold?.toString() || '5',
         item_number: item.item_number || '',
         description: item.description || '',
         photo_url: item.photo_url || '',
@@ -39,6 +43,8 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
         name: '',
         vendor: '',
         price: '',
+        quantity_on_hand: '0',
+        low_stock_threshold: '5',
         item_number: '',
         description: '',
         photo_url: '',
@@ -64,6 +70,8 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
       name: formData.name,
       vendor: formData.vendor || null,
       price: formData.price ? parseFloat(formData.price) : null,
+      quantity_on_hand: formData.quantity_on_hand ? parseFloat(formData.quantity_on_hand) : 0,
+      low_stock_threshold: formData.low_stock_threshold ? parseFloat(formData.low_stock_threshold) : 5,
       item_number: formData.item_number || null,
       description: formData.description || null,
       photo_url: formData.photo_url || null,
@@ -174,6 +182,36 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave }) {
                   className="h-11 pl-7"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Starting Inventory & Low Stock Threshold Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="quantity_on_hand">Starting Inventory</Label>
+              <Input
+                id="quantity_on_hand"
+                type="number"
+                min="0"
+                step="1"
+                value={formData.quantity_on_hand}
+                onChange={e => setFormData(prev => ({ ...prev, quantity_on_hand: e.target.value }))}
+                placeholder="0"
+                className="h-11"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="low_stock_threshold">Low Stock Alert</Label>
+              <Input
+                id="low_stock_threshold"
+                type="number"
+                min="0"
+                step="1"
+                value={formData.low_stock_threshold}
+                onChange={e => setFormData(prev => ({ ...prev, low_stock_threshold: e.target.value }))}
+                placeholder="5"
+                className="h-11"
+              />
             </div>
           </div>
 
