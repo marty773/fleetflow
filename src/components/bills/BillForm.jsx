@@ -21,6 +21,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function BillForm({ bill, vehicles, items = [], onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(bill || {
@@ -43,6 +49,13 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
     vehicle_id: '',
     item_id: '',
   });
+  const [showNewItemDialog, setShowNewItemDialog] = useState(false);
+  const [newItemData, setNewItemData] = useState({
+    name: '',
+    vendor: '',
+    price: 0,
+  });
+  const [creatingItem, setCreatingItem] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -99,6 +112,34 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
     e.preventDefault();
     const total = calculateTotal();
     onSubmit({ ...formData, total_amount: total });
+  };
+
+  const handleCreateNewItem = async () => {
+    if (!newItemData.name || newItemData.price <= 0) return;
+    
+    setCreatingItem(true);
+    try {
+      const createdItem = await base44.entities.Item.create({
+        name: newItemData.name,
+        vendor: newItemData.vendor || '',
+        price: newItemData.price,
+        quantity_on_hand: 0,
+      });
+      
+      // Update items list and select the new item
+      items.push(createdItem);
+      setNewItem({
+        ...newItem,
+        item_id: createdItem.id,
+        description: createdItem.name,
+        unit_price: createdItem.price,
+      });
+      
+      setShowNewItemDialog(false);
+      setNewItemData({ name: '', vendor: '', price: 0 });
+    } finally {
+      setCreatingItem(false);
+    }
   };
 
   return (
@@ -262,29 +303,39 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select value={newItem.item_id} onValueChange={(value) => {
-                    const selectedItem = items.find(i => i.id === value);
-                    setNewItem({ 
-                      ...newItem, 
-                      item_id: value,
-                      description: selectedItem?.name || newItem.description,
-                      unit_price: selectedItem?.price || newItem.unit_price
-                    });
-                  }}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Stock Item (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={null}>None</SelectItem>
-                      {items.map(item => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                  <div className="flex gap-2">
+                    <Select value={newItem.item_id} onValueChange={(value) => {
+                      const selectedItem = items.find(i => i.id === value);
+                      setNewItem({ 
+                        ...newItem, 
+                        item_id: value,
+                        description: selectedItem?.name || newItem.description,
+                        unit_price: selectedItem?.price || newItem.unit_price
+                      });
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Stock Item (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={null}>None</SelectItem>
+                        {items.map(item => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowNewItemDialog(true)}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  </div>
+                  </div>
 
               <Button
                 type="button"
@@ -380,6 +431,60 @@ export default function BillForm({ bill, vehicles, items = [], onSubmit, onCance
             </Button>
           </div>
         </form>
+
+        {/* New Item Dialog */}
+        <Dialog open={showNewItemDialog} onOpenChange={setShowNewItemDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Stock Item</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="item_name">Item Name *</Label>
+                <Input
+                  id="item_name"
+                  placeholder="e.g., Engine Oil 5L"
+                  value={newItemData.name}
+                  onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="item_vendor">Vendor</Label>
+                <Input
+                  id="item_vendor"
+                  placeholder="Vendor name (optional)"
+                  value={newItemData.vendor}
+                  onChange={(e) => setNewItemData({ ...newItemData, vendor: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="item_price">Price *</Label>
+                <Input
+                  id="item_price"
+                  type="number"
+                  placeholder="0.00"
+                  value={newItemData.price}
+                  onChange={(e) => setNewItemData({ ...newItemData, price: parseFloat(e.target.value) || 0 })}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setShowNewItemDialog(false)} disabled={creatingItem}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateNewItem}
+                  disabled={creatingItem || !newItemData.name || newItemData.price <= 0}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {creatingItem ? 'Creating...' : 'Create Item'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
