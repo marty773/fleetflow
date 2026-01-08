@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import VehicleCostReport from '../components/reports/VehicleCostReport';
 import InventoryReport from '../components/reports/InventoryReport';
+import VendorReport from '../components/reports/VendorReport';
 
 export default function Reports() {
   const [selectedReport, setSelectedReport] = useState('vehicle-costs');
@@ -30,6 +31,7 @@ export default function Reports() {
               <SelectContent>
                 <SelectItem value="vehicle-costs">Vehicle Costs</SelectItem>
                 <SelectItem value="inventory">Inventory</SelectItem>
+                <SelectItem value="vendors">Vendors</SelectItem>
               </SelectContent>
             </Select>
           </div>
