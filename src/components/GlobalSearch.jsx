@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Truck, FileText, Wrench, Package, Users, Calendar } from 'lucide-react';
+import { Search, Truck, FileText, Wrench, Package, Users, Calendar, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -180,8 +180,20 @@ export default function GlobalSearch() {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search vehicles, bills, maintenance, items, vendors..."
-              className="pl-12 pr-4 py-6 text-base bg-white shadow-2xl border-2 border-slate-200 rounded-2xl focus:border-amber-500"
+              className="pl-12 pr-10 py-6 text-base bg-white shadow-2xl border-2 border-slate-200 rounded-2xl focus:border-amber-500"
             />
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setSearchTriggered(false);
+                  setShowResults(false);
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 rounded-full transition-colors"
+              >
+                <X className="w-4 h-4 text-slate-400" />
+              </button>
+            )}
           </div>
           <button
             onClick={handleSearch}
