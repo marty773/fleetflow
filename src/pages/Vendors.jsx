@@ -20,6 +20,11 @@ export default function Vendors() {
   const [viewingVendor, setViewingVendor] = useState(null);
   const queryClient = useQueryClient();
 
+  const { data: vendors = [] } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => base44.entities.Vendor.list(),
+  });
+
   // Check for URL parameter to auto-open edit form
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -33,11 +38,6 @@ export default function Vendors() {
       }
     }
   }, [vendors]);
-
-  const { data: vendors = [] } = useQuery({
-    queryKey: ['vendors'],
-    queryFn: () => base44.entities.Vendor.list(),
-  });
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Vendor.create(data),
