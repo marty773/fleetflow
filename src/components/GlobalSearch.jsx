@@ -170,7 +170,7 @@ export default function GlobalSearch() {
           </DialogHeader>
 
           <div className="space-y-6">
-            {results.vehicles.length > 0 && (
+            {results && results.vehicles.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <Truck className="w-4 h-4" />
@@ -193,7 +193,7 @@ export default function GlobalSearch() {
               </div>
             )}
 
-            {results.bills.length > 0 && (
+            {results && results.bills.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <FileText className="w-4 h-4" />
@@ -222,7 +222,7 @@ export default function GlobalSearch() {
               </div>
             )}
 
-            {results.maintenance.length > 0 && (
+            {results && results.maintenance.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <Wrench className="w-4 h-4" />
@@ -246,7 +246,7 @@ export default function GlobalSearch() {
               </div>
             )}
 
-            {results.items.length > 0 && (
+            {results && results.items.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <Package className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default function GlobalSearch() {
               </div>
             )}
 
-            {results.vendors.length > 0 && (
+            {results && results.vendors.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <Users className="w-4 h-4" />
@@ -299,7 +299,7 @@ export default function GlobalSearch() {
               </div>
             )}
 
-            {results.intervals.length > 0 && (
+            {results && results.intervals.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
