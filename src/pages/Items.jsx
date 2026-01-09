@@ -356,15 +356,38 @@ export default function Items() {
               </div>
             )}
           </div>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setViewingItem(null)}>Close</Button>
-            <Button onClick={() => {
-              setEditingItem(viewingItem);
-              setViewingItem(null);
-              setFormOpen(true);
-            }}>
-              Edit Item
+          <div className="flex gap-2 mt-6 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={() => setViewingItem(null)}
+              className="flex-1"
+            >
+              Close
             </Button>
+            <Button 
+              onClick={() => {
+                setEditingItem(viewingItem);
+                setViewingItem(null);
+                setFormOpen(true);
+              }}
+              className="flex-1 bg-amber-600 hover:bg-amber-700"
+            >
+              Edit
+            </Button>
+            {viewingItem?.photo_url && (
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = viewingItem.photo_url;
+                  link.download = `${viewingItem.name}.jpg`;
+                  link.click();
+                }}
+                className="flex-1"
+              >
+                Download
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>

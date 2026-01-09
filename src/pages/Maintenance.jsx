@@ -357,14 +357,23 @@ export default function Maintenance() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button variant="outline" onClick={() => setViewingRecord(null)}>Close</Button>
-                <Button onClick={() => {
-                  setEditingRecord(viewingRecord);
-                  setViewingRecord(null);
-                  setShowRecordForm(true);
-                }}>
-                  Edit Record
+              <div className="flex gap-2 mt-6 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewingRecord(null)}
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setEditingRecord(viewingRecord);
+                    setViewingRecord(null);
+                    setShowRecordForm(true);
+                  }}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                >
+                  Edit
                 </Button>
               </div>
             </DialogContent>

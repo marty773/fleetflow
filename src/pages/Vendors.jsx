@@ -177,13 +177,22 @@ export default function Vendors() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button variant="outline" onClick={() => setViewingVendor(null)}>Close</Button>
-                <Button onClick={() => {
-                  setEditingVendor(viewingVendor);
-                  setViewingVendor(null);
-                  setShowForm(true);
-                }}>
+              <div className="flex gap-2 mt-6 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewingVendor(null)}
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setEditingVendor(viewingVendor);
+                    setViewingVendor(null);
+                    setShowForm(true);
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
                   Edit
                 </Button>
               </div>

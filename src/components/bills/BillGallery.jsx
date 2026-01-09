@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight, X, FileText, Loader, Download } from 'lucide-react';
 import { Document, Page } from 'react-pdf';
@@ -58,68 +60,69 @@ export default function BillGallery({ bills, vehicles }) {
 
   return (
     <div className="space-y-4">
-      {/* Lightbox */}
+      {/* Lightbox Dialog */}
       {selectedIdx !== null && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="relative max-w-4xl w-full">
-            {isPdf(billsWithPhotos[selectedIdx].photo_url) ? (
-              <div className="bg-white rounded-lg p-4">
-                {pdfLoading[selectedIdx] && (
-                  <div className="flex items-center justify-center h-96">
-                    <Loader className="w-8 h-8 animate-spin text-slate-400" />
-                  </div>
-                )}
-                <Document
-                  file={billsWithPhotos[selectedIdx].photo_url}
-                  onLoadSuccess={(pdf) => onPdfLoadSuccess(selectedIdx, pdf)}
-                  onLoadStart={() => onPdfLoadStart(selectedIdx)}
-                  loading={<div className="flex items-center justify-center h-96"><Loader className="w-8 h-8 animate-spin text-slate-400" /></div>}
-                >
-                  <Page pageNumber={1} width={400} />
-                </Document>
+        <Dialog open={selectedIdx !== null} onOpenChange={() => setSelectedIdx(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+            <div className="relative bg-black min-h-[50vh] flex items-center justify-center">
+              {isPdf(billsWithPhotos[selectedIdx].photo_url) ? (
+                <div className="bg-white rounded-lg p-4">
+                  {pdfLoading[selectedIdx] && (
+                    <div className="flex items-center justify-center h-96">
+                      <Loader className="w-8 h-8 animate-spin text-slate-400" />
+                    </div>
+                  )}
+                  <Document
+                    file={billsWithPhotos[selectedIdx].photo_url}
+                    onLoadSuccess={(pdf) => onPdfLoadSuccess(selectedIdx, pdf)}
+                    onLoadStart={() => onPdfLoadStart(selectedIdx)}
+                    loading={<div className="flex items-center justify-center h-96"><Loader className="w-8 h-8 animate-spin text-slate-400" /></div>}
+                  >
+                    <Page pageNumber={1} width={400} />
+                  </Document>
+                </div>
+              ) : (
+                <img
+                  src={billsWithPhotos[selectedIdx].photo_url}
+                  alt="Bill"
+                  className="max-w-full max-h-[70vh] object-contain"
+                />
+              )}
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-4 rounded-b-lg">
+                <p className="font-semibold">
+                  {vehicleMap[billsWithPhotos[selectedIdx].vehicle_id]?.name}
+                </p>
+                <p className="text-sm opacity-90">
+                  {billsWithPhotos[selectedIdx].vendor} •{' '}
+                  {format(new Date(billsWithPhotos[selectedIdx].bill_date), 'MMM dd, yyyy')}
+                </p>
               </div>
-            ) : (
-              <img
-                src={billsWithPhotos[selectedIdx].photo_url}
-                alt="Bill"
-                className="w-full rounded-lg"
-              />
-            )}
-            <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-4 rounded-b-lg">
-              <p className="font-semibold">
-                {vehicleMap[billsWithPhotos[selectedIdx].vehicle_id]?.name}
-              </p>
-              <p className="text-sm opacity-90">
-                {billsWithPhotos[selectedIdx].vendor} •{' '}
-                {format(new Date(billsWithPhotos[selectedIdx].bill_date), 'MMM dd, yyyy')}
-              </p>
             </div>
-            <button
-              onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-              onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-            <button
-              onClick={() => handleDownload(billsWithPhotos[selectedIdx].photo_url, getFileName(billsWithPhotos[selectedIdx]))}
-              className="absolute top-4 left-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition"
-            >
-              <Download className="w-6 h-6" />
-            </button>
-            <button
-              onClick={() => setSelectedIdx(null)}
-              className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
+            <div className="flex gap-2 p-4 bg-white">
+              <Button
+                variant="outline"
+                onClick={handlePrev}
+                className="flex-1"
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleDownload(billsWithPhotos[selectedIdx].photo_url, getFileName(billsWithPhotos[selectedIdx]))}
+                className="flex-1"
+              >
+                <Download className="w-4 h-4 mr-2" /> Download
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleNext}
+                className="flex-1"
+              >
+                Next
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Gallery Grid */}

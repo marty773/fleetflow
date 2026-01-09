@@ -259,15 +259,38 @@ export default function Bills() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button variant="outline" onClick={() => setViewingBill(null)}>Close</Button>
-                <Button onClick={() => {
-                  setEditingBill(viewingBill);
-                  setViewingBill(null);
-                  setShowForm(true);
-                }}>
-                  Edit Bill
+              <div className="flex gap-2 mt-6 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewingBill(null)}
+                  className="flex-1"
+                >
+                  Close
                 </Button>
+                <Button 
+                  onClick={() => {
+                    setEditingBill(viewingBill);
+                    setViewingBill(null);
+                    setShowForm(true);
+                  }}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                >
+                  Edit
+                </Button>
+                {viewingBill.photo_url && (
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = viewingBill.photo_url;
+                      link.download = `bill_${viewingBill.bill_number || viewingBill.id}.jpg`;
+                      link.click();
+                    }}
+                    className="flex-1"
+                  >
+                    Download
+                  </Button>
+                )}
               </div>
             </DialogContent>
           </Dialog>
