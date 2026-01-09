@@ -6,7 +6,10 @@ import { Edit2, Trash2, Truck, Package, Eye } from 'lucide-react';
 
 export default function VehicleCard({ vehicle, onView, onEdit, onDelete, isDeleting }) {
   return (
-    <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+    <Card 
+      className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+      onClick={onView}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
@@ -37,37 +40,6 @@ export default function VehicleCard({ vehicle, onView, onEdit, onDelete, isDelet
               <p className="font-mono text-xs text-slate-700 truncate">{vehicle.vin}</p>
             </div>
           )}
-        </div>
-
-        <div className="flex gap-2 pt-3 border-t">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onView}
-            className="flex-1"
-          >
-            <Eye className="w-4 h-4 mr-1" /> View
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(vehicle)}
-          >
-            <Edit2 className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (confirm('Are you sure you want to delete this vehicle?')) {
-                onDelete();
-              }
-            }}
-            disabled={isDeleting}
-            className="text-red-600 hover:text-red-700"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
         </div>
       </CardContent>
     </Card>

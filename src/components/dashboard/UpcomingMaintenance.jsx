@@ -35,7 +35,7 @@ export default function UpcomingMaintenance({ intervals, vehicles }) {
               const urgency = getUrgency(interval.next_due_date);
               const vehicle = vehicleMap[interval.vehicle_id];
               return (
-                <div key={interval.id} className="p-3 border rounded-lg hover:bg-slate-50 transition">
+                <div key={interval.id} className="p-3 border rounded-lg hover:bg-slate-50 transition cursor-pointer">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <p className="font-medium text-sm text-slate-900">{interval.name}</p>

@@ -5,7 +5,10 @@ import { Phone, Mail, MapPin, Eye, Edit, Trash2 } from 'lucide-react';
 
 export default function VendorCard({ vendor, onView, onEdit, onDelete, isDeleting }) {
   return (
-    <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+    <Card 
+      className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onView(vendor)}
+    >
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">{vendor.name}</CardTitle>
         {vendor.category && (
@@ -17,12 +20,20 @@ export default function VendorCard({ vendor, onView, onEdit, onDelete, isDeletin
           <p className="text-slate-600">Contact: {vendor.contact_person}</p>
         )}
         {vendor.email && (
-          <a href={`mailto:${vendor.email}`} className="flex items-center gap-2 text-blue-600 hover:underline">
+          <a 
+            href={`mailto:${vendor.email}`} 
+            className="flex items-center gap-2 text-blue-600 hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Mail className="w-4 h-4" /> {vendor.email}
           </a>
         )}
         {vendor.phone && (
-          <a href={`tel:${vendor.phone}`} className="flex items-center gap-2 text-blue-600 hover:underline">
+          <a 
+            href={`tel:${vendor.phone}`} 
+            className="flex items-center gap-2 text-blue-600 hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Phone className="w-4 h-4" /> {vendor.phone}
           </a>
         )}
@@ -32,35 +43,6 @@ export default function VendorCard({ vendor, onView, onEdit, onDelete, isDeletin
           </p>
         )}
       </CardContent>
-      <div className="border-t p-3 flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onView(vendor)}
-          className="flex-1"
-        >
-          <Eye className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onEdit(vendor)}
-          className="flex-1"
-        >
-          <Edit className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 text-red-600 hover:text-red-700"
-          onClick={() => {
-            if (confirm('Delete vendor?')) onDelete(vendor.id);
-          }}
-          disabled={isDeleting}
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
-      </div>
     </Card>
   );
 }

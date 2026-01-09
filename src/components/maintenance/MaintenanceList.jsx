@@ -39,7 +39,11 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
   return (
     <div className="space-y-4">
       {sortedRecords.map((record) => (
-        <Card key={record.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+        <Card 
+          key={record.id} 
+          className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => onView(record)}
+        >
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -80,35 +84,6 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
                     Odometer: {record.odometer_reading} miles
                   </p>
                 )}
-              </div>
-              <div className="flex gap-1 ml-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onView(record)}
-                >
-                  <Eye className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(record)}
-                >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm('Delete this maintenance record?')) {
-                      onDelete(record.id);
-                    }
-                  }}
-                  disabled={isDeleting}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
               </div>
             </div>
           </CardContent>
