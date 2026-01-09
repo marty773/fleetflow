@@ -3,12 +3,15 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { createPageUrl } from '@/utils';
 
 export default function VendorReport() {
   const [expandedVendor, setExpandedVendor] = useState(null);
+  const [viewingTransaction, setViewingTransaction] = useState(null);
 
   const { data: vendors = [] } = useQuery({
     queryKey: ['vendors'],
@@ -165,9 +168,9 @@ export default function VendorReport() {
                     <p className="text-sm font-semibold text-slate-700 mb-3">Recent Transactions</p>
                     <div className="space-y-2">
                       {vendor.transactions.slice(0, 5).map((txn, idx) => (
-                        <a
+                        <div
                           key={idx}
-                          href={txn.type === 'bill' ? createPageUrl(`Bills?view=${txn.id}`) : createPageUrl(`Maintenance?view=${txn.id}`)}
+                          onClick={() => setViewingTransaction(txn)}
                           className="flex items-center justify-between p-2 bg-white rounded border hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
                         >
                           <div>
@@ -176,7 +179,7 @@ export default function VendorReport() {
                             <p className="text-xs text-slate-500">{format(new Date(txn.date), 'MMM dd, yyyy')}</p>
                           </div>
                           <p className="font-semibold text-slate-900">${txn.amount.toFixed(2)}</p>
-                        </a>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -186,6 +189,46 @@ export default function VendorReport() {
           </Card>
         ))}
       </div>
+
+      {/* Transaction View Dialog */}
+      {viewingTransaction && (
+        <Dialog open={!!viewingTransaction} onOpenChange={() => setViewingTransaction(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{viewingTransaction.type === 'bill' ? 'Bill' : 'Maintenance'} Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-slate-500">Description</Label>
+                <p className="font-medium">{viewingTransaction.description}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Date</Label>
+                <p className="font-medium">{format(new Date(viewingTransaction.date), 'MMM dd, yyyy')}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Amount</Label>
+                <p className="font-medium text-lg">${viewingTransaction.amount.toFixed(2)}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Category</Label>
+                <Badge className={categoryColors[viewingTransaction.category]} variant="outline">
+                  {viewingTransaction.category?.replace('_', ' ')}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => setViewingTransaction(null)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

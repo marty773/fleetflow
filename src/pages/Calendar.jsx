@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -12,11 +13,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight, AlertCircle, Wrench } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, getDay, startOfWeek, endOfWeek, addDays } from 'date-fns';
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState('all');
+  const [selectedDay, setSelectedDay] = useState(null);
 
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -37,10 +39,12 @@ export default function Calendar() {
     ? intervals.filter(i => i.is_active)
     : intervals.filter(i => i.is_active && i.vehicle_id === selectedVehicle);
 
-  // Get all days in the current month
+  // Get all days in the current month plus padding for full weeks
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
-  const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const calendarStart = startOfWeek(monthStart);
+  const calendarEnd = endOfWeek(monthEnd);
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   // Get events for each day
   const eventsMap = useMemo(() => {
@@ -154,8 +158,9 @@ export default function Calendar() {
                     return (
                       <div
                         key={day.toISOString()}
-                        className={`min-h-24 p-2 border rounded-lg ${
-                          isCurrentMonth ? 'bg-white' : 'bg-slate-50'
+                        onClick={() => setSelectedDay(day)}
+                        className={`min-h-24 p-2 border rounded-lg cursor-pointer transition-all ${
+                          isCurrentMonth ? 'bg-white hover:bg-slate-50' : 'bg-slate-50'
                         } ${isToday ? 'border-blue-500 border-2' : 'border-slate-200'}`}
                       >
                         <p className={`text-sm font-semibold mb-1 ${
@@ -169,7 +174,7 @@ export default function Calendar() {
                             return (
                               <div
                                 key={event.id}
-                                className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer ${
+                                className={`text-xs px-1 py-0.5 rounded truncate ${
                                   maintenanceColors[event.maintenance_type]
                                 }`}
                                 title={event.name}
@@ -238,6 +243,72 @@ export default function Calendar() {
             </Card>
           </div>
         </div>
+
+        {/* Day View Dialog */}
+        {selectedDay && (
+          <Dialog open={!!selectedDay} onOpenChange={() => setSelectedDay(null)}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Events for {format(selectedDay, 'MMMM d, yyyy')}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                {getDayEvents(selectedDay).length > 0 ? (
+                  getDayEvents(selectedDay).map(event => {
+                    const status = getEventStatus(event);
+                    return (
+                      <div
+                        key={event.id}
+                        className={`p-4 rounded-lg ${statusColors[status]}`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="font-semibold text-slate-900">{event.name}</h3>
+                            <p className="text-sm text-slate-600 mt-1">
+                              {vehicleMap[event.vehicle_id]?.name}
+                            </p>
+                          </div>
+                          <Badge className={maintenanceColors[event.maintenance_type]}>
+                            {event.maintenance_type?.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                        {event.interval_months && (
+                          <p className="text-sm text-slate-600">
+                            Every {event.interval_months} months
+                          </p>
+                        )}
+                        {event.interval_miles && (
+                          <p className="text-sm text-slate-600">
+                            Every {event.interval_miles} miles
+                          </p>
+                        )}
+                        {status === 'overdue' && (
+                          <div className="flex items-center gap-1 mt-2 text-red-600">
+                            <AlertCircle className="w-4 h-4" />
+                            <span className="text-sm font-semibold">Overdue</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-8">
+                    <Wrench className="w-12 h-12 mx-auto text-slate-300 mb-2" />
+                    <p className="text-slate-500">No events scheduled for this day</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2 mt-6 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedDay(null)}
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );
