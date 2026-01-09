@@ -64,6 +64,13 @@ export default function BillGallery({ bills, vehicles }) {
       {selectedIdx !== null && (
         <Dialog open={selectedIdx !== null} onOpenChange={() => setSelectedIdx(null)}>
           <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+            <Button
+              onClick={() => setSelectedIdx(null)}
+              className="absolute top-4 right-4 z-50 bg-white/20 hover:bg-white/30 text-white rounded-full p-2 h-10 w-10"
+              variant="ghost"
+            >
+              <X className="w-5 h-5" />
+            </Button>
             <div className="relative bg-black min-h-[50vh] flex items-center justify-center">
               {isPdf(billsWithPhotos[selectedIdx].photo_url) ? (
                 <div className="bg-white rounded-lg p-4">
