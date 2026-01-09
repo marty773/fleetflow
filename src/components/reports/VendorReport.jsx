@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 export default function VendorReport() {
   const [expandedVendor, setExpandedVendor] = useState(null);
   const [viewingTransaction, setViewingTransaction] = useState(null);
+  const queryClient = useQueryClient();
 
   const { data: vendors = [] } = useQuery({
     queryKey: ['vendors'],
@@ -27,6 +28,21 @@ export default function VendorReport() {
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
+
+  const { data: items = [] } = useQuery({
+    queryKey: ['items'],
+    queryFn: () => base44.entities.Item.list(),
+  });
+
+  const { data: vehicles = [] } = useQuery({
+    queryKey: ['vehicles'],
+    queryFn: () => base44.entities.Vehicle.list(),
+  });
+
+  const vehicleMap = vehicles.reduce((acc, v) => {
+    acc[v.id] = v;
+    return acc;
+  }, {});
 
   // Calculate vendor metrics
   const vendorMetrics = vendors.map(vendor => {
@@ -52,6 +68,7 @@ export default function VendorReport() {
           amount: b.total_amount,
           description: `Bill #${b.bill_number || 'N/A'}`,
           category: b.category,
+          fullData: b,
         })),
         ...vendorMaintenance.map(m => ({
           id: m.id,
@@ -60,6 +77,7 @@ export default function VendorReport() {
           amount: m.total_cost,
           description: m.title,
           category: m.maintenance_type,
+          fullData: m,
         })),
       ].sort((a, b) => new Date(b.date) - new Date(a.date)),
     };
@@ -89,12 +107,17 @@ export default function VendorReport() {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0 shadow-sm cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
+          if (vendorMetrics.length > 0) {
+            setExpandedVendor(vendorMetrics[0].id);
+          }
+        }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">Total Spent</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-slate-900">${totalSpent.toFixed(2)}</p>
+            <p className="text-xs text-slate-500 mt-2">Click to view top vendor</p>
           </CardContent>
         </Card>
 
@@ -192,42 +215,177 @@ export default function VendorReport() {
 
       {/* Transaction View Dialog */}
       {viewingTransaction && (
-        <Dialog open={!!viewingTransaction} onOpenChange={() => setViewingTransaction(null)}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>{viewingTransaction.type === 'bill' ? 'Bill' : 'Maintenance'} Details</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
+      <Dialog open={!!viewingTransaction} onOpenChange={() => setViewingTransaction(null)}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{viewingTransaction.type === 'bill' ? 'Bill' : 'Maintenance'} Details</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-4">
+        {viewingTransaction.type === 'bill' ? (
+          <>
+            {viewingTransaction.fullData.photo_url && (
+              <div className="flex justify-center">
+                <img
+                  src={viewingTransaction.fullData.photo_url}
+                  alt="Bill"
+                  className="max-h-64 rounded-lg object-cover"
+                />
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-slate-500">Description</Label>
-                <p className="font-medium">{viewingTransaction.description}</p>
+                <Label className="text-slate-500">Vendor</Label>
+                <p className="font-medium">{viewingTransaction.fullData.vendor}</p>
               </div>
               <div>
                 <Label className="text-slate-500">Date</Label>
-                <p className="font-medium">{format(new Date(viewingTransaction.date), 'MMM dd, yyyy')}</p>
+                <p className="font-medium">{format(new Date(viewingTransaction.fullData.bill_date), 'MMM dd, yyyy')}</p>
               </div>
               <div>
-                <Label className="text-slate-500">Amount</Label>
-                <p className="font-medium text-lg">${viewingTransaction.amount.toFixed(2)}</p>
+                <Label className="text-slate-500">Bill Number</Label>
+                <p className="font-medium">{viewingTransaction.fullData.bill_number || '-'}</p>
               </div>
               <div>
                 <Label className="text-slate-500">Category</Label>
-                <Badge className={categoryColors[viewingTransaction.category]} variant="outline">
-                  {viewingTransaction.category?.replace('_', ' ')}
-                </Badge>
+                <p className="font-medium capitalize">{viewingTransaction.fullData.category?.replace('_', ' ')}</p>
               </div>
             </div>
-            <div className="flex gap-2 mt-6 pt-4 border-t">
-              <Button 
-                variant="outline" 
-                onClick={() => setViewingTransaction(null)}
-                className="flex-1"
-              >
-                Close
-              </Button>
+            {viewingTransaction.fullData.line_items && viewingTransaction.fullData.line_items.length > 0 && (
+              <div>
+                <Label className="text-slate-500 mb-2 block">Line Items</Label>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="text-left p-2">Description</th>
+                        <th className="text-center p-2">Qty</th>
+                        <th className="text-right p-2">Price</th>
+                        <th className="text-right p-2">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {viewingTransaction.fullData.line_items.map((item, idx) => (
+                        <tr key={idx} className="border-t">
+                          <td className="p-2">
+                            {item.description}
+                            {item.vehicle_id && (
+                              <span className="text-xs text-slate-500 block">
+                                Vehicle: {vehicleMap[item.vehicle_id]?.name}
+                              </span>
+                            )}
+                          </td>
+                          <td className="text-center p-2">{item.quantity}</td>
+                          <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                          <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                      <tr className="border-t bg-slate-50 font-semibold">
+                        <td colSpan={3} className="p-2 text-right">Total:</td>
+                        <td className="text-right p-2">${viewingTransaction.fullData.total_amount?.toFixed(2)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            {viewingTransaction.fullData.notes && (
+              <div>
+                <Label className="text-slate-500">Notes</Label>
+                <p className="text-sm mt-1">{viewingTransaction.fullData.notes}</p>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-slate-500">Vehicle</Label>
+                <p className="font-medium">{vehicleMap[viewingTransaction.fullData.vehicle_id]?.name || '-'}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Date</Label>
+                <p className="font-medium">{format(new Date(viewingTransaction.fullData.performed_date), 'MMM dd, yyyy')}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Type</Label>
+                <p className="font-medium capitalize">{viewingTransaction.fullData.maintenance_type?.replace('_', ' ')}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Vendor</Label>
+                <p className="font-medium">{viewingTransaction.fullData.vendor || '-'}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Odometer</Label>
+                <p className="font-medium">{viewingTransaction.fullData.odometer_reading || '-'}</p>
+              </div>
+              <div>
+                <Label className="text-slate-500">Total Cost</Label>
+                <p className="font-medium text-lg">${viewingTransaction.fullData.total_cost?.toFixed(2) || '0.00'}</p>
+              </div>
             </div>
-          </DialogContent>
-        </Dialog>
+            {viewingTransaction.fullData.work_items && viewingTransaction.fullData.work_items.length > 0 && (
+              <div>
+                <Label className="text-slate-500 mb-2 block">Work Items</Label>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="text-left p-2">Description</th>
+                        <th className="text-center p-2">Qty</th>
+                        <th className="text-right p-2">Price</th>
+                        <th className="text-right p-2">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {viewingTransaction.fullData.work_items.map((item, idx) => (
+                        <tr key={idx} className="border-t">
+                          <td className="p-2">{item.description}</td>
+                          <td className="text-center p-2">{item.quantity}</td>
+                          <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                          <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            {viewingTransaction.fullData.parts_used && viewingTransaction.fullData.parts_used.length > 0 && (
+              <div>
+                <Label className="text-slate-500 mb-2 block">Parts Used</Label>
+                <div className="space-y-2">
+                  {viewingTransaction.fullData.parts_used.map((part, idx) => {
+                    const item = items.find(i => i.id === part.item_id);
+                    return (
+                      <div key={idx} className="flex justify-between items-center p-2 bg-slate-50 rounded">
+                        <span className="text-sm">{item?.name || 'Unknown item'}</span>
+                        <span className="text-sm font-medium">Qty: {part.quantity_used}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {viewingTransaction.fullData.notes && (
+              <div>
+                <Label className="text-slate-500">Notes</Label>
+                <p className="text-sm mt-1">{viewingTransaction.fullData.notes}</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      <div className="flex gap-2 mt-6 pt-4 border-t">
+        <Button 
+          variant="outline" 
+          onClick={() => setViewingTransaction(null)}
+          className="flex-1"
+        >
+          Close
+        </Button>
+      </div>
+      </DialogContent>
+      </Dialog>
       )}
     </div>
   );
