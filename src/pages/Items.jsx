@@ -31,6 +31,7 @@ export default function Items() {
   const [editingItem, setEditingItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [viewingItem, setViewingItem] = useState(null);
+  const [photoLightbox, setPhotoLightbox] = useState(null);
   const [recalculating, setRecalculating] = useState(false);
 
   const queryClient = useQueryClient();
@@ -323,7 +324,8 @@ export default function Items() {
                 <img
                   src={viewingItem.photo_url}
                   alt={viewingItem.name}
-                  className="max-h-64 rounded-lg object-cover"
+                  className="max-h-64 rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => setPhotoLightbox(viewingItem.photo_url)}
                 />
               </div>
             )}
@@ -391,6 +393,42 @@ export default function Items() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Photo Lightbox */}
+      {photoLightbox && (
+        <Dialog open={!!photoLightbox} onOpenChange={() => setPhotoLightbox(null)}>
+          <DialogContent className="max-w-5xl max-h-[95vh] p-0 overflow-hidden bg-black">
+            <div className="relative flex items-center justify-center min-h-[50vh]">
+              <img
+                src={photoLightbox}
+                alt="Item photo"
+                className="max-w-full max-h-[90vh] object-contain"
+              />
+            </div>
+            <div className="flex gap-2 p-4 bg-white">
+              <Button 
+                variant="outline"
+                onClick={() => setPhotoLightbox(null)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = photoLightbox;
+                  link.download = 'item-photo.jpg';
+                  link.click();
+                }}
+                className="flex-1"
+              >
+                Download
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
