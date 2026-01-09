@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 export default function InventoryReport() {
   const [expandedItems, setExpandedItems] = useState({});
   const [viewingTransaction, setViewingTransaction] = useState(null);
+  const [filterMode, setFilterMode] = useState('all');
   const queryClient = useQueryClient();
 
   const { data: items = [] } = useQuery({
@@ -115,48 +116,29 @@ export default function InventoryReport() {
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-          if (window.innerWidth < 768 && sortedItems.length > 0) {
-            // On mobile, open first transaction directly
-            const firstItemWithTransactions = sortedItems.find(item => {
-              const txns = getItemTransactions(item.id);
-              return txns.length > 0;
-            });
-            if (firstItemWithTransactions) {
-              const txns = getItemTransactions(firstItemWithTransactions.id);
-              setViewingTransaction(txns[0]);
-            }
-          } else {
-            const itemsToExpand = {};
-            sortedItems.forEach(item => {
-              if ((item.price || 0) * (item.quantity_on_hand || 0) > 0) {
-                itemsToExpand[item.id] = true;
-              }
-            });
-            setExpandedItems(itemsToExpand);
-          }
+          setFilterMode('value');
+          const itemsToExpand = {};
+          sortedItems.slice(0, 5).forEach(item => {
+            itemsToExpand[item.id] = true;
+          });
+          setExpandedItems(itemsToExpand);
         }}>
           <CardHeader>
             <CardTitle className="text-lg">Total Inventory Value</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-slate-900">${totalValue.toFixed(2)}</p>
-            <p className="text-xs text-slate-500 mt-2">Tap to view transactions</p>
+            <p className="text-xs text-slate-500 mt-2">Tap to view top items</p>
           </CardContent>
         </Card>
 
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-          if (window.innerWidth < 768 && lowStockItems.length > 0) {
-            const txns = getItemTransactions(lowStockItems[0].id);
-            if (txns.length > 0) {
-              setViewingTransaction(txns[0]);
-            }
-          } else {
-            const itemsToExpand = {};
-            lowStockItems.forEach(item => {
-              itemsToExpand[item.id] = true;
-            });
-            setExpandedItems(itemsToExpand);
-          }
+          setFilterMode('low');
+          const itemsToExpand = {};
+          lowStockItems.forEach(item => {
+            itemsToExpand[item.id] = true;
+          });
+          setExpandedItems(itemsToExpand);
         }}>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -171,18 +153,12 @@ export default function InventoryReport() {
         </Card>
 
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-          if (window.innerWidth < 768 && outOfStockItems.length > 0) {
-            const txns = getItemTransactions(outOfStockItems[0].id);
-            if (txns.length > 0) {
-              setViewingTransaction(txns[0]);
-            }
-          } else {
-            const itemsToExpand = {};
-            outOfStockItems.forEach(item => {
-              itemsToExpand[item.id] = true;
-            });
-            setExpandedItems(itemsToExpand);
-          }
+          setFilterMode('out');
+          const itemsToExpand = {};
+          outOfStockItems.forEach(item => {
+            itemsToExpand[item.id] = true;
+          });
+          setExpandedItems(itemsToExpand);
         }}>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -206,8 +182,25 @@ export default function InventoryReport() {
         </Card>
       ) : (
         <Card>
-          <CardHeader>
-            <CardTitle>All Inventory Items</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>
+              {filterMode === 'all' && 'All Inventory Items'}
+              {filterMode === 'value' && 'Top 5 Items by Value'}
+              {filterMode === 'low' && 'Low Stock Items'}
+              {filterMode === 'out' && 'Out of Stock Items'}
+            </CardTitle>
+            {filterMode !== 'all' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setFilterMode('all');
+                  setExpandedItems({});
+                }}
+              >
+                Show All
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             <Table>
@@ -224,7 +217,13 @@ export default function InventoryReport() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedItems.map((item) => {
+                {sortedItems.filter((item) => {
+                  if (filterMode === 'all') return true;
+                  if (filterMode === 'value') return sortedItems.indexOf(item) < 5;
+                  if (filterMode === 'low') return lowStockItems.includes(item);
+                  if (filterMode === 'out') return outOfStockItems.includes(item);
+                  return true;
+                }).map((item) => {
                   const qty = item.quantity_on_hand || 0;
                   const value = (item.price || 0) * qty;
                   let status = 'in-stock';

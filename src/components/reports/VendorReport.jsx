@@ -12,6 +12,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 export default function VendorReport() {
   const [expandedVendor, setExpandedVendor] = useState(null);
   const [viewingTransaction, setViewingTransaction] = useState(null);
+  const [filterMode, setFilterMode] = useState('all');
   const queryClient = useQueryClient();
 
   const { data: vendors = [] } = useQuery({
@@ -109,12 +110,8 @@ export default function VendorReport() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-0 shadow-sm cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
           if (vendorMetrics.length > 0) {
-            if (window.innerWidth < 768 && vendorMetrics[0].transactions.length > 0) {
-              // On mobile, open first transaction directly
-              setViewingTransaction(vendorMetrics[0].transactions[0]);
-            } else {
-              setExpandedVendor(vendorMetrics[0].id);
-            }
+            setFilterMode('top');
+            setExpandedVendor(vendorMetrics[0].id);
           }
         }}>
           <CardHeader className="pb-2">
@@ -122,7 +119,7 @@ export default function VendorReport() {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-slate-900">${totalSpent.toFixed(2)}</p>
-            <p className="text-xs text-slate-500 mt-2">Tap to view transactions</p>
+            <p className="text-xs text-slate-500 mt-2">Tap to view top vendor</p>
           </CardContent>
         </Card>
 
@@ -147,7 +144,23 @@ export default function VendorReport() {
 
       {/* Vendor List */}
       <div className="space-y-3">
-        {vendorMetrics.map((vendor) => (
+        {filterMode !== 'all' && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              setFilterMode('all');
+              setExpandedVendor(null);
+            }}
+            className="mb-4"
+          >
+            Show All Vendors
+          </Button>
+        )}
+        {vendorMetrics.filter((vendor) => {
+          if (filterMode === 'top') return vendor === vendorMetrics[0];
+          return true;
+        }).map((vendor) => (
           <Card key={vendor.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
             <button
               onClick={() => {

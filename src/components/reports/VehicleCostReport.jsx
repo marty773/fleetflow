@@ -22,6 +22,7 @@ export default function VehicleCostReport() {
   const [timeframe, setTimeframe] = useState('30');
   const [expandedVehicles, setExpandedVehicles] = useState(new Set());
   const [viewingTransaction, setViewingTransaction] = useState(null);
+  const [filterMode, setFilterMode] = useState('all');
   const queryClient = useQueryClient();
 
   const { data: vehicles = [] } = useQuery({
@@ -167,13 +168,9 @@ export default function VehicleCostReport() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={(e) => {
             e.stopPropagation();
-            if (costData.length > 0 && costData[0].transactions.length > 0) {
-              // On mobile, open the first transaction directly
-              if (window.innerWidth < 768) {
-                setViewingTransaction(costData[0].transactions[0]);
-              } else {
-                setExpandedVehicles(new Set(costData.map(d => d.vehicle.id)));
-              }
+            if (costData.length > 0) {
+              setFilterMode('top');
+              setExpandedVehicles(new Set([costData[0].vehicle.id]));
             }
           }}>
             <CardHeader>
@@ -183,7 +180,7 @@ export default function VehicleCostReport() {
               <p className="text-3xl font-bold text-slate-900">
                 ${totalExpenses.toFixed(2)}
               </p>
-              <p className="text-xs text-slate-500 mt-2">Tap to view transactions</p>
+              <p className="text-xs text-slate-500 mt-2">Tap to view top vehicle</p>
             </CardContent>
           </Card>
 
@@ -198,8 +195,20 @@ export default function VehicleCostReport() {
         </div>
 
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Cost Breakdown by Vehicle</CardTitle>
+              {filterMode !== 'all' && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setFilterMode('all');
+                    setExpandedVehicles(new Set());
+                  }}
+                >
+                  Show All
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               <Table>
@@ -214,7 +223,10 @@ export default function VehicleCostReport() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {costData.map((item) => {
+                  {costData.filter((item) => {
+                    if (filterMode === 'top') return item === costData[0];
+                    return true;
+                  }).map((item) => {
                     const isExpanded = expandedVehicles.has(item.vehicle.id);
                     return (
                       <React.Fragment key={item.vehicle.id}>
