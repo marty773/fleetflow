@@ -57,6 +57,20 @@ export default function Vehicles() {
     setShowForm(true);
   };
 
+  // Check for URL parameter to auto-open edit form
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    
+    if (editId && vehicles.length > 0) {
+      const vehicle = vehicles.find(v => v.id === editId);
+      if (vehicle) {
+        setEditingVehicle(vehicle);
+        setShowForm(true);
+      }
+    }
+  }, [vehicles]);
+
   useEffect(() => {
     if (showForm && formRef.current) {
       formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -20,6 +20,20 @@ export default function Vendors() {
   const [viewingVendor, setViewingVendor] = useState(null);
   const queryClient = useQueryClient();
 
+  // Check for URL parameter to auto-open edit form
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    
+    if (editId && vendors.length > 0) {
+      const vendor = vendors.find(v => v.id === editId);
+      if (vendor) {
+        setEditingVendor(vendor);
+        setShowForm(true);
+      }
+    }
+  }, [vendors]);
+
   const { data: vendors = [] } = useQuery({
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list(),

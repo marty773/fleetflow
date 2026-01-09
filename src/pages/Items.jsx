@@ -36,6 +36,20 @@ export default function Items() {
 
   const queryClient = useQueryClient();
 
+  // Check for URL parameter to auto-open edit form
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    
+    if (editId && items.length > 0) {
+      const item = items.find(i => i.id === editId);
+      if (item) {
+        setEditingItem(item);
+        setFormOpen(true);
+      }
+    }
+  }, [items]);
+
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['items'],
     queryFn: () => base44.entities.Item.list('-created_date'),

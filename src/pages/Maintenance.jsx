@@ -52,17 +52,34 @@ export default function Maintenance() {
     queryFn: () => base44.entities.MaintenanceInterval.list(),
   });
 
-  // Check for URL parameter to auto-open a specific record
+  // Check for URL parameter to auto-open a specific record or interval
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
-    if (viewId && records.length > 0) {
+    const editId = urlParams.get('edit');
+    const editIntervalId = urlParams.get('editInterval');
+    
+    if (editId && records.length > 0) {
+      const record = records.find(r => r.id === editId);
+      if (record) {
+        setEditingRecord(record);
+        setShowRecordForm(true);
+        setActiveTab('records');
+      }
+    } else if (editIntervalId && intervals.length > 0) {
+      const interval = intervals.find(i => i.id === editIntervalId);
+      if (interval) {
+        setEditingInterval(interval);
+        setShowIntervalForm(true);
+        setActiveTab('intervals');
+      }
+    } else if (viewId && records.length > 0) {
       const record = records.find(r => r.id === viewId);
       if (record) {
         setViewingRecord(record);
       }
     }
-  }, [records]);
+  }, [records, intervals]);
 
   const createRecordMutation = useMutation({
     mutationFn: (data) => base44.entities.MaintenanceRecord.create(data),

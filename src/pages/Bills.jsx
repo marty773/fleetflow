@@ -48,7 +48,15 @@ export default function Bills() {
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
-    if (viewId && bills.length > 0) {
+    const editId = urlParams.get('edit');
+    
+    if (editId && bills.length > 0) {
+      const bill = bills.find(b => b.id === editId);
+      if (bill) {
+        setEditingBill(bill);
+        setShowForm(true);
+      }
+    } else if (viewId && bills.length > 0) {
       const bill = bills.find(b => b.id === viewId);
       if (bill) {
         setViewingBill(bill);
