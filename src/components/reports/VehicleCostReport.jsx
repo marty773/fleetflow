@@ -173,23 +173,25 @@ export default function VehicleCostReport() {
               setExpandedVehicles(new Set([costData[0].vehicle.id]));
             }
           }}>
-            <CardHeader>
-              <CardTitle className="text-lg">Total Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-slate-900">
-                ${totalExpenses.toFixed(2)}
-              </p>
-              <p className="text-xs text-slate-500 mt-2">Tap to view top vehicle</p>
+            <CardContent className="p-4 md:p-6">
+              <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+                <div className="flex-1 md:flex-none md:w-full">
+                  <CardTitle className="text-base md:text-lg mb-1 md:mb-2">Total Expenses</CardTitle>
+                  <p className="text-xs text-slate-500 md:mt-2">Tap to view top vehicle</p>
+                </div>
+                <p className="text-2xl md:text-3xl font-bold text-slate-900 shrink-0">
+                  ${totalExpenses.toFixed(2)}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Cost Distribution</CardTitle>
-            </CardHeader>
-            <CardContent className="h-64">
-              <VehicleCostChart data={costData} />
+            <CardContent className="p-4 md:p-6">
+              <CardTitle className="text-base md:text-lg mb-4">Cost Distribution</CardTitle>
+              <div className="h-48 md:h-64">
+                <VehicleCostChart data={costData} />
+              </div>
             </CardContent>
           </Card>
         </div>

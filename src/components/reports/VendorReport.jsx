@@ -114,30 +114,32 @@ export default function VendorReport() {
             setExpandedVendor(vendorMetrics[0].id);
           }
         }}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Spent</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-slate-900">${totalSpent.toFixed(2)}</p>
-            <p className="text-xs text-slate-500 mt-2">Tap to view top vendor</p>
+          <CardContent className="p-4 md:p-6">
+            <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+              <div className="flex-1 md:flex-none md:w-full">
+                <CardTitle className="text-sm font-medium text-slate-600 mb-1 md:mb-2">Total Spent</CardTitle>
+                <p className="text-xs text-slate-500 md:mt-2">Tap to view top vendor</p>
+              </div>
+              <p className="text-xl md:text-2xl font-bold text-slate-900 shrink-0">${totalSpent.toFixed(2)}</p>
+            </div>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Active Vendors</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-slate-900">{vendors.length}</p>
+          <CardContent className="p-4 md:p-6">
+            <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+              <CardTitle className="text-sm font-medium text-slate-600 flex-1 md:flex-none md:w-full">Active Vendors</CardTitle>
+              <p className="text-xl md:text-2xl font-bold text-slate-900 shrink-0">{vendors.length}</p>
+            </div>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Transactions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-slate-900">{totalTransactions}</p>
+          <CardContent className="p-4 md:p-6">
+            <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+              <CardTitle className="text-sm font-medium text-slate-600 flex-1 md:flex-none md:w-full">Total Transactions</CardTitle>
+              <p className="text-xl md:text-2xl font-bold text-slate-900 shrink-0">{totalTransactions}</p>
+            </div>
           </CardContent>
         </Card>
       </div>

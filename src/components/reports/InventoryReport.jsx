@@ -123,12 +123,14 @@ export default function InventoryReport() {
           });
           setExpandedItems(itemsToExpand);
         }}>
-          <CardHeader>
-            <CardTitle className="text-lg">Total Inventory Value</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-slate-900">${totalValue.toFixed(2)}</p>
-            <p className="text-xs text-slate-500 mt-2">Tap to view top items</p>
+          <CardContent className="p-4 md:p-6">
+            <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+              <div className="flex-1 md:flex-none md:w-full">
+                <CardTitle className="text-base md:text-lg mb-1 md:mb-2">Total Inventory Value</CardTitle>
+                <p className="text-xs text-slate-500 md:mt-2">Tap to view top items</p>
+              </div>
+              <p className="text-2xl md:text-3xl font-bold text-slate-900 shrink-0">${totalValue.toFixed(2)}</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -140,15 +142,17 @@ export default function InventoryReport() {
           });
           setExpandedItems(itemsToExpand);
         }}>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-amber-500" />
-              Low Stock Items
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-amber-600">{lowStockItems.length}</p>
-            <p className="text-xs text-slate-500 mt-2">Tap to view details</p>
+          <CardContent className="p-4 md:p-6">
+            <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+              <div className="flex-1 md:flex-none md:w-full">
+                <CardTitle className="text-base md:text-lg flex items-center gap-2 mb-1 md:mb-2">
+                  <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+                  Low Stock Items
+                </CardTitle>
+                <p className="text-xs text-slate-500 md:mt-2">Tap to view details</p>
+              </div>
+              <p className="text-2xl md:text-3xl font-bold text-amber-600 shrink-0">{lowStockItems.length}</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -160,15 +164,17 @@ export default function InventoryReport() {
           });
           setExpandedItems(itemsToExpand);
         }}>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Package className="w-5 h-5 text-red-500" />
-              Out of Stock
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-red-600">{outOfStockItems.length}</p>
-            <p className="text-xs text-slate-500 mt-2">Tap to view details</p>
+          <CardContent className="p-4 md:p-6">
+            <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+              <div className="flex-1 md:flex-none md:w-full">
+                <CardTitle className="text-base md:text-lg flex items-center gap-2 mb-1 md:mb-2">
+                  <Package className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
+                  Out of Stock
+                </CardTitle>
+                <p className="text-xs text-slate-500 md:mt-2">Tap to view details</p>
+              </div>
+              <p className="text-2xl md:text-3xl font-bold text-red-600 shrink-0">{outOfStockItems.length}</p>
+            </div>
           </CardContent>
         </Card>
       </div>
