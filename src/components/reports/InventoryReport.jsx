@@ -115,29 +115,48 @@ export default function InventoryReport() {
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-          const itemsToExpand = {};
-          sortedItems.forEach(item => {
-            if ((item.price || 0) * (item.quantity_on_hand || 0) > 0) {
-              itemsToExpand[item.id] = true;
+          if (window.innerWidth < 768 && sortedItems.length > 0) {
+            // On mobile, open first transaction directly
+            const firstItemWithTransactions = sortedItems.find(item => {
+              const txns = getItemTransactions(item.id);
+              return txns.length > 0;
+            });
+            if (firstItemWithTransactions) {
+              const txns = getItemTransactions(firstItemWithTransactions.id);
+              setViewingTransaction(txns[0]);
             }
-          });
-          setExpandedItems(itemsToExpand);
+          } else {
+            const itemsToExpand = {};
+            sortedItems.forEach(item => {
+              if ((item.price || 0) * (item.quantity_on_hand || 0) > 0) {
+                itemsToExpand[item.id] = true;
+              }
+            });
+            setExpandedItems(itemsToExpand);
+          }
         }}>
           <CardHeader>
             <CardTitle className="text-lg">Total Inventory Value</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-slate-900">${totalValue.toFixed(2)}</p>
-            <p className="text-xs text-slate-500 mt-2">Click to expand all items</p>
+            <p className="text-xs text-slate-500 mt-2">Tap to view transactions</p>
           </CardContent>
         </Card>
 
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-          const itemsToExpand = {};
-          lowStockItems.forEach(item => {
-            itemsToExpand[item.id] = true;
-          });
-          setExpandedItems(itemsToExpand);
+          if (window.innerWidth < 768 && lowStockItems.length > 0) {
+            const txns = getItemTransactions(lowStockItems[0].id);
+            if (txns.length > 0) {
+              setViewingTransaction(txns[0]);
+            }
+          } else {
+            const itemsToExpand = {};
+            lowStockItems.forEach(item => {
+              itemsToExpand[item.id] = true;
+            });
+            setExpandedItems(itemsToExpand);
+          }
         }}>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -147,16 +166,23 @@ export default function InventoryReport() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-amber-600">{lowStockItems.length}</p>
-            <p className="text-xs text-slate-500 mt-2">Click to view details</p>
+            <p className="text-xs text-slate-500 mt-2">Tap to view details</p>
           </CardContent>
         </Card>
 
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-          const itemsToExpand = {};
-          outOfStockItems.forEach(item => {
-            itemsToExpand[item.id] = true;
-          });
-          setExpandedItems(itemsToExpand);
+          if (window.innerWidth < 768 && outOfStockItems.length > 0) {
+            const txns = getItemTransactions(outOfStockItems[0].id);
+            if (txns.length > 0) {
+              setViewingTransaction(txns[0]);
+            }
+          } else {
+            const itemsToExpand = {};
+            outOfStockItems.forEach(item => {
+              itemsToExpand[item.id] = true;
+            });
+            setExpandedItems(itemsToExpand);
+          }
         }}>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -166,7 +192,7 @@ export default function InventoryReport() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-red-600">{outOfStockItems.length}</p>
-            <p className="text-xs text-slate-500 mt-2">Click to view details</p>
+            <p className="text-xs text-slate-500 mt-2">Tap to view details</p>
           </CardContent>
         </Card>
       </div>
@@ -217,14 +243,23 @@ export default function InventoryReport() {
 
                   return (
                     <React.Fragment key={item.id}>
-                      <TableRow className="hover:bg-slate-50">
-                        <TableCell>
+                      <TableRow className="hover:bg-slate-50 cursor-pointer" onClick={() => {
+                        // On mobile, open first transaction directly
+                        if (window.innerWidth < 768 && transactions.length > 0) {
+                          setViewingTransaction(transactions[0]);
+                        } else {
+                          toggleExpanded(item.id);
+                        }
+                      }}>
+                        <TableCell onClick={(e) => {
+                          e.stopPropagation();
+                          toggleExpanded(item.id);
+                        }}>
                           {transactions.length > 0 && (
                             <Button
                               variant="ghost"
                               size="sm"
                               className="h-6 w-6 p-0"
-                              onClick={() => toggleExpanded(item.id)}
                             >
                               {isExpanded ? (
                                 <ChevronDown className="h-4 w-4" />

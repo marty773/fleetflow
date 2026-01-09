@@ -165,9 +165,15 @@ export default function VehicleCostReport() {
       ) : (
         <>
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-            if (costData.length > 0) {
-              setExpandedVehicles(new Set(costData.map(d => d.vehicle.id)));
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={(e) => {
+            e.stopPropagation();
+            if (costData.length > 0 && costData[0].transactions.length > 0) {
+              // On mobile, open the first transaction directly
+              if (window.innerWidth < 768) {
+                setViewingTransaction(costData[0].transactions[0]);
+              } else {
+                setExpandedVehicles(new Set(costData.map(d => d.vehicle.id)));
+              }
             }
           }}>
             <CardHeader>
@@ -177,7 +183,7 @@ export default function VehicleCostReport() {
               <p className="text-3xl font-bold text-slate-900">
                 ${totalExpenses.toFixed(2)}
               </p>
-              <p className="text-xs text-slate-500 mt-2">Click to expand all vehicles</p>
+              <p className="text-xs text-slate-500 mt-2">Tap to view transactions</p>
             </CardContent>
           </Card>
 
@@ -212,8 +218,18 @@ export default function VehicleCostReport() {
                     const isExpanded = expandedVehicles.has(item.vehicle.id);
                     return (
                       <React.Fragment key={item.vehicle.id}>
-                        <TableRow className="cursor-pointer hover:bg-slate-50" onClick={() => toggleVehicle(item.vehicle.id)}>
-                          <TableCell>
+                        <TableRow className="cursor-pointer hover:bg-slate-50" onClick={(e) => {
+                          // On mobile, open first transaction directly
+                          if (window.innerWidth < 768 && item.transactions.length > 0) {
+                            setViewingTransaction(item.transactions[0]);
+                          } else {
+                            toggleVehicle(item.vehicle.id);
+                          }
+                        }}>
+                          <TableCell onClick={(e) => {
+                            e.stopPropagation();
+                            toggleVehicle(item.vehicle.id);
+                          }}>
                             <Button variant="ghost" size="icon" className="h-6 w-6">
                               {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                             </Button>

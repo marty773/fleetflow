@@ -109,7 +109,12 @@ export default function VendorReport() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-0 shadow-sm cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
           if (vendorMetrics.length > 0) {
-            setExpandedVendor(vendorMetrics[0].id);
+            if (window.innerWidth < 768 && vendorMetrics[0].transactions.length > 0) {
+              // On mobile, open first transaction directly
+              setViewingTransaction(vendorMetrics[0].transactions[0]);
+            } else {
+              setExpandedVendor(vendorMetrics[0].id);
+            }
           }
         }}>
           <CardHeader className="pb-2">
@@ -117,7 +122,7 @@ export default function VendorReport() {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-slate-900">${totalSpent.toFixed(2)}</p>
-            <p className="text-xs text-slate-500 mt-2">Click to view top vendor</p>
+            <p className="text-xs text-slate-500 mt-2">Tap to view transactions</p>
           </CardContent>
         </Card>
 
@@ -145,7 +150,14 @@ export default function VendorReport() {
         {vendorMetrics.map((vendor) => (
           <Card key={vendor.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
             <button
-              onClick={() => setExpandedVendor(expandedVendor === vendor.id ? null : vendor.id)}
+              onClick={() => {
+                // On mobile, open first transaction directly
+                if (window.innerWidth < 768 && vendor.transactions.length > 0) {
+                  setViewingTransaction(vendor.transactions[0]);
+                } else {
+                  setExpandedVendor(expandedVendor === vendor.id ? null : vendor.id);
+                }
+              }}
               className="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50"
             >
               <div className="flex-1">
