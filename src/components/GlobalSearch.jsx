@@ -138,22 +138,22 @@ export default function GlobalSearch() {
 
     switch(type) {
       case 'vehicles':
-        navigate(createPageUrl('Vehicles'));
+        navigate(createPageUrl('Vehicles') + `?edit=${item.id}`);
         break;
       case 'bills':
-        navigate(createPageUrl('Bills') + `?view=${item.id}`);
+        navigate(createPageUrl('Bills') + `?edit=${item.id}`);
         break;
       case 'maintenance':
-        navigate(createPageUrl('Maintenance'));
+        navigate(createPageUrl('Maintenance') + `?edit=${item.id}`);
         break;
       case 'items':
-        navigate(createPageUrl('Items'));
+        navigate(createPageUrl('Items') + `?edit=${item.id}`);
         break;
       case 'vendors':
-        navigate(createPageUrl('Vendors'));
+        navigate(createPageUrl('Vendors') + `?edit=${item.id}`);
         break;
       case 'intervals':
-        navigate(createPageUrl('Maintenance'));
+        navigate(createPageUrl('Maintenance') + `?editInterval=${item.id}`);
         break;
       default:
         break;
