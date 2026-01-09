@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ export default function Vehicles() {
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [viewingVehicle, setViewingVehicle] = useState(null);
   const queryClient = useQueryClient();
+  const formRef = useRef(null);
 
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -56,6 +57,12 @@ export default function Vehicles() {
     setShowForm(true);
   };
 
+  useEffect(() => {
+    if (showForm && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [showForm]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-5xl mx-auto px-4">
@@ -76,15 +83,17 @@ export default function Vehicles() {
         </div>
 
         {showForm && (
-          <VehicleForm
-            vehicle={editingVehicle}
-            onSubmit={handleSubmit}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingVehicle(null);
-            }}
-            isLoading={createMutation.isPending || updateMutation.isPending}
-          />
+          <div ref={formRef}>
+            <VehicleForm
+              vehicle={editingVehicle}
+              onSubmit={handleSubmit}
+              onCancel={() => {
+                setShowForm(false);
+                setEditingVehicle(null);
+              }}
+              isLoading={createMutation.isPending || updateMutation.isPending}
+            />
+          </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
