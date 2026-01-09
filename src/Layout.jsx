@@ -4,6 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign } from 'lucide-react';
 import { useState } from 'react';
+import GlobalSearch from '@/components/GlobalSearch';
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -79,9 +80,12 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full pb-24">
         {children}
       </main>
-    </div>
-  );
-}
+
+      {/* Global Search */}
+      <GlobalSearch />
+      </div>
+      );
+      }
