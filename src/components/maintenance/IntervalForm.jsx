@@ -11,96 +11,46 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { X } from 'lucide-react';
-import { addMonths } from 'date-fns';
 
 export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, isLoading }) {
-  const getInitialType = () => {
-    if (interval) {
-      return interval.interval_months ? 'months' : 'miles';
-    }
-    return 'months';
-  };
-
-  const [intervalType, setIntervalType] = useState(getInitialType());
   const [formData, setFormData] = useState({
     vehicle_id: interval?.vehicle_id || '',
     interval_name: interval?.interval_name || '',
     maintenance_type: interval?.maintenance_type || 'oil_change',
-    interval_months: interval?.interval_months || '',
+    interval_months: interval?.interval_months || 3,
     interval_miles: interval?.interval_miles || '',
     last_performed_date: interval?.last_performed_date || '',
     last_performed_mileage: interval?.last_performed_mileage || '',
-    next_due_date: interval?.next_due_date || '',
-    next_due_mileage: interval?.next_due_mileage || '',
     notes: interval?.notes || '',
   });
-
-  // Auto-calculate next due
-  useEffect(() => {
-    if (intervalType === 'months' && formData.last_performed_date && formData.interval_months) {
-      const nextDate = addMonths(new Date(formData.last_performed_date), parseInt(formData.interval_months));
-      setFormData(prev => ({ ...prev, next_due_date: nextDate.toISOString().split('T')[0] }));
-    }
-  }, [intervalType, formData.last_performed_date, formData.interval_months]);
-
-  useEffect(() => {
-    if (intervalType === 'miles' && formData.last_performed_mileage && formData.interval_miles) {
-      const nextMileage = parseFloat(formData.last_performed_mileage) + parseFloat(formData.interval_miles);
-      setFormData(prev => ({ ...prev, next_due_mileage: nextMileage }));
-    }
-  }, [intervalType, formData.last_performed_mileage, formData.interval_miles]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleTypeChange = (newType) => {
-    setIntervalType(newType);
-    // Clear opposite type fields
-    if (newType === 'months') {
-      setFormData(prev => ({
-        ...prev,
-        interval_miles: '',
-        last_performed_mileage: '',
-        next_due_mileage: '',
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        interval_months: '',
-        last_performed_date: '',
-        next_due_date: '',
-      }));
+  const calculateNextDue = () => {
+    const data = { ...formData };
+    
+    // Calculate next due date
+    if (data.last_performed_date && data.interval_months) {
+      const lastDate = new Date(data.last_performed_date);
+      const nextDate = new Date(lastDate);
+      nextDate.setMonth(nextDate.getMonth() + parseInt(data.interval_months));
+      data.next_due_date = nextDate.toISOString().split('T')[0];
     }
+
+    // Calculate next due mileage
+    if (data.last_performed_mileage && data.interval_miles) {
+      data.next_due_mileage = parseFloat(data.last_performed_mileage) + parseFloat(data.interval_miles);
+    }
+
+    return data;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    const cleanData = {
-      vehicle_id: formData.vehicle_id,
-      interval_name: formData.interval_name,
-      maintenance_type: formData.maintenance_type,
-      notes: formData.notes || null,
-    };
-    
-    if (intervalType === 'months') {
-      cleanData.interval_months = formData.interval_months ? parseFloat(formData.interval_months) : null;
-      cleanData.last_performed_date = formData.last_performed_date || null;
-      cleanData.next_due_date = formData.next_due_date || null;
-      cleanData.interval_miles = null;
-      cleanData.last_performed_mileage = null;
-      cleanData.next_due_mileage = null;
-    } else {
-      cleanData.interval_miles = formData.interval_miles ? parseFloat(formData.interval_miles) : null;
-      cleanData.last_performed_mileage = formData.last_performed_mileage ? parseFloat(formData.last_performed_mileage) : null;
-      cleanData.next_due_mileage = formData.next_due_mileage ? parseFloat(formData.next_due_mileage) : null;
-      cleanData.interval_months = null;
-      cleanData.last_performed_date = null;
-      cleanData.next_due_date = null;
-    }
-    
-    onSubmit(cleanData);
+    const submissionData = calculateNextDue();
+    onSubmit(submissionData);
   };
 
   return (
@@ -137,7 +87,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
               <Label htmlFor="interval_name">Interval Name *</Label>
               <Input
                 id="interval_name"
-                placeholder="e.g., Oil Change"
+                placeholder="e.g., Oil Change Every 3 Months"
                 value={formData.interval_name}
                 onChange={(e) => handleChange('interval_name', e.target.value)}
                 required
@@ -167,101 +117,59 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
 
             <div>
-              <Label htmlFor="interval_type">Interval Based On *</Label>
-              <Select value={intervalType} onValueChange={handleTypeChange}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="months">Time (Months)</SelectItem>
-                  <SelectItem value="miles">Mileage (Miles)</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="interval_months">Repeat Every (Months) *</Label>
+              <Input
+                id="interval_months"
+                type="number"
+                min="1"
+                placeholder="e.g., 3"
+                value={formData.interval_months}
+                onChange={(e) => handleChange('interval_months', e.target.value)}
+                required
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">How often this maintenance should occur</p>
             </div>
 
-            {intervalType === 'months' && (
-              <>
-                <div>
-                  <Label htmlFor="interval_months">Interval (Months) *</Label>
-                  <Input
-                    id="interval_months"
-                    type="number"
-                    min="1"
-                    value={formData.interval_months}
-                    onChange={(e) => handleChange('interval_months', e.target.value)}
-                    required
-                    className="mt-2"
-                  />
-                </div>
+            <div>
+              <Label htmlFor="interval_miles">Or Every (Miles) - Optional</Label>
+              <Input
+                id="interval_miles"
+                type="number"
+                min="1"
+                placeholder="e.g., 3000"
+                value={formData.interval_miles}
+                onChange={(e) => handleChange('interval_miles', e.target.value)}
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">Leave empty if not mileage-based</p>
+            </div>
 
-                <div>
-                  <Label htmlFor="last_performed_date">Last Performed *</Label>
-                  <Input
-                    id="last_performed_date"
-                    type="date"
-                    value={formData.last_performed_date}
-                    onChange={(e) => handleChange('last_performed_date', e.target.value)}
-                    required
-                    className="mt-2"
-                  />
-                </div>
+            <div>
+              <Label htmlFor="last_performed_date">Last Performed Date *</Label>
+              <Input
+                id="last_performed_date"
+                type="date"
+                value={formData.last_performed_date}
+                onChange={(e) => handleChange('last_performed_date', e.target.value)}
+                required
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">When was this maintenance last done?</p>
+            </div>
 
-                <div>
-                  <Label htmlFor="next_due_date">Next Due Date</Label>
-                  <Input
-                    id="next_due_date"
-                    type="date"
-                    value={formData.next_due_date}
-                    disabled
-                    className="mt-2 bg-slate-50"
-                  />
-                  <p className="text-xs text-slate-500 mt-1">Auto-calculated</p>
-                </div>
-              </>
-            )}
-
-            {intervalType === 'miles' && (
-              <>
-                <div>
-                  <Label htmlFor="interval_miles">Interval (Miles) *</Label>
-                  <Input
-                    id="interval_miles"
-                    type="number"
-                    min="1"
-                    value={formData.interval_miles}
-                    onChange={(e) => handleChange('interval_miles', e.target.value)}
-                    required
-                    className="mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="last_performed_mileage">Last Odometer Reading *</Label>
-                  <Input
-                    id="last_performed_mileage"
-                    type="number"
-                    placeholder="Miles"
-                    value={formData.last_performed_mileage}
-                    onChange={(e) => handleChange('last_performed_mileage', e.target.value)}
-                    required
-                    className="mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="next_due_mileage">Next Due Mileage</Label>
-                  <Input
-                    id="next_due_mileage"
-                    type="number"
-                    placeholder="Calculated from interval"
-                    value={formData.next_due_mileage}
-                    disabled
-                    className="mt-2 bg-slate-50"
-                  />
-                  <p className="text-xs text-slate-500 mt-1">Auto-calculated</p>
-                </div>
-              </>
-            )}
+            <div>
+              <Label htmlFor="last_performed_mileage">Last Odometer Reading - Optional</Label>
+              <Input
+                id="last_performed_mileage"
+                type="number"
+                placeholder="Miles"
+                value={formData.last_performed_mileage}
+                onChange={(e) => handleChange('last_performed_mileage', e.target.value)}
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">Odometer reading at last maintenance</p>
+            </div>
           </div>
 
           <div>

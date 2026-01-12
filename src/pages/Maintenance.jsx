@@ -112,11 +112,6 @@ export default function Maintenance() {
       setShowIntervalForm(false);
       setEditingInterval(null);
     },
-    onError: (error) => {
-      console.error('Create interval error:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
-      alert('Failed to create interval: ' + (error?.message || JSON.stringify(error)));
-    },
   });
 
   const updateIntervalMutation = useMutation({
@@ -184,20 +179,10 @@ export default function Maintenance() {
   };
 
   const handleSubmitInterval = async (data) => {
-    console.log('handleSubmitInterval called with:', data);
-    try {
-      if (editingInterval) {
-        const result = await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data });
-        console.log('Update result:', result);
-      } else {
-        const result = await createIntervalMutation.mutateAsync(data);
-        console.log('Create result:', result);
-      }
-      console.log('Interval saved successfully');
-    } catch (error) {
-      console.error('Failed to save interval:', error);
-      console.error('Error stack:', error.stack);
-      alert('Failed to save interval: ' + (error.message || JSON.stringify(error)));
+    if (editingInterval) {
+      await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data });
+    } else {
+      await createIntervalMutation.mutateAsync(data);
     }
   };
 

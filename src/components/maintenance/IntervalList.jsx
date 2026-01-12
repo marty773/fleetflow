@@ -32,8 +32,12 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
     );
   }
 
-  const getStatus = (dueDate) => {
-    const days = differenceInDays(new Date(dueDate), new Date());
+  const getStatus = (interval) => {
+    if (!interval.next_due_date) {
+      return { label: 'Scheduled', icon: Clock, color: 'text-slate-600', bgColor: 'bg-slate-50' };
+    }
+    
+    const days = differenceInDays(new Date(interval.next_due_date), new Date());
     if (days < 0) {
       return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600', bgColor: 'bg-red-50' };
     } else if (days <= 7) {
@@ -45,15 +49,16 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
     }
   };
 
-  const activeIntervals = intervals.filter(i => i.is_active);
-  const sortedIntervals = [...activeIntervals].sort(
-    (a, b) => new Date(a.next_due_date) - new Date(b.next_due_date)
-  );
+  const sortedIntervals = [...intervals].sort((a, b) => {
+    if (!a.next_due_date) return 1;
+    if (!b.next_due_date) return -1;
+    return new Date(a.next_due_date) - new Date(b.next_due_date);
+  });
 
   return (
     <div className="space-y-4">
       {sortedIntervals.map((interval) => {
-        const status = getStatus(interval.next_due_date);
+        const status = getStatus(interval);
         const StatusIcon = status.icon;
         return (
           <Card key={interval.id} className={`border-0 shadow-sm hover:shadow-md transition-shadow ${status.bgColor}`}>
@@ -61,7 +66,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-slate-900">{interval.name}</h3>
+                    <h3 className="text-lg font-semibold text-slate-900">{interval.interval_name}</h3>
                     <Badge className={maintenanceColors[interval.maintenance_type]}>
                       {interval.maintenance_type?.replace('_', ' ')}
                     </Badge>
@@ -76,26 +81,26 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
                     <div>
                       <p className="text-slate-600">Vehicle</p>
                       <p className="font-semibold text-slate-900">
-                        {vehicleMap[interval.vehicle_id]?.name}
+                        {vehicleMap[interval.vehicle_id]?.name || 'Unknown'}
                       </p>
                     </div>
                     <div>
                       <p className="text-slate-600">Interval</p>
                       <p className="font-semibold text-slate-900">
                         Every {interval.interval_months} month{interval.interval_months > 1 ? 's' : ''}
-                        {interval.interval_miles && ` / ${interval.interval_miles} mi`}
+                        {interval.interval_miles ? ` / ${interval.interval_miles} mi` : ''}
                       </p>
                     </div>
                     <div>
                       <p className="text-slate-600">Last Done</p>
                       <p className="font-semibold text-slate-900">
-                        {format(new Date(interval.last_performed_date), 'MMM dd, yyyy')}
+                        {interval.last_performed_date ? format(new Date(interval.last_performed_date), 'MMM dd, yyyy') : 'Not set'}
                       </p>
                     </div>
                     <div>
                       <p className="text-slate-600">Next Due</p>
                       <p className="font-semibold text-slate-900">
-                        {format(new Date(interval.next_due_date), 'MMM dd, yyyy')}
+                        {interval.next_due_date ? format(new Date(interval.next_due_date), 'MMM dd, yyyy') : 'Not calculated'}
                       </p>
                     </div>
                   </div>
