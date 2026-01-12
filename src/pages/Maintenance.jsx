@@ -124,9 +124,12 @@ export default function Maintenance() {
   });
 
   const deleteIntervalMutation = useMutation({
-    mutationFn: (id) => base44.entities.MaintenanceInterval.delete(id),
+    mutationFn: async (id) => {
+      await base44.entities.MaintenanceInterval.delete(id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+      queryClient.refetchQueries({ queryKey: ['maintenanceIntervals'] });
     },
   });
 

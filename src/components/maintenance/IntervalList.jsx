@@ -62,22 +62,22 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
         const StatusIcon = status.icon;
         return (
           <Card key={interval.id} className={`border-0 shadow-sm hover:shadow-md transition-shadow ${status.bgColor}`}>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-slate-900">{interval.interval_name}</h3>
+                  <div className="flex items-center gap-2 flex-wrap mb-2">
+                    <h3 className="text-base md:text-lg font-semibold text-slate-900">{interval.interval_name}</h3>
                     <Badge className={maintenanceColors[interval.maintenance_type]}>
                       {interval.maintenance_type?.replace('_', ' ')}
                     </Badge>
-                    <div className="flex items-center gap-1 ml-2">
+                    <div className="flex items-center gap-1">
                       <StatusIcon className={`w-4 h-4 ${status.color}`} />
                       <Badge variant="secondary" className="text-xs">
                         {status.label}
                       </Badge>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4 mt-3 text-sm">
                     <div>
                       <p className="text-slate-600">Vehicle</p>
                       <p className="font-semibold text-slate-900">
@@ -105,7 +105,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 ml-4">
+                <div className="flex gap-2 justify-end md:justify-start">
                   <Button
                     variant="outline"
                     size="sm"
@@ -117,7 +117,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      if (confirm('Delete this interval?')) {
+                      if (window.confirm('Delete this interval?')) {
                         onDelete(interval.id);
                       }
                     }}
