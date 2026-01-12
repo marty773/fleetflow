@@ -36,8 +36,8 @@ export default function Calendar() {
   }, {});
 
   const filteredIntervals = selectedVehicle === 'all'
-    ? intervals.filter(i => i.is_active)
-    : intervals.filter(i => i.is_active && i.vehicle_id === selectedVehicle);
+    ? intervals
+    : intervals.filter(i => i.vehicle_id === selectedVehicle);
 
   // Get all days in the current month plus padding for full weeks
   const monthStart = startOfMonth(currentDate);
@@ -50,12 +50,14 @@ export default function Calendar() {
   const eventsMap = useMemo(() => {
     const map = {};
     filteredIntervals.forEach(interval => {
-      const dueDate = new Date(interval.next_due_date);
-      const dateKey = dueDate.toISOString().split('T')[0];
-      if (!map[dateKey]) {
-        map[dateKey] = [];
+      if (interval.next_due_date) {
+        const dueDate = new Date(interval.next_due_date);
+        const dateKey = dueDate.toISOString().split('T')[0];
+        if (!map[dateKey]) {
+          map[dateKey] = [];
+        }
+        map[dateKey].push(interval);
       }
-      map[dateKey].push(interval);
     });
     return map;
   }, [filteredIntervals]);
@@ -177,9 +179,9 @@ export default function Calendar() {
                                 className={`text-xs px-1 py-0.5 rounded truncate ${
                                   maintenanceColors[event.maintenance_type]
                                 }`}
-                                title={event.name}
-                              >
-                                {event.name}
+                                title={event.interval_name}
+                                >
+                                {event.interval_name}
                               </div>
                             );
                           })}
@@ -204,8 +206,9 @@ export default function Calendar() {
                 <CardTitle className="text-lg">Upcoming Services</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-3 max-h-96 overflow-y-auto">
-                {filteredIntervals.length > 0 ? (
+                {filteredIntervals.filter(i => i.next_due_date).length > 0 ? (
                   [...filteredIntervals]
+                    .filter(i => i.next_due_date)
                     .sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date))
                     .slice(0, 10)
                     .map(interval => {
@@ -216,7 +219,7 @@ export default function Calendar() {
                           className={`p-3 rounded-lg ${statusColors[status]}`}
                         >
                           <p className="font-semibold text-sm text-slate-900 mb-1">
-                            {interval.name}
+                            {interval.interval_name}
                           </p>
                           <p className="text-xs text-slate-600 mb-2">
                             {vehicleMap[interval.vehicle_id]?.name}
@@ -262,7 +265,7 @@ export default function Calendar() {
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h3 className="font-semibold text-slate-900">{event.name}</h3>
+                            <h3 className="font-semibold text-slate-900">{event.interval_name}</h3>
                             <p className="text-sm text-slate-600 mt-1">
                               {vehicleMap[event.vehicle_id]?.name}
                             </p>
