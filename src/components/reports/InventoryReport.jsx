@@ -7,8 +7,16 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, AlertTriangle, ChevronDown, ChevronRight, Plus, Minus } from 'lucide-react';
+import { Package, AlertTriangle, ChevronDown, ChevronRight, Plus, Minus, Download } from 'lucide-react';
 import { format } from 'date-fns';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function InventoryReport() {
   const [expandedItems, setExpandedItems] = useState({});
@@ -62,7 +70,6 @@ export default function InventoryReport() {
   const getItemTransactions = (itemId) => {
     const transactions = [];
 
-    // Find purchases from bills
     bills.forEach((bill) => {
       if (bill.line_items) {
         bill.line_items.forEach((lineItem) => {
@@ -81,7 +88,6 @@ export default function InventoryReport() {
       }
     });
 
-    // Find usage from maintenance
     maintenanceRecords.forEach((record) => {
       if (record.parts_used) {
         record.parts_used.forEach((part) => {
@@ -110,9 +116,81 @@ export default function InventoryReport() {
     }));
   };
 
+  const handleDownloadPdf = async () => {
+    const element = document.getElementById('inventory-report');
+    if (!element) return;
+
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`inventory_report_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
+  const handleDownloadCsv = () => {
+    const headers = ['Item Name', 'Item Number', 'Vendor', 'Price', 'Qty on Hand', 'Total Value', 'Status'];
+    const csvRows = [];
+
+    csvRows.push(headers.join(','));
+
+    sortedItems.forEach((item) => {
+      const qty = item.quantity_on_hand || 0;
+      const value = (item.price || 0) * qty;
+      let status = 'In Stock';
+      
+      if (qty === 0) {
+        status = 'Out of Stock';
+      } else if (qty <= (item.low_stock_threshold || 2)) {
+        status = 'Low Stock';
+      }
+
+      const row = [
+        item.name,
+        item.item_number || '-',
+        item.vendor || '-',
+        item.price?.toFixed(2) || '0.00',
+        qty,
+        value.toFixed(2),
+        status,
+      ];
+      csvRows.push(row.map((e) => `"${e}"`).join(','));
+    });
+
+    csvRows.push('');
+    csvRows.push(`Total Inventory Value,"$${totalValue.toFixed(2)}"`);
+    csvRows.push(`Low Stock Items,${lowStockItems.length}`);
+    csvRows.push(`Out of Stock Items,${outOfStockItems.length}`);
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `inventory_report_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Inventory Overview</h2>
+    <div className="space-y-6" id="inventory-report">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Inventory Overview</h2>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Download className="w-4 h-4" /> Download
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={handleDownloadPdf}>Download PDF</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDownloadCsv}>Download CSV</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
@@ -249,7 +327,6 @@ export default function InventoryReport() {
                   return (
                     <React.Fragment key={item.id}>
                       <TableRow className="hover:bg-slate-50 cursor-pointer" onClick={() => {
-                        // On mobile, open first transaction directly
                         if (window.innerWidth < 768 && transactions.length > 0) {
                           setViewingTransaction(transactions[0]);
                         } else {

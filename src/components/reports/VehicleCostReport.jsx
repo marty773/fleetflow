@@ -14,9 +14,17 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import VehicleCostChart from './VehicleCostChart';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function VehicleCostReport() {
   const [timeframe, setTimeframe] = useState('30');
@@ -139,22 +147,80 @@ export default function VehicleCostReport() {
     setExpandedVehicles(newExpanded);
   };
 
+  const handleDownloadPdf = async () => {
+    const element = document.getElementById('vehicle-cost-report');
+    if (!element) return;
+
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`vehicle_cost_report_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
+  const handleDownloadCsv = () => {
+    const headers = ['Vehicle Name', 'Vehicle Type', 'License Plate', 'Total Cost', '% of Total'];
+    const csvRows = [];
+
+    csvRows.push(headers.join(','));
+
+    costData.forEach((item) => {
+      const row = [
+        item.vehicle.name,
+        item.vehicle.type,
+        item.vehicle.license_plate || '-',
+        item.totalCost.toFixed(2),
+        ((item.totalCost / totalExpenses) * 100).toFixed(1) + '%',
+      ];
+      csvRows.push(row.map((e) => `"${e}"`).join(','));
+    });
+
+    csvRows.push('');
+    csvRows.push(`Total Expenses,"$${totalExpenses.toFixed(2)}"`);
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `vehicle_cost_report_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" id="vehicle-cost-report">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Vehicle Costs by Timeframe</h2>
-        <Select value={timeframe} onValueChange={setTimeframe}>
-          <SelectTrigger className="w-48 bg-white">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-            <SelectItem value="90">Last 90 days</SelectItem>
-            <SelectItem value="180">Last 6 months</SelectItem>
-            <SelectItem value="365">Last year</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={timeframe} onValueChange={setTimeframe}>
+            <SelectTrigger className="w-48 bg-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 90 days</SelectItem>
+              <SelectItem value="180">Last 6 months</SelectItem>
+              <SelectItem value="365">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="w-4 h-4" /> Download
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleDownloadPdf}>Download PDF</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDownloadCsv}>Download CSV</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {costData.length === 0 ? (
@@ -233,7 +299,6 @@ export default function VehicleCostReport() {
                     return (
                       <React.Fragment key={item.vehicle.id}>
                         <TableRow className="cursor-pointer hover:bg-slate-50" onClick={(e) => {
-                          // On mobile, open first transaction directly
                           if (window.innerWidth < 768 && item.transactions.length > 0) {
                             setViewingTransaction(item.transactions[0]);
                           } else {

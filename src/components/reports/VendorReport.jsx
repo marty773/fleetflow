@@ -7,7 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function VendorReport() {
   const [expandedVendor, setExpandedVendor] = useState(null);
@@ -45,7 +53,6 @@ export default function VendorReport() {
     return acc;
   }, {});
 
-  // Calculate vendor metrics
   const vendorMetrics = vendors.map(vendor => {
     const vendorBills = bills.filter(b => b.vendor === vendor.name);
     const vendorMaintenance = maintenanceRecords.filter(m => m.vendor === vendor.name);
@@ -104,8 +111,72 @@ export default function VendorReport() {
     cleaning: 'bg-green-100 text-green-800',
   };
 
+  const handleDownloadPdf = async () => {
+    const element = document.getElementById('vendor-report');
+    if (!element) return;
+
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`vendor_report_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
+  const handleDownloadCsv = () => {
+    const headers = ['Vendor Name', 'Category', 'Bill Count', 'Maintenance Count', 'Total Bills', 'Total Maintenance', 'Total Spent'];
+    const csvRows = [];
+
+    csvRows.push(headers.join(','));
+
+    vendorMetrics.forEach((vendor) => {
+      const row = [
+        vendor.name,
+        vendor.category || '-',
+        vendor.billCount,
+        vendor.maintenanceCount,
+        vendor.billTotal.toFixed(2),
+        vendor.maintenanceTotal.toFixed(2),
+        vendor.total.toFixed(2),
+      ];
+      csvRows.push(row.map((e) => `"${e}"`).join(','));
+    });
+
+    csvRows.push('');
+    csvRows.push(`Total Spent,"$${totalSpent.toFixed(2)}"`);
+    csvRows.push(`Active Vendors,${vendors.length}`);
+    csvRows.push(`Total Transactions,${totalTransactions}`);
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `vendor_report_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" id="vendor-report">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Vendor Report</h2>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Download className="w-4 h-4" /> Download
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={handleDownloadPdf}>Download PDF</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDownloadCsv}>Download CSV</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-0 shadow-sm cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
@@ -166,7 +237,6 @@ export default function VendorReport() {
           <Card key={vendor.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
             <button
               onClick={() => {
-                // On mobile, open first transaction directly
                 if (window.innerWidth < 768 && vendor.transactions.length > 0) {
                   setViewingTransaction(vendor.transactions[0]);
                 } else {
