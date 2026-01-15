@@ -357,7 +357,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                         <SelectItem value={null}>None</SelectItem>
                         {items.map(item => (
                           <SelectItem key={item.id} value={item.id}>
-                            {item.name}
+                            {item.name}{item.item_number ? ` - ${item.item_number}` : ''}
                           </SelectItem>
                         ))}
                       </SelectContent>
