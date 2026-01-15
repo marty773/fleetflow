@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2 } from 'lucide-react';
+import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2, Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   Table,
   TableBody,
@@ -27,6 +28,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 export default function BillForm({ bill, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(bill || {
@@ -61,6 +75,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
     photo_url: '',
   });
   const [creatingItem, setCreatingItem] = useState(false);
+  const [itemSearchOpen, setItemSearchOpen] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -341,27 +356,74 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                     </SelectContent>
                   </Select>
                   <div className="flex gap-2">
-                    <Select value={newItem.item_id} onValueChange={(value) => {
-                      const selectedItem = items.find(i => i.id === value);
-                      setNewItem({ 
-                        ...newItem, 
-                        item_id: value,
-                        description: selectedItem?.name || newItem.description,
-                        unit_price: selectedItem?.price || newItem.unit_price
-                      });
-                    }}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Stock Item (optional)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={null}>None</SelectItem>
-                        {items.map(item => (
-                          <SelectItem key={item.id} value={item.id}>
-                            {item.name}{item.item_number ? ` - ${item.item_number}` : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={itemSearchOpen} onOpenChange={setItemSearchOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={itemSearchOpen}
+                          className="flex-1 justify-between"
+                        >
+                          {newItem.item_id
+                            ? items.find((item) => item.id === newItem.item_id)?.name
+                            : "Stock Item (optional)"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[300px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search by name or part #..." />
+                          <CommandList>
+                            <CommandEmpty>No item found.</CommandEmpty>
+                            <CommandGroup>
+                              <CommandItem
+                                value="none"
+                                onSelect={() => {
+                                  setNewItem({ ...newItem, item_id: '' });
+                                  setItemSearchOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    !newItem.item_id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                None
+                              </CommandItem>
+                              {items.map((item) => (
+                                <CommandItem
+                                  key={item.id}
+                                  value={`${item.name} ${item.item_number || ''}`}
+                                  onSelect={() => {
+                                    setNewItem({ 
+                                      ...newItem, 
+                                      item_id: item.id,
+                                      description: item.name,
+                                      unit_price: item.price
+                                    });
+                                    setItemSearchOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      newItem.item_id === item.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  <div className="flex flex-col">
+                                    <span>{item.name}</span>
+                                    {item.item_number && (
+                                      <span className="text-xs text-slate-500">{item.item_number}</span>
+                                    )}
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <Button
                       type="button"
                       variant="outline"
