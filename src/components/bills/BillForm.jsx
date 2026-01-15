@@ -134,6 +134,12 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
     onSubmit({ ...formData, total_amount: total });
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+      e.preventDefault();
+    }
+  };
+
   const handlePhotoUploadNewItem = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -188,7 +194,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
         </button>
       </CardHeader>
       <CardContent className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-6">
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
