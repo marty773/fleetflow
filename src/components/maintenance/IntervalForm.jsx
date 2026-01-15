@@ -24,6 +24,21 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     notes: interval?.notes || '',
   });
 
+  useEffect(() => {
+    if (interval) {
+      setFormData({
+        vehicle_id: interval.vehicle_id || '',
+        interval_name: interval.interval_name || '',
+        maintenance_type: interval.maintenance_type || 'oil_change',
+        interval_months: interval.interval_months || 3,
+        interval_miles: interval.interval_miles || '',
+        last_performed_date: interval.last_performed_date || '',
+        last_performed_mileage: interval.last_performed_mileage || '',
+        notes: interval.notes || '',
+      });
+    }
+  }, [interval]);
+
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
