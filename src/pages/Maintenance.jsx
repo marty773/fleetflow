@@ -146,10 +146,11 @@ export default function Maintenance() {
       queryClient.invalidateQueries({ queryKey: ['items'] });
     }
 
+    let createdRecord;
     if (editingRecord) {
       await updateRecordMutation.mutateAsync({ id: editingRecord.id, data });
     } else {
-      await createRecordMutation.mutateAsync(data);
+      createdRecord = await createRecordMutation.mutateAsync(data);
     }
 
     // Update related maintenance intervals
@@ -179,6 +180,20 @@ export default function Maintenance() {
     }
 
     queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+
+    // Send email notification if maintenance involves JEM Trailer or JEM 2022 RAM
+    if (!editingRecord && createdRecord) {
+      const vehicle = vehicles.find(v => v.id === data.vehicle_id);
+      if (vehicle && (vehicle.name === 'JEM Trailer' || vehicle.name === 'JEM 2022 RAM')) {
+        const recordUrl = `${window.location.origin}${window.location.pathname}?view=${createdRecord.id}`;
+        
+        await base44.integrations.Core.SendEmail({
+          to: 'manny@fishersbackyardstructures.com',
+          subject: `New Maintenance Record for ${vehicle.name}`,
+          body: `A new maintenance record has been logged for ${vehicle.name}.\n\nTitle: ${data.title}\nType: ${data.maintenance_type?.replace('_', ' ')}\nDate: ${format(new Date(data.performed_date), 'MMM dd, yyyy')}\nCost: $${data.total_cost?.toFixed(2) || '0.00'}\n\nView details: ${recordUrl}`
+        });
+      }
+    }
   };
 
   const handleSubmitInterval = async (data) => {
