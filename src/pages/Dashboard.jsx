@@ -9,27 +9,34 @@ import { TrendingUp, AlertCircle, Wrench, DollarSign, Calendar, Plus } from 'luc
 import DashboardStats from '../components/dashboard/DashboardStats';
 import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
 import RecentExpenses from '../components/dashboard/RecentExpenses';
+import CompanySelector from '../components/CompanySelector';
 
 export default function Dashboard() {
-  const { data: vehicles = [] } = useQuery({
+  const [selectedCompany, setSelectedCompany] = useState("Fisher's Enterprise");
+  const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const { data: bills = [] } = useQuery({
+  const { data: allBills = [] } = useQuery({
     queryKey: ['bills'],
     queryFn: () => base44.entities.Bill.list(),
   });
 
-  const { data: maintenanceIntervals = [] } = useQuery({
+  const { data: allMaintenanceIntervals = [] } = useQuery({
     queryKey: ['maintenanceIntervals'],
     queryFn: () => base44.entities.MaintenanceInterval.list(),
   });
 
-  const { data: maintenanceRecords = [] } = useQuery({
+  const { data: allMaintenanceRecords = [] } = useQuery({
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
+
+  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const bills = allBills.filter(b => b.company_id === selectedCompany);
+  const maintenanceIntervals = allMaintenanceIntervals.filter(m => m.company_id === selectedCompany);
+  const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
 
   const calculateStats = () => {
     const thirtyDaysAgo = new Date();
@@ -66,7 +73,10 @@ export default function Dashboard() {
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Fleet Dashboard</h1>
             <p className="text-slate-600">Manage your truck and trailer fleet</p>
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+          <CompanySelector value={selectedCompany} onChange={setSelectedCompany} />
+        </div>
+        
+        <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
             <Link to={createPageUrl('Bills')} className="flex-1 sm:flex-none">
               <Button className="bg-amber-500 hover:bg-amber-600 w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" /> New Bill
@@ -77,7 +87,6 @@ export default function Dashboard() {
                 <Plus className="w-4 h-4 mr-2" /> New Maintenance
               </Button>
             </Link>
-          </div>
         </div>
 
         {/* Stats */}
