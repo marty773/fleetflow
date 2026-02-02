@@ -119,6 +119,23 @@ function LayoutContent({ children, currentPageName }) {
 
       {/* Main Content */}
       <main className="flex-1 w-full pb-24">
+        <div 
+          className="sticky top-0 z-10 px-6 py-3 border-b shadow-sm"
+          style={{ 
+            backgroundColor: 'white',
+            borderBottomColor: themeColors.primaryLight 
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-600">Active Company:</span>
+            <span 
+              className="text-sm font-bold"
+              style={{ color: themeColors.primary }}
+            >
+              {selectedCompany}
+            </span>
+          </div>
+        </div>
         {children}
       </main>
 
