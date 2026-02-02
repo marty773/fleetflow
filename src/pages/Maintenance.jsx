@@ -18,8 +18,10 @@ import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalForm from '../components/maintenance/IntervalForm';
 import IntervalList from '../components/maintenance/IntervalList';
 import { format } from 'date-fns';
+import { useCompany } from '../components/CompanyContext';
 
 export default function Maintenance() {
+  const { selectedCompany } = useCompany();
   const [showRecordForm, setShowRecordForm] = useState(false);
   const [showIntervalForm, setShowIntervalForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
@@ -28,7 +30,7 @@ export default function Maintenance() {
   const [activeTab, setActiveTab] = useState('records');
   const queryClient = useQueryClient();
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
@@ -43,15 +45,19 @@ export default function Maintenance() {
     queryFn: () => base44.entities.Vendor.list(),
   });
 
-  const { data: records = [] } = useQuery({
+  const { data: allRecords = [] } = useQuery({
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
-  const { data: intervals = [] } = useQuery({
+  const { data: allIntervals = [] } = useQuery({
     queryKey: ['maintenanceIntervals'],
     queryFn: () => base44.entities.MaintenanceInterval.list(),
   });
+
+  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const records = allRecords.filter(r => r.company_id === selectedCompany);
+  const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
 
   // Check for URL parameter to auto-open a specific record or interval
   React.useEffect(() => {
@@ -135,9 +141,11 @@ export default function Maintenance() {
   });
 
   const handleSubmitRecord = async (data) => {
+    const dataWithCompany = { ...data, company_id: selectedCompany };
+    
     // Group parts by item_id and sum quantities
     const partQuantityMap = {};
-    if (data.parts_used && data.parts_used.length > 0) {
+    if (dataWithCompany.parts_used && dataWithCompany.parts_used.length > 0) {
       data.parts_used.forEach(part => {
         if (!partQuantityMap[part.item_id]) {
           partQuantityMap[part.item_id] = 0;
@@ -164,24 +172,24 @@ export default function Maintenance() {
     }
 
     // Update related maintenance intervals
-    const relatedIntervals = intervals.filter(
-      interval => interval.vehicle_id === data.vehicle_id && interval.maintenance_type === data.maintenance_type
+    const relatedIntervals = allIntervals.filter(
+      interval => interval.vehicle_id === dataWithCompany.vehicle_id && interval.maintenance_type === dataWithCompany.maintenance_type
     );
 
     for (const interval of relatedIntervals) {
       const updateData = {
-        last_performed_date: data.performed_date,
+        last_performed_date: dataWithCompany.performed_date,
       };
 
-      if (data.odometer_reading) {
-        updateData.last_performed_mileage = parseFloat(data.odometer_reading);
+      if (dataWithCompany.odometer_reading) {
+        updateData.last_performed_mileage = parseFloat(dataWithCompany.odometer_reading);
         if (interval.interval_miles) {
-          updateData.next_due_mileage = parseFloat(data.odometer_reading) + parseFloat(interval.interval_miles);
+          updateData.next_due_mileage = parseFloat(dataWithCompany.odometer_reading) + parseFloat(interval.interval_miles);
         }
       }
 
       if (interval.interval_months) {
-        const nextDate = new Date(data.performed_date);
+        const nextDate = new Date(dataWithCompany.performed_date);
         nextDate.setMonth(nextDate.getMonth() + parseInt(interval.interval_months));
         updateData.next_due_date = nextDate.toISOString().split('T')[0];
       }
@@ -193,25 +201,26 @@ export default function Maintenance() {
 
     // Send email notification if maintenance involves JEM Trailer or JEM 2022 RAM
     if (!editingRecord && createdRecord) {
-      const vehicle = vehicles.find(v => v.id === data.vehicle_id);
+      const vehicle = allVehicles.find(v => v.id === dataWithCompany.vehicle_id);
       if (vehicle && (vehicle.name === 'JEM Trailer' || vehicle.name === 'JEM 2022 RAM')) {
         const recordUrl = `${window.location.origin}${window.location.pathname}?view=${createdRecord.id}`;
         
         await base44.integrations.Core.SendEmail({
           to: 'manny@fishersbackyardstructures.com',
           subject: `New Maintenance Record for ${vehicle.name}`,
-          body: `A new maintenance record has been logged for ${vehicle.name}.\n\nTitle: ${data.title}\nType: ${data.maintenance_type?.replace('_', ' ')}\nDate: ${format(new Date(data.performed_date), 'MMM dd, yyyy')}\nCost: $${data.total_cost?.toFixed(2) || '0.00'}\n\nView details: ${recordUrl}`
+          body: `A new maintenance record has been logged for ${vehicle.name}.\n\nTitle: ${dataWithCompany.title}\nType: ${dataWithCompany.maintenance_type?.replace('_', ' ')}\nDate: ${format(new Date(dataWithCompany.performed_date), 'MMM dd, yyyy')}\nCost: $${dataWithCompany.total_cost?.toFixed(2) || '0.00'}\n\nView details: ${recordUrl}`
         });
       }
     }
   };
 
   const handleSubmitInterval = async (data) => {
+    const dataWithCompany = { ...data, company_id: selectedCompany };
     let createdInterval;
     if (editingInterval) {
-      await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data });
+      await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data: dataWithCompany });
     } else {
-      createdInterval = await createIntervalMutation.mutateAsync(data);
+      createdInterval = await createIntervalMutation.mutateAsync(dataWithCompany);
     }
 
     // Sync to Google Calendar if there's a next due date
