@@ -358,7 +358,15 @@ export default function InventoryReport() {
                             </Button>
                           )}
                         </TableCell>
-                        <TableCell className="font-medium">{item.name}</TableCell>
+                        <TableCell 
+                          className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer underline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.href = `/items?edit=${item.id}`;
+                          }}
+                        >
+                          {item.name}
+                        </TableCell>
                         <TableCell className="font-mono text-sm">
                           {item.item_number || '-'}
                         </TableCell>
