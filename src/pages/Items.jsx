@@ -20,7 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Plus, Search, Package, Grid3X3, List, Loader2 } from 'lucide-react';
+import { Plus, Search, Package, Grid3X3, List, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
 
@@ -41,6 +41,21 @@ export default function Items() {
     queryFn: () => base44.entities.Item.list('-created_date'),
   });
 
+  const { data: bills = [] } = useQuery({
+    queryKey: ['bills'],
+    queryFn: () => base44.entities.Bill.list(),
+  });
+
+  const { data: maintenanceRecords = [] } = useQuery({
+    queryKey: ['maintenanceRecords'],
+    queryFn: () => base44.entities.MaintenanceRecord.list(),
+  });
+
+  const { data: vehicles = [] } = useQuery({
+    queryKey: ['vehicles'],
+    queryFn: () => base44.entities.Vehicle.list(),
+  });
+
   // Check for URL parameter to auto-open edit form
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -55,20 +70,53 @@ export default function Items() {
     }
   }, [items]);
 
-  const { data: bills = [] } = useQuery({
-    queryKey: ['bills'],
-    queryFn: () => base44.entities.Bill.list(),
-  });
-
-  const { data: maintenanceRecords = [] } = useQuery({
-    queryKey: ['maintenanceRecords'],
-    queryFn: () => base44.entities.MaintenanceRecord.list(),
-  });
-
   const { data: vendors = [] } = useQuery({
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list(),
   });
+
+  const vehicleMap = vehicles.reduce((acc, v) => {
+    acc[v.id] = v;
+    return acc;
+  }, {});
+
+  const getItemTransactions = (itemId) => {
+    const transactions = [];
+
+    bills.forEach((bill) => {
+      if (bill.line_items) {
+        bill.line_items.forEach((lineItem) => {
+          if (lineItem.item_id === itemId && lineItem.item_quantity > 0) {
+            transactions.push({
+              type: 'purchase',
+              date: bill.bill_date,
+              quantity: lineItem.item_quantity,
+              vendor: bill.vendor,
+              reference: `Bill #${bill.bill_number || 'N/A'}`,
+            });
+          }
+        });
+      }
+    });
+
+    maintenanceRecords.forEach((record) => {
+      if (record.parts_used) {
+        record.parts_used.forEach((part) => {
+          if (part.item_id === itemId) {
+            transactions.push({
+              type: 'usage',
+              date: record.performed_date,
+              quantity: part.quantity_used,
+              vehicle: vehicleMap[record.vehicle_id]?.name || 'Unknown',
+              reference: record.title,
+            });
+          }
+        });
+      }
+    });
+
+    return transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  };
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Item.delete(id),
@@ -379,6 +427,46 @@ export default function Items() {
                 <p className="text-sm mt-1">{viewingItem.description}</p>
               </div>
             )}
+
+            {viewingItem && getItemTransactions(viewingItem.id).length > 0 && (
+              <div className="border-t pt-4">
+                <Label className="text-slate-500 block mb-3">Transaction History</Label>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {getItemTransactions(viewingItem.id).map((txn, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm"
+                    >
+                      <div className="flex items-center gap-3">
+                        {txn.type === 'purchase' ? (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-600" />
+                        )}
+                        <div>
+                          <p className="font-medium text-slate-900">
+                            {new Date(txn.date).toLocaleDateString()}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {txn.type === 'purchase'
+                              ? `Purchased from ${txn.vendor}`
+                              : `Used on ${txn.vehicle}`}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className={`font-semibold ${
+                          txn.type === 'purchase' ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {txn.type === 'purchase' ? '+' : '-'}
+                        {txn.quantity}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <div className="flex gap-2 mt-6 pt-4 border-t">
             <Button 
@@ -387,15 +475,6 @@ export default function Items() {
               className="flex-1"
             >
               Close
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => {
-                window.location.href = `/reports?item=${viewingItem.id}`;
-              }}
-              className="flex-1"
-            >
-              View Report
             </Button>
             <Button 
               onClick={() => {
