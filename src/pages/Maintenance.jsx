@@ -247,6 +247,22 @@ export default function Maintenance() {
     }
   };
 
+  const handleFetchMotiveData = async () => {
+    try {
+      toast.loading('Fetching Motive maintenance data...');
+      const result = await base44.functions.invoke('fetchMotiveMaintenanceData', {});
+      toast.dismiss();
+      if (result.data.success) {
+        toast.success(`Loaded ${result.data.count} inspections from Motive`);
+      } else {
+        toast.error('Failed to fetch Motive data');
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Error connecting to Motive API');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
