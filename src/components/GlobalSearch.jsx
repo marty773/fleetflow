@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
+import { useCompany } from '@/components/CompanyContext';
 
 export default function GlobalSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +16,7 @@ export default function GlobalSearch() {
   const [viewingItem, setViewingItem] = useState(null);
   const [searchTriggered, setSearchTriggered] = useState(false);
   const navigate = useNavigate();
+  const { selectedCompany } = useCompany();
 
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -59,49 +61,67 @@ export default function GlobalSearch() {
       intervals: [],
     };
 
-    // Search vehicles
+    // Search vehicles - filtered by company
     results.vehicles = vehicles.filter(v => 
-      v.name?.toLowerCase().includes(term) ||
+      v.company_id === selectedCompany &&
+      (v.name?.toLowerCase().includes(term) ||
       v.license_plate?.toLowerCase().includes(term) ||
       v.vin?.toLowerCase().includes(term) ||
       v.make?.toLowerCase().includes(term) ||
-      v.model?.toLowerCase().includes(term)
+      v.model?.toLowerCase().includes(term) ||
+      v.type?.toLowerCase().includes(term) ||
+      v.year?.toString().includes(term))
     );
 
-    // Search bills
+    // Search bills - filtered by company
     results.bills = bills.filter(b =>
-      b.vendor?.toLowerCase().includes(term) ||
+      b.company_id === selectedCompany &&
+      (b.vendor?.toLowerCase().includes(term) ||
       b.bill_number?.toLowerCase().includes(term) ||
-      b.category?.toLowerCase().includes(term)
+      b.category?.toLowerCase().includes(term) ||
+      b.notes?.toLowerCase().includes(term) ||
+      b.line_items?.some(item => 
+        item.description?.toLowerCase().includes(term)
+      ))
     );
 
-    // Search maintenance records
+    // Search maintenance records - filtered by company
     results.maintenance = maintenanceRecords.filter(m =>
-      m.title?.toLowerCase().includes(term) ||
+      m.company_id === selectedCompany &&
+      (m.title?.toLowerCase().includes(term) ||
       m.vendor?.toLowerCase().includes(term) ||
-      m.maintenance_type?.toLowerCase().includes(term)
+      m.maintenance_type?.toLowerCase().includes(term) ||
+      m.notes?.toLowerCase().includes(term) ||
+      m.odometer_reading?.toLowerCase().includes(term))
     );
 
-    // Search items
+    // Search items - filtered by company
     results.items = items.filter(i =>
-      i.name?.toLowerCase().includes(term) ||
+      i.company_id === selectedCompany &&
+      (i.name?.toLowerCase().includes(term) ||
       i.vendor?.toLowerCase().includes(term) ||
       i.item_number?.toLowerCase().includes(term) ||
-      i.description?.toLowerCase().includes(term)
+      i.description?.toLowerCase().includes(term))
     );
 
-    // Search vendors
+    // Search vendors - filtered by company
     results.vendors = vendors.filter(v =>
-      v.name?.toLowerCase().includes(term) ||
+      v.company_id === selectedCompany &&
+      (v.name?.toLowerCase().includes(term) ||
       v.contact_person?.toLowerCase().includes(term) ||
       v.email?.toLowerCase().includes(term) ||
-      v.category?.toLowerCase().includes(term)
+      v.phone?.toLowerCase().includes(term) ||
+      v.category?.toLowerCase().includes(term) ||
+      v.city?.toLowerCase().includes(term) ||
+      v.state?.toLowerCase().includes(term))
     );
 
-    // Search intervals
+    // Search intervals - filtered by company
     results.intervals = intervals.filter(i =>
-      i.interval_name?.toLowerCase().includes(term) ||
-      i.maintenance_type?.toLowerCase().includes(term)
+      i.company_id === selectedCompany &&
+      (i.interval_name?.toLowerCase().includes(term) ||
+      i.maintenance_type?.toLowerCase().includes(term) ||
+      i.notes?.toLowerCase().includes(term))
     );
 
     return results;
