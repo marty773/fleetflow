@@ -129,8 +129,8 @@ export default function Bills() {
       createdBill = await createMutation.mutateAsync(dataWithCompany);
     }
 
-    // Send email notification for all new bills
-    if (!editingBill && createdBill) {
+    // Send email notification for Fisher's Enterprise bills only
+    if (!editingBill && createdBill && selectedCompany === "Fisher's Enterprise") {
       const billUrl = `${window.location.origin}${window.location.pathname}?view=${createdBill.id}`;
       
       await base44.integrations.Core.SendEmail({
