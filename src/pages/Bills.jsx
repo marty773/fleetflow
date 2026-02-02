@@ -122,23 +122,15 @@ export default function Bills() {
       createdBill = await createMutation.mutateAsync(data);
     }
 
-    // Send email notification if bill involves JEM Trailer or JEM 2022 RAM
+    // Send email notification for all new bills
     if (!editingBill && createdBill) {
-      const affectedVehicles = data.line_items
-        ?.filter(item => item.vehicle_id)
-        .map(item => vehicles.find(v => v.id === item.vehicle_id))
-        .filter(v => v && (v.name === 'JEM Trailer' || v.name === 'JEM 2022 RAM'));
-
-      if (affectedVehicles && affectedVehicles.length > 0) {
-        const vehicleNames = affectedVehicles.map(v => v.name).join(', ');
-        const billUrl = `${window.location.origin}${window.location.pathname}?view=${createdBill.id}`;
-        
-        await base44.integrations.Core.SendEmail({
-          to: 'manny@fishersbackyardstructures.com',
-          subject: `New Bill for ${vehicleNames}`,
-          body: `A new bill has been recorded for ${vehicleNames}.\n\nVendor: ${data.vendor}\nDate: ${format(new Date(data.bill_date), 'MMM dd, yyyy')}\nTotal: $${data.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
-        });
-      }
+      const billUrl = `${window.location.origin}${window.location.pathname}?view=${createdBill.id}`;
+      
+      await base44.integrations.Core.SendEmail({
+        to: 'manny@fishersbackyardstructures.com',
+        subject: `New Bill from ${data.vendor}`,
+        body: `A new bill has been recorded.\n\nVendor: ${data.vendor}\nDate: ${format(new Date(data.bill_date), 'MMM dd, yyyy')}\nCategory: ${data.category?.replace('_', ' ')}\nTotal: $${data.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
+      });
     }
   };
 
