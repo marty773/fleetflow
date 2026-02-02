@@ -389,6 +389,15 @@ export default function Items() {
               Close
             </Button>
             <Button 
+              variant="outline"
+              onClick={() => {
+                window.location.href = `/reports?item=${viewingItem.id}`;
+              }}
+              className="flex-1"
+            >
+              View Report
+            </Button>
+            <Button 
               onClick={() => {
                 setEditingItem(viewingItem);
                 setViewingItem(null);
