@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, AlertTriangle, ChevronDown, ChevronRight, Plus, Minus, Download } from 'lucide-react';
+import { Package, AlertTriangle, ChevronDown, ChevronRight, Plus, Minus, Download, TrendingUp, TrendingDown } from 'lucide-react';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -23,6 +23,7 @@ export default function InventoryReport({ highlightItemId }) {
   const { selectedCompany } = useCompany();
   const [expandedItems, setExpandedItems] = useState({});
   const [viewingTransaction, setViewingTransaction] = useState(null);
+  const [viewingItem, setViewingItem] = useState(null);
   const [filterMode, setFilterMode] = useState('all');
   const queryClient = useQueryClient();
 
@@ -379,7 +380,7 @@ export default function InventoryReport({ highlightItemId }) {
                           className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer underline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.location.href = `/items?edit=${item.id}`;
+                            setViewingItem(item);
                           }}
                         >
                           {item.name}
@@ -449,6 +450,109 @@ export default function InventoryReport({ highlightItemId }) {
             </Table>
           </CardContent>
         </Card>
+      )}
+
+      {/* Item Quick View Dialog */}
+      {viewingItem && (
+        <Dialog open={!!viewingItem} onOpenChange={() => setViewingItem(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Item Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {viewingItem.photo_url && (
+                <div className="flex justify-center">
+                  <img
+                    src={viewingItem.photo_url}
+                    alt={viewingItem.name}
+                    className="max-h-64 rounded-lg object-cover"
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-slate-500">Name</Label>
+                  <p className="font-medium">{viewingItem.name}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Price</Label>
+                  <p className="font-medium">${viewingItem.price?.toFixed(2) || '0.00'}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Item Number</Label>
+                  <p className="font-medium">{viewingItem.item_number || '-'}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Quantity on Hand</Label>
+                  <p className="font-medium">{viewingItem.quantity_on_hand || 0}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Vendor</Label>
+                  <p className="font-medium">{viewingItem.vendor || '-'}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Low Stock Threshold</Label>
+                  <p className="font-medium">{viewingItem.low_stock_threshold || 2}</p>
+                </div>
+              </div>
+              {viewingItem.description && (
+                <div>
+                  <Label className="text-slate-500">Description</Label>
+                  <p className="text-sm mt-1">{viewingItem.description}</p>
+                </div>
+              )}
+
+              {getItemTransactions(viewingItem.id).length > 0 && (
+                <div className="border-t pt-4">
+                  <Label className="text-slate-500 block mb-3">Transaction History</Label>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {getItemTransactions(viewingItem.id).map((txn, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm"
+                      >
+                        <div className="flex items-center gap-3">
+                          {txn.type === 'purchase' ? (
+                            <TrendingUp className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <TrendingDown className="h-4 w-4 text-red-600" />
+                          )}
+                          <div>
+                            <p className="font-medium text-slate-900">
+                              {format(new Date(txn.date), 'MMM dd, yyyy')}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {txn.type === 'purchase'
+                                ? `Purchased from ${txn.vendor}`
+                                : `Used on ${txn.vehicle}`}
+                            </p>
+                          </div>
+                        </div>
+                        <span
+                          className={`font-semibold ${
+                            txn.type === 'purchase' ? 'text-green-600' : 'text-red-600'
+                          }`}
+                        >
+                          {txn.type === 'purchase' ? '+' : '-'}
+                          {txn.quantity}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 mt-6 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => setViewingItem(null)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Transaction Detail Dialog */}
