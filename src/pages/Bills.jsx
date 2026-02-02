@@ -16,15 +16,17 @@ import BillForm from '../components/bills/BillForm';
 import BillList from '../components/bills/BillList';
 import BillGallery from '../components/bills/BillGallery';
 import { format } from 'date-fns';
+import { useCompany } from '../components/CompanyContext';
 
 export default function Bills() {
+  const { selectedCompany } = useCompany();
   const [showForm, setShowForm] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
   const queryClient = useQueryClient();
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
@@ -39,10 +41,13 @@ export default function Bills() {
     queryFn: () => base44.entities.Vendor.list(),
   });
 
-  const { data: bills = [] } = useQuery({
+  const { data: allBills = [] } = useQuery({
     queryKey: ['bills'],
     queryFn: () => base44.entities.Bill.list(),
   });
+
+  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const bills = allBills.filter(b => b.company_id === selectedCompany);
 
   // Check for URL parameter to auto-open a specific bill
   React.useEffect(() => {
@@ -91,9 +96,11 @@ export default function Bills() {
   });
 
   const handleSubmit = async (data) => {
+    const dataWithCompany = { ...data, company_id: selectedCompany };
+    
     // Group line items by item_id and sum quantities
     const itemQuantityMap = {};
-    data.line_items
+    dataWithCompany.line_items
       .filter(item => item.item_id && item.item_quantity > 0)
       .forEach(item => {
         if (!itemQuantityMap[item.item_id]) {
@@ -117,9 +124,9 @@ export default function Bills() {
 
     let createdBill;
     if (editingBill) {
-      await updateMutation.mutateAsync({ id: editingBill.id, data });
+      await updateMutation.mutateAsync({ id: editingBill.id, data: dataWithCompany });
     } else {
-      createdBill = await createMutation.mutateAsync(data);
+      createdBill = await createMutation.mutateAsync(dataWithCompany);
     }
 
     // Send email notification for all new bills
@@ -128,8 +135,8 @@ export default function Bills() {
       
       await base44.integrations.Core.SendEmail({
         to: 'manny@fishersbackyardstructures.com',
-        subject: `New Bill from ${data.vendor}`,
-        body: `A new bill has been recorded.\n\nVendor: ${data.vendor}\nDate: ${format(new Date(data.bill_date), 'MMM dd, yyyy')}\nCategory: ${data.category?.replace('_', ' ')}\nTotal: $${data.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
+        subject: `New Bill from ${dataWithCompany.vendor}`,
+        body: `A new bill has been recorded.\n\nCompany: ${selectedCompany}\nVendor: ${dataWithCompany.vendor}\nDate: ${format(new Date(dataWithCompany.bill_date), 'MMM dd, yyyy')}\nCategory: ${dataWithCompany.category?.replace('_', ' ')}\nTotal: $${dataWithCompany.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
       });
     }
   };

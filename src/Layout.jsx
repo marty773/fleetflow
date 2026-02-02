@@ -5,9 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
+import CompanySelector from '@/components/CompanySelector';
+import { useCompany } from '@/components/CompanyContext';
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { selectedCompany, setSelectedCompany } = useCompany();
 
   const navItems = [
       { name: 'Dashboard', path: 'Dashboard', icon: Wrench },
@@ -42,9 +45,13 @@ export default function Layout({ children, currentPageName }) {
         }`}
       >
         <div className="p-6">
-          <div className="flex items-center gap-2 mb-8 mt-12 lg:mt-0">
+          <div className="flex items-center gap-2 mb-4 mt-12 lg:mt-0">
             <Truck className="w-8 h-8 text-amber-600" />
             <h1 className="text-xl font-bold text-slate-900">FleetTracker</h1>
+          </div>
+
+          <div className="mb-6">
+            <CompanySelector value={selectedCompany} onChange={setSelectedCompany} />
           </div>
 
           <nav className="space-y-2">

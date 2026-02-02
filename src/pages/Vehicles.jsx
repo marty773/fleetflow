@@ -7,18 +7,22 @@ import { Plus, Trash2, Edit2 } from 'lucide-react';
 import VehicleForm from '../components/vehicles/VehicleForm';
 import VehicleCard from '../components/vehicles/VehicleCard';
 import VehicleViewDialog from '../components/vehicles/VehicleViewDialog';
+import { useCompany } from '../components/CompanyContext';
 
 export default function Vehicles() {
+  const { selectedCompany } = useCompany();
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [viewingVehicle, setViewingVehicle] = useState(null);
   const queryClient = useQueryClient();
   const formRef = useRef(null);
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
+
+  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Vehicle.create(data),
@@ -45,10 +49,11 @@ export default function Vehicles() {
   });
 
   const handleSubmit = (data) => {
+    const dataWithCompany = { ...data, company_id: selectedCompany };
     if (editingVehicle) {
-      updateMutation.mutate({ id: editingVehicle.id, data });
+      updateMutation.mutate({ id: editingVehicle.id, data: dataWithCompany });
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(dataWithCompany);
     }
   };
 

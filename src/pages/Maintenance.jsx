@@ -158,9 +158,9 @@ export default function Maintenance() {
 
     let createdRecord;
     if (editingRecord) {
-      await updateRecordMutation.mutateAsync({ id: editingRecord.id, data });
+      await updateRecordMutation.mutateAsync({ id: editingRecord.id, data: dataWithCompany });
     } else {
-      createdRecord = await createRecordMutation.mutateAsync(data);
+      createdRecord = await createRecordMutation.mutateAsync(dataWithCompany);
     }
 
     // Update related maintenance intervals

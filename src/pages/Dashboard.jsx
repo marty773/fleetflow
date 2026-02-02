@@ -9,10 +9,10 @@ import { TrendingUp, AlertCircle, Wrench, DollarSign, Calendar, Plus } from 'luc
 import DashboardStats from '../components/dashboard/DashboardStats';
 import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
 import RecentExpenses from '../components/dashboard/RecentExpenses';
-import CompanySelector from '../components/CompanySelector';
+import { useCompany } from '../components/CompanyContext';
 
 export default function Dashboard() {
-  const [selectedCompany, setSelectedCompany] = useState("Fisher's Enterprise");
+  const { selectedCompany } = useCompany();
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
@@ -73,7 +73,6 @@ export default function Dashboard() {
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Fleet Dashboard</h1>
             <p className="text-slate-600">Manage your truck and trailer fleet</p>
           </div>
-          <CompanySelector value={selectedCompany} onChange={setSelectedCompany} />
         </div>
         
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
