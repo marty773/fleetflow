@@ -82,7 +82,12 @@ export default function Dashboard() {
               </Button>
             </Link>
             <Link to={createPageUrl('Maintenance')} className="flex-1 sm:flex-none">
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+              <Button 
+                className="w-full sm:w-auto"
+                style={{ backgroundColor: 'var(--color-primary)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+              >
                 <Plus className="w-4 h-4 mr-2" /> New Maintenance
               </Button>
             </Link>

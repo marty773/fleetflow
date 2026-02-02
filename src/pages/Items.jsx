@@ -213,7 +213,10 @@ export default function Items() {
 
           <Button
             onClick={handleAddNew}
-            className="h-11 bg-amber-600 hover:bg-amber-700 shadow-sm"
+            className="h-11 shadow-sm"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
           >
             <Plus className="h-5 w-5 mr-2" />
             Add Item
@@ -224,7 +227,7 @@ export default function Items() {
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+          <Loader2 className="h-8 w-8 animate-spin" style={{ color: 'var(--color-primary)' }} />
         </div>
       ) : filteredItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -240,7 +243,12 @@ export default function Items() {
               : 'Add your first item to get started'}
           </p>
           {!searchQuery && (
-            <Button onClick={handleAddNew} className="bg-amber-600 hover:bg-amber-700">
+            <Button 
+              onClick={handleAddNew}
+              style={{ backgroundColor: 'var(--color-primary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add First Item
             </Button>
@@ -287,7 +295,7 @@ export default function Items() {
                 </div>
               </div>
               {item.price && (
-                <div className="font-semibold text-amber-600 text-lg">
+                <div className="font-semibold text-lg" style={{ color: 'var(--color-primary)' }}>
                   ${item.price.toFixed(2)}
                 </div>
               )}
@@ -386,7 +394,10 @@ export default function Items() {
                 setViewingItem(null);
                 setFormOpen(true);
               }}
-              className="flex-1 bg-amber-600 hover:bg-amber-700"
+              className="flex-1"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
             >
               Edit
             </Button>

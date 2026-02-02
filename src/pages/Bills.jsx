@@ -161,7 +161,10 @@ export default function Bills() {
               setEditingBill(null);
               setShowForm(!showForm);
             }}
-            className="bg-amber-500 hover:bg-amber-600 w-full sm:w-auto"
+            className="w-full sm:w-auto"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
           >
             <Plus className="w-4 h-4 mr-2" /> New Bill
           </Button>
@@ -303,7 +306,10 @@ export default function Bills() {
                     setViewingBill(null);
                     setShowForm(true);
                   }}
-                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                  className="flex-1"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
                 >
                   Edit
                 </Button>
