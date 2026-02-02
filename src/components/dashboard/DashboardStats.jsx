@@ -8,9 +8,9 @@ export default function DashboardStats({ stats }) {
       label: 'Fleet Size',
       value: stats.totalVehicles,
       icon: TrendingUp,
-      color: 'blue',
-      bgColor: 'bg-blue-50',
-      iconColor: 'text-blue-600',
+      color: 'slate',
+      bgColor: 'bg-slate-50',
+      iconColor: 'text-slate-700',
     },
     {
       label: 'Expenses (30 Days)',
