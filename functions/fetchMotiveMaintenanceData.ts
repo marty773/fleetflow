@@ -16,9 +16,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing API credentials' }, { status: 500 });
     }
 
+    // Extract account ID from email if needed
+    const cleanAccountId = accountId.includes('@') ? accountId.split('@')[0].replace(/\./g, '') : accountId;
+
     // Fetch maintenance inspections from Motive
     const response = await fetch(
-      `https://api.motive.com/v1/accounts/${accountId}/maintenance/inspections`,
+      `https://api.motive.com/v1/accounts/${cleanAccountId}/maintenance/inspections`,
       {
         method: 'GET',
         headers: {
