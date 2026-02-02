@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useCompany } from '../CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
@@ -27,31 +28,37 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function VehicleCostReport() {
+  const { selectedCompany } = useCompany();
   const [timeframe, setTimeframe] = useState('30');
   const [expandedVehicles, setExpandedVehicles] = useState(new Set());
   const [viewingTransaction, setViewingTransaction] = useState(null);
   const [filterMode, setFilterMode] = useState('all');
   const queryClient = useQueryClient();
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const { data: bills = [] } = useQuery({
+  const { data: allBills = [] } = useQuery({
     queryKey: ['bills'],
     queryFn: () => base44.entities.Bill.list(),
   });
 
-  const { data: maintenanceRecords = [] } = useQuery({
+  const { data: allMaintenanceRecords = [] } = useQuery({
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
-  const { data: items = [] } = useQuery({
+  const { data: allItems = [] } = useQuery({
     queryKey: ['items'],
     queryFn: () => base44.entities.Item.list(),
   });
+
+  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const bills = allBills.filter(b => b.company_id === selectedCompany);
+  const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
+  const items = allItems.filter(i => i.company_id === selectedCompany);
 
   const updateBillMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Bill.update(id, data),
