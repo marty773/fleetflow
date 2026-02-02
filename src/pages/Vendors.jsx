@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCompany } from '../components/CompanyContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Phone, Mail, MapPin, Trash2, Edit, X } from 'lucide-react';
@@ -15,15 +16,18 @@ import VendorForm from '../components/vendors/VendorForm';
 import VendorCard from '../components/vendors/VendorCard';
 
 export default function Vendors() {
+  const { selectedCompany } = useCompany();
   const [showForm, setShowForm] = useState(false);
   const [editingVendor, setEditingVendor] = useState(null);
   const [viewingVendor, setViewingVendor] = useState(null);
   const queryClient = useQueryClient();
 
-  const { data: vendors = [] } = useQuery({
+  const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list(),
   });
+
+  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
 
   // Check for URL parameter to auto-open edit form
   React.useEffect(() => {

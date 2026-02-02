@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { useCompany } from '../components/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,19 +17,23 @@ import { ChevronLeft, ChevronRight, AlertCircle, Wrench } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, getDay, startOfWeek, endOfWeek, addDays } from 'date-fns';
 
 export default function Calendar() {
+  const { selectedCompany } = useCompany();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState('all');
   const [selectedDay, setSelectedDay] = useState(null);
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const { data: intervals = [] } = useQuery({
+  const { data: allIntervals = [] } = useQuery({
     queryKey: ['maintenanceIntervals'],
     queryFn: () => base44.entities.MaintenanceInterval.list(),
   });
+
+  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
