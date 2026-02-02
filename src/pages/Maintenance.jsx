@@ -135,13 +135,22 @@ export default function Maintenance() {
   });
 
   const handleSubmitRecord = async (data) => {
-    // Deduct inventory for parts used
+    // Group parts by item_id and sum quantities
+    const partQuantityMap = {};
     if (data.parts_used && data.parts_used.length > 0) {
-      for (const part of data.parts_used) {
-        const currentItem = items.find(i => i.id === part.item_id);
+      data.parts_used.forEach(part => {
+        if (!partQuantityMap[part.item_id]) {
+          partQuantityMap[part.item_id] = 0;
+        }
+        partQuantityMap[part.item_id] += part.quantity_used;
+      });
+
+      // Deduct inventory using atomic operations
+      for (const [item_id, quantity_used] of Object.entries(partQuantityMap)) {
+        const currentItem = items.find(i => i.id === item_id);
         if (currentItem) {
-          const newQty = (currentItem.quantity_on_hand || 0) - part.quantity_used;
-          await base44.entities.Item.update(part.item_id, { quantity_on_hand: Math.max(0, newQty) });
+          const newQty = (currentItem.quantity_on_hand || 0) - quantity_used;
+          await base44.entities.Item.update(item_id, { quantity_on_hand: Math.max(0, newQty) });
         }
       }
       queryClient.invalidateQueries({ queryKey: ['items'] });

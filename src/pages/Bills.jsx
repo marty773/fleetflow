@@ -91,24 +91,27 @@ export default function Bills() {
   });
 
   const handleSubmit = async (data) => {
-    // Update item quantities from line items
-    const itemUpdates = data.line_items
+    // Group line items by item_id and sum quantities
+    const itemQuantityMap = {};
+    data.line_items
       .filter(item => item.item_id && item.item_quantity > 0)
-      .map(item => ({
-        item_id: item.item_id,
-        quantity_to_add: item.item_quantity,
-      }));
+      .forEach(item => {
+        if (!itemQuantityMap[item.item_id]) {
+          itemQuantityMap[item.item_id] = 0;
+        }
+        itemQuantityMap[item.item_id] += item.item_quantity;
+      });
 
-    // Update inventory
-    for (const update of itemUpdates) {
-      const currentItem = items.find(i => i.id === update.item_id);
+    // Update inventory using atomic operations
+    for (const [item_id, quantity_to_add] of Object.entries(itemQuantityMap)) {
+      const currentItem = items.find(i => i.id === item_id);
       if (currentItem) {
-        const newQty = (currentItem.quantity_on_hand || 0) + update.quantity_to_add;
-        await base44.entities.Item.update(update.item_id, { quantity_on_hand: newQty });
+        const newQty = (currentItem.quantity_on_hand || 0) + quantity_to_add;
+        await base44.entities.Item.update(item_id, { quantity_on_hand: newQty });
       }
     }
     
-    if (itemUpdates.length > 0) {
+    if (Object.keys(itemQuantityMap).length > 0) {
       queryClient.invalidateQueries({ queryKey: ['items'] });
     }
 
