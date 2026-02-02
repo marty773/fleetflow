@@ -3,7 +3,8 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Wrench } from 'lucide-react';
+import { Plus, Wrench, Calendar as CalendarIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -197,10 +198,33 @@ export default function Maintenance() {
   };
 
   const handleSubmitInterval = async (data) => {
+    let createdInterval;
     if (editingInterval) {
       await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data });
     } else {
-      await createIntervalMutation.mutateAsync(data);
+      createdInterval = await createIntervalMutation.mutateAsync(data);
+    }
+
+    // Sync to Google Calendar if there's a next due date
+    if (data.next_due_date && createdInterval) {
+      try {
+        await base44.functions.invoke('syncMaintenanceToCalendar', { interval_id: createdInterval.id });
+        toast.success('Synced to Google Calendar');
+      } catch (error) {
+        toast.error('Failed to sync to calendar');
+      }
+    }
+  };
+
+  const handleSyncAll = async () => {
+    try {
+      toast.loading('Syncing to Google Calendar...');
+      const result = await base44.functions.invoke('syncMaintenanceToCalendar', {});
+      toast.dismiss();
+      toast.success(`Synced ${result.data.synced} maintenance dates to Google Calendar`);
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Failed to sync to calendar');
     }
   };
 
@@ -263,7 +287,14 @@ export default function Maintenance() {
           </TabsContent>
 
           <TabsContent value="intervals" className="mt-6">
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-end gap-2 mb-6">
+              <Button
+                onClick={handleSyncAll}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Google Calendar
+              </Button>
               <Button
                 onClick={() => {
                   setEditingInterval(null);
