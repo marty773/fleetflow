@@ -23,8 +23,10 @@ import { Label } from '@/components/ui/label';
 import { Plus, Search, Package, Grid3X3, List, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
+import { useCompany } from '@/components/CompanyContext';
 
 export default function Items() {
+  const { selectedCompany } = useCompany();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('grid');
   const [formOpen, setFormOpen] = useState(false);
@@ -36,25 +38,30 @@ export default function Items() {
 
   const queryClient = useQueryClient();
 
-  const { data: items = [], isLoading } = useQuery({
+  const { data: allItems = [], isLoading } = useQuery({
     queryKey: ['items'],
     queryFn: () => base44.entities.Item.list('-created_date'),
   });
 
-  const { data: bills = [] } = useQuery({
+  const { data: allBills = [] } = useQuery({
     queryKey: ['bills'],
     queryFn: () => base44.entities.Bill.list(),
   });
 
-  const { data: maintenanceRecords = [] } = useQuery({
+  const { data: allMaintenanceRecords = [] } = useQuery({
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
+
+  const items = allItems.filter(i => i.company_id === selectedCompany);
+  const bills = allBills.filter(b => b.company_id === selectedCompany);
+  const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
+  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
 
   // Check for URL parameter to auto-open edit form
   React.useEffect(() => {
