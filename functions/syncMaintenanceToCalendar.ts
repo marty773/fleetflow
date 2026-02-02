@@ -47,16 +47,11 @@ Deno.serve(async (req) => {
         description: description,
         start: {
           date: interval.next_due_date,
+          timeZone: 'America/New_York',
         },
         end: {
           date: interval.next_due_date,
-        },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            { method: 'email', minutes: 7 * 24 * 60 }, // 7 days before
-            { method: 'popup', minutes: 3 * 24 * 60 }, // 3 days before
-          ],
+          timeZone: 'America/New_York',
         },
       };
 
