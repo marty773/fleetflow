@@ -6,14 +6,45 @@ import { Phone, Mail, MapPin, Eye, Edit, Trash2 } from 'lucide-react';
 export default function VendorCard({ vendor, onView, onEdit, onDelete, isDeleting }) {
   return (
     <Card 
-      className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+      className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
       onClick={() => onView(vendor)}
     >
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg">{vendor.name}</CardTitle>
-        {vendor.category && (
-          <p className="text-xs text-slate-500 capitalize mt-1">{vendor.category}</p>
-        )}
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-lg">{vendor.name}</CardTitle>
+            {vendor.category && (
+              <p className="text-xs text-slate-500 capitalize mt-1">{vendor.category}</p>
+            )}
+          </div>
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(vendor);
+              }}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(`Delete vendor "${vendor.name}"?`)) {
+                  onDelete(vendor.id);
+                }
+              }}
+              disabled={isDeleting}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
         {vendor.contact_person && (
