@@ -72,8 +72,8 @@ function LayoutContent({ children, currentPageName }) {
       >
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4 mt-12 lg:mt-0">
-            <Truck className="w-8 h-8" style={{ color: themeColors.iconBg }} />
-            <h1 className="text-xl font-bold text-slate-900">FleetTracker</h1>
+            <img src="/dashboard-icon.png" alt="FleetFlow" className="w-8 h-8 rounded-lg" />
+            <h1 className="text-xl font-bold text-slate-900">FleetFlow</h1>
           </div>
 
           <div className="mb-6">
