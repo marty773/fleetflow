@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit2, Trash2, Truck, Package, Eye } from 'lucide-react';
+import { Edit2, Trash2, Truck, Container, Eye } from 'lucide-react';
 
 export default function VehicleCard({ vehicle, onView, onEdit, onDelete, isDeleting }) {
   return (
@@ -22,7 +22,7 @@ export default function VehicleCard({ vehicle, onView, onEdit, onDelete, isDelet
             {vehicle.type === 'truck' ? (
               <Truck className="w-3 h-3 mr-1" />
             ) : (
-              <Package className="w-3 h-3 mr-1" />
+              <Container className="w-3 h-3 mr-1" />
             )}
             {vehicle.type}
           </Badge>
