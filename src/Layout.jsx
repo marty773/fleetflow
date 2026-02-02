@@ -50,8 +50,8 @@ function LayoutContent({ children, currentPageName }) {
           --color-icon-bg: ${themeColors.iconBg};
         }
       `}</style>
-      {/* Mobile menu button */}
-      <div className="fixed top-4 left-4 z-40 lg:hidden">
+      {/* Mobile header */}
+      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center h-14 px-4 bg-white border-b border-slate-200">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 hover:bg-slate-200 rounded-lg transition"
@@ -62,6 +62,12 @@ function LayoutContent({ children, currentPageName }) {
             <Menu className="w-6 h-6 text-slate-900" />
           )}
         </button>
+        <div 
+          className="flex-1 text-center text-sm font-semibold pr-12"
+          style={{ color: themeColors.primary }}
+        >
+          {selectedCompany}
+        </div>
       </div>
 
       {/* Sidebar */}
@@ -118,9 +124,9 @@ function LayoutContent({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full pb-24">
+      <main className="flex-1 w-full pb-24 pt-14 lg:pt-0">
         <div 
-          className="flex items-center justify-center h-14 text-sm font-semibold"
+          className="hidden lg:flex items-center justify-center h-14 text-sm font-semibold"
           style={{ color: themeColors.primary }}
         >
           {selectedCompany}
