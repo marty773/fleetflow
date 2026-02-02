@@ -63,7 +63,7 @@ function LayoutContent({ children, currentPageName }) {
           )}
         </button>
         <div 
-          className="flex-1 text-center text-sm font-semibold pr-12"
+          className="flex-1 text-center text-base font-semibold pr-12"
           style={{ color: themeColors.primary }}
         >
           {selectedCompany}
@@ -124,9 +124,9 @@ function LayoutContent({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full pb-24 pt-14 lg:pt-0">
+      <main className="flex-1 w-full pb-24">
         <div 
-          className="hidden lg:flex items-center justify-center h-14 text-sm font-semibold"
+          className="mt-14 lg:mt-0 hidden lg:flex items-center justify-center h-14 text-base font-semibold"
           style={{ color: themeColors.primary }}
         >
           {selectedCompany}
