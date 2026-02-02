@@ -72,7 +72,7 @@ function LayoutContent({ children, currentPageName }) {
       >
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4 mt-12 lg:mt-0">
-            <img src="/dashboard-icon.png" alt="FleetFlow" className="w-8 h-8 rounded-lg" />
+            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695d462470d43f37f0539478/e0b7746bb_ChatGPTImageFeb2202602_58_12PM.png" alt="FleetFlow" className="w-8 h-8 rounded-lg" />
             <h1 className="text-xl font-bold text-slate-900">FleetFlow</h1>
           </div>
 
