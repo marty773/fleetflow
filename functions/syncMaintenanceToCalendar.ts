@@ -60,29 +60,39 @@ Deno.serve(async (req) => {
         },
       };
 
-      const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(event),
-      });
-
-      if (response.ok) {
-        const createdEvent = await response.json();
-        results.push({
-          interval_id: interval.id,
-          event_id: createdEvent.id,
-          event_link: createdEvent.htmlLink,
-          success: true,
+      try {
+        const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(event),
         });
-      } else {
-        const error = await response.text();
+
+        if (response.ok) {
+          const createdEvent = await response.json();
+          results.push({
+            interval_id: interval.id,
+            event_id: createdEvent.id,
+            event_link: createdEvent.htmlLink,
+            success: true,
+          });
+        } else {
+          const errorText = await response.text();
+          console.error('Calendar API error:', errorText, 'Event:', JSON.stringify(event));
+          results.push({
+            interval_id: interval.id,
+            success: false,
+            error: errorText,
+          });
+        }
+      } catch (err) {
+        console.error('Fetch error for interval', interval.id, ':', err.message);
         results.push({
           interval_id: interval.id,
           success: false,
-          error: error,
+          error: err.message,
         });
       }
     }
