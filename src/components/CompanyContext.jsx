@@ -12,11 +12,11 @@ export function CompanyProvider({ children }) {
     const fetchUserAccess = async () => {
       try {
         const user = await base44.auth.me();
-        if (user?.allowed_company_ids && user.allowed_company_ids.length > 0) {
-          setAllowedCompanies(user.allowed_company_ids);
+        if (user?.Company && user.Company.length > 0) {
+          setAllowedCompanies(user.Company);
           // Auto-select first allowed company if current selection is not allowed
-          if (!user.allowed_company_ids.includes(selectedCompany)) {
-            setSelectedCompany(user.allowed_company_ids[0]);
+          if (!user.Company.includes(selectedCompany)) {
+            setSelectedCompany(user.Company[0]);
           }
         }
       } catch (error) {
