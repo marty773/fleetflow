@@ -19,6 +19,7 @@ import IntervalForm from '../components/maintenance/IntervalForm';
 import IntervalList from '../components/maintenance/IntervalList';
 import { format } from 'date-fns';
 import { useCompany } from '../components/CompanyContext';
+import { Download } from 'lucide-react';
 
 export default function Maintenance() {
   const { selectedCompany } = useCompany();
