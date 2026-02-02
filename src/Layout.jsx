@@ -12,6 +12,23 @@ function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { selectedCompany, setSelectedCompany } = useCompany();
 
+  // Dynamic theming based on company
+  const themeColors = selectedCompany === "Pencroft Structures" 
+    ? {
+        primary: '#16a34a',      // green-600
+        primaryHover: '#15803d',  // green-700
+        primaryLight: '#bbf7d0',  // green-200
+        accent: '#22c55e',        // green-500
+        iconBg: '#16a34a'         // green-600
+      }
+    : {
+        primary: '#f59e0b',       // amber-500
+        primaryHover: '#d97706',  // amber-600
+        primaryLight: '#fde68a',  // amber-200
+        accent: '#f59e0b',        // amber-500
+        iconBg: '#d97706'         // amber-600
+      };
+
   const navItems = [
       { name: 'Dashboard', path: 'Dashboard', icon: Wrench },
       { name: 'Vehicles', path: 'Vehicles', icon: Truck },
@@ -24,6 +41,15 @@ function LayoutContent({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
+      <style>{`
+        :root {
+          --color-primary: ${themeColors.primary};
+          --color-primary-hover: ${themeColors.primaryHover};
+          --color-primary-light: ${themeColors.primaryLight};
+          --color-accent: ${themeColors.accent};
+          --color-icon-bg: ${themeColors.iconBg};
+        }
+      `}</style>
       {/* Mobile menu button */}
       <div className="fixed top-4 left-4 z-40 lg:hidden">
         <button
@@ -46,7 +72,7 @@ function LayoutContent({ children, currentPageName }) {
       >
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4 mt-12 lg:mt-0">
-            <Truck className="w-8 h-8 text-amber-600" />
+            <Truck className="w-8 h-8" style={{ color: themeColors.iconBg }} />
             <h1 className="text-xl font-bold text-slate-900">FleetTracker</h1>
           </div>
 
@@ -65,9 +91,14 @@ function LayoutContent({ children, currentPageName }) {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     isActive
-                      ? 'bg-amber-50 text-amber-700 border-l-4 border-amber-600'
+                      ? 'border-l-4'
                       : 'text-slate-600 hover:bg-slate-50'
                   }`}
+                  style={isActive ? {
+                    backgroundColor: themeColors.primaryLight,
+                    color: themeColors.primaryHover,
+                    borderLeftColor: themeColors.iconBg
+                  } : {}}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.name}</span>

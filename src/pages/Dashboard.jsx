@@ -77,7 +77,7 @@ export default function Dashboard() {
         
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
             <Link to={createPageUrl('Bills')} className="flex-1 sm:flex-none">
-              <Button className="bg-amber-500 hover:bg-amber-600 w-full sm:w-auto">
+              <Button className="w-full sm:w-auto" style={{ backgroundColor: 'var(--color-primary)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}>
                 <Plus className="w-4 h-4 mr-2" /> New Bill
               </Button>
             </Link>
