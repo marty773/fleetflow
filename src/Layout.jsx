@@ -120,7 +120,7 @@ function LayoutContent({ children, currentPageName }) {
       {/* Main Content */}
       <main className="flex-1 w-full pb-24">
         <div 
-          className="text-center text-sm font-semibold pt-4 pb-2"
+          className="text-center text-sm font-semibold pt-4 pb-2 lg:pl-0 pl-14"
           style={{ color: themeColors.primary }}
         >
           {selectedCompany}
