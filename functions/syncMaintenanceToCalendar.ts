@@ -41,17 +41,21 @@ Deno.serve(async (req) => {
         description += `\nNotes: ${interval.notes}`;
       }
 
+      // Extract date in YYYY-MM-DD format from ISO string or date
+      let dateStr = interval.next_due_date;
+      if (dateStr.includes('T')) {
+        dateStr = dateStr.split('T')[0];
+      }
+
       // Create calendar event
       const event = {
         summary: `${vehicleName} - ${interval.interval_name}`,
         description: description,
         start: {
-          date: interval.next_due_date,
-          timeZone: 'America/New_York',
+          date: dateStr,
         },
         end: {
-          date: interval.next_due_date,
-          timeZone: 'America/New_York',
+          date: dateStr,
         },
       };
 
