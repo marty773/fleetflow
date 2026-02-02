@@ -49,7 +49,10 @@ export default function ItemCard({ item, onView, onEdit, onDelete }) {
 
         {/* Price Badge */}
         {item.price && (
-          <Badge className="absolute top-3 right-3 bg-amber-500 hover:bg-amber-500 text-white font-semibold px-3 py-1 shadow-lg">
+          <Badge 
+            className="absolute top-3 right-3 text-white font-semibold px-3 py-1 shadow-lg"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          >
             ${item.price.toFixed(2)}
           </Badge>
         )}
