@@ -14,6 +14,17 @@ import VendorReport from '../components/reports/VendorReport';
 
 export default function Reports() {
   const [selectedReport, setSelectedReport] = useState('vehicle-costs');
+  const [highlightItemId, setHighlightItemId] = useState(null);
+
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('item');
+    
+    if (itemId) {
+      setSelectedReport('inventory');
+      setHighlightItemId(itemId);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
@@ -38,7 +49,7 @@ export default function Reports() {
         </div>
 
         {selectedReport === 'vehicle-costs' && <VehicleCostReport />}
-        {selectedReport === 'inventory' && <InventoryReport />}
+        {selectedReport === 'inventory' && <InventoryReport highlightItemId={highlightItemId} />}
       {selectedReport === 'vendors' && <VendorReport />}
       </div>
     </div>

@@ -19,12 +19,26 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export default function InventoryReport() {
+export default function InventoryReport({ highlightItemId }) {
   const { selectedCompany } = useCompany();
   const [expandedItems, setExpandedItems] = useState({});
   const [viewingTransaction, setViewingTransaction] = useState(null);
   const [filterMode, setFilterMode] = useState('all');
   const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    if (highlightItemId) {
+      setExpandedItems({ [highlightItemId]: true });
+      setTimeout(() => {
+        const element = document.getElementById(`item-row-${highlightItemId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('bg-blue-50');
+          setTimeout(() => element.classList.remove('bg-blue-50'), 2000);
+        }
+      }, 100);
+    }
+  }, [highlightItemId]);
 
   const { data: allItems = [] } = useQuery({
     queryKey: ['items'],
@@ -333,7 +347,10 @@ export default function InventoryReport() {
 
                   return (
                     <React.Fragment key={item.id}>
-                      <TableRow className="hover:bg-slate-50 cursor-pointer" onClick={() => {
+                      <TableRow 
+                        id={`item-row-${item.id}`}
+                        className="hover:bg-slate-50 cursor-pointer transition-colors" 
+                        onClick={() => {
                         if (window.innerWidth < 768 && transactions.length > 0) {
                           setViewingTransaction(transactions[0]);
                         } else {
