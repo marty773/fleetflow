@@ -322,7 +322,7 @@ export default function Maintenance() {
           </TabsContent>
 
           <TabsContent value="intervals" className="mt-6">
-            <div className="flex justify-end gap-2 mb-6">
+            <div className="flex flex-col lg:flex-row justify-end gap-2 mb-6">
               {selectedCompany === "Fisher's Enterprise" && (
                 <Button
                   onClick={handleFetchMotiveData}
