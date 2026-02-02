@@ -180,7 +180,10 @@ export default function GlobalSearch() {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search vehicles, bills, maintenance, items, vendors..."
-              className="pl-12 pr-10 py-6 text-base bg-white shadow-2xl border-2 border-slate-200 rounded-2xl focus:border-amber-500"
+              className="pl-12 pr-10 py-6 text-base bg-white shadow-2xl border-2 border-slate-200 rounded-2xl"
+              style={{ borderColor: 'var(--color-primary, #f59e0b)' }}
+              onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
             />
             {searchTerm && (
               <button
@@ -197,7 +200,10 @@ export default function GlobalSearch() {
           </div>
           <button
             onClick={handleSearch}
-            className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-2xl font-medium transition-colors"
+            className="px-6 py-3 text-white rounded-2xl shadow-2xl font-medium transition-colors"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
           >
             Search
           </button>
@@ -568,7 +574,10 @@ export default function GlobalSearch() {
               </button>
               <button
                 onClick={handleEdit}
-                className="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 text-white rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--color-primary)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
               >
                 Edit
               </button>
