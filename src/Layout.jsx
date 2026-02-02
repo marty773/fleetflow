@@ -6,9 +6,9 @@ import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign } from 
 import { useState } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
 import CompanySelector from '@/components/CompanySelector';
-import { useCompany } from '@/components/CompanyContext';
+import { CompanyProvider, useCompany } from '@/components/CompanyContext';
 
-export default function Layout({ children, currentPageName }) {
+function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { selectedCompany, setSelectedCompany } = useCompany();
 
@@ -96,3 +96,11 @@ export default function Layout({ children, currentPageName }) {
       </div>
       );
       }
+
+export default function Layout(props) {
+  return (
+    <CompanyProvider>
+      <LayoutContent {...props} />
+    </CompanyProvider>
+  );
+}
