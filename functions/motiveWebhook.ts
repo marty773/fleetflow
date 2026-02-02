@@ -7,6 +7,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
+    // Verify webhook secret from query parameter
+    const url = new URL(req.url);
+    const webhookSecret = url.searchParams.get('secret');
+    const expectedSecret = Deno.env.get('Motivewebhook');
+
+    if (!webhookSecret || webhookSecret !== expectedSecret) {
+      return Response.json({ error: 'Invalid webhook secret' }, { status: 401 });
+    }
+
     const payload = await req.json();
     
     // Log the webhook event (for debugging)
