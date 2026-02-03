@@ -230,11 +230,19 @@ export default function Bills() {
               <div className="space-y-4">
                 {viewingBill.photo_url && (
                   <div className="flex justify-center">
-                    <img
-                      src={viewingBill.photo_url}
-                      alt="Bill"
-                      className="max-h-64 rounded-lg object-cover"
-                    />
+                    {viewingBill.photo_url.includes('drive.google.com') ? (
+                      <iframe
+                        src={viewingBill.photo_url}
+                        className="w-full h-96 rounded-lg border"
+                        title="Bill Preview"
+                      />
+                    ) : (
+                      <img
+                        src={viewingBill.photo_url}
+                        alt="Bill"
+                        className="max-h-64 rounded-lg object-cover"
+                      />
+                    )}
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-4">

@@ -116,9 +116,20 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
 
     setPhotoUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      handleChange('photo_url', file_url);
-      setPhotoPreview(file_url);
+      // Use Google Drive for PDFs, regular upload for images
+      if (file.type === 'application/pdf') {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('fileName', file.name);
+        
+        const { data } = await base44.functions.invoke('uploadToGoogleDrive', formData);
+        handleChange('photo_url', data.preview_url);
+        setPhotoPreview(data.preview_url);
+      } else {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        handleChange('photo_url', file_url);
+        setPhotoPreview(file_url);
+      }
     } finally {
       setPhotoUploading(false);
     }
@@ -275,16 +286,14 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
             <div className="mt-2">
               {photoPreview ? (
                 <div className="relative inline-block">
-                  {photoPreview.toLowerCase().endsWith('.pdf') ? (
-                    <a
-                      href={photoPreview}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 h-40 px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-blue-600 hover:bg-slate-100"
-                    >
-                      <Upload className="w-5 h-5" />
-                      <span className="font-medium">View PDF</span>
-                    </a>
+                  {photoPreview.includes('drive.google.com') || photoPreview.toLowerCase().endsWith('.pdf') ? (
+                    <div className="relative w-full border rounded-lg overflow-hidden">
+                      <iframe
+                        src={photoPreview.includes('drive.google.com') ? photoPreview : photoPreview}
+                        className="w-full h-96"
+                        title="PDF Preview"
+                      />
+                    </div>
                   ) : (
                     <img
                       src={photoPreview}
