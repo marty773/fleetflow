@@ -47,7 +47,7 @@ export default function BillList({ bills, vehicles, items, onView, onEdit, onDel
                 <p className="text-sm text-slate-600 mb-2">{bill.vendor}</p>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-slate-500">
-                    {format(parseISO(bill.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}
+                    {format(new Date(bill.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
                   </span>
                   <Badge className={categoryColors[bill.category]} variant="outline">
                     {bill.category?.replace('_', ' ')}

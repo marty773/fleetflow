@@ -55,8 +55,10 @@ export default function BillGallery({ bills, vehicles }) {
   };
 
   const getFileName = (bill) => {
-    return `${bill.vendor}_${format(new Date(bill.bill_date), 'yyyy-MM-dd')}_${bill.bill_number || 'bill'}${isPdf(bill.photo_url) ? '.pdf' : '.jpg'}`;
+    return `${bill.vendor}_${format(new Date(bill.bill_date + 'T12:00:00'), 'yyyy-MM-dd')}_${bill.bill_number || 'bill'}${isPdf(bill.photo_url) ? '.pdf' : '.jpg'}`;
   };
+
+  const isPdfDriveUrl = (url) => url?.includes('drive.google.com');
 
   return (
     <div className="space-y-4">
@@ -72,22 +74,30 @@ export default function BillGallery({ bills, vehicles }) {
               <X className="w-5 h-5" />
             </Button>
             <div className="relative bg-black min-h-[50vh] flex items-center justify-center">
-              {isPdf(billsWithPhotos[selectedIdx].photo_url) ? (
-                <div className="bg-white rounded-lg p-4">
-                  {pdfLoading[selectedIdx] && (
-                    <div className="flex items-center justify-center h-96">
-                      <Loader className="w-8 h-8 animate-spin text-slate-400" />
-                    </div>
-                  )}
-                  <Document
-                    file={billsWithPhotos[selectedIdx].photo_url}
-                    onLoadSuccess={(pdf) => onPdfLoadSuccess(selectedIdx, pdf)}
-                    onLoadStart={() => onPdfLoadStart(selectedIdx)}
-                    loading={<div className="flex items-center justify-center h-96"><Loader className="w-8 h-8 animate-spin text-slate-400" /></div>}
-                  >
-                    <Page pageNumber={1} width={400} />
-                  </Document>
-                </div>
+              {isPdf(billsWithPhotos[selectedIdx].photo_url) || isPdfDriveUrl(billsWithPhotos[selectedIdx].photo_url) ? (
+                isPdfDriveUrl(billsWithPhotos[selectedIdx].photo_url) ? (
+                  <iframe
+                    src={billsWithPhotos[selectedIdx].photo_url}
+                    className="w-full h-[70vh] bg-white"
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <div className="bg-white rounded-lg p-4">
+                    {pdfLoading[selectedIdx] && (
+                      <div className="flex items-center justify-center h-96">
+                        <Loader className="w-8 h-8 animate-spin text-slate-400" />
+                      </div>
+                    )}
+                    <Document
+                      file={billsWithPhotos[selectedIdx].photo_url}
+                      onLoadSuccess={(pdf) => onPdfLoadSuccess(selectedIdx, pdf)}
+                      onLoadStart={() => onPdfLoadStart(selectedIdx)}
+                      loading={<div className="flex items-center justify-center h-96"><Loader className="w-8 h-8 animate-spin text-slate-400" /></div>}
+                    >
+                      <Page pageNumber={1} width={400} />
+                    </Document>
+                  </div>
+                )
               ) : (
                 <img
                   src={billsWithPhotos[selectedIdx].photo_url}
@@ -101,7 +111,7 @@ export default function BillGallery({ bills, vehicles }) {
                 </p>
                 <p className="text-sm opacity-90">
                   {billsWithPhotos[selectedIdx].vendor} •{' '}
-                  {format(new Date(billsWithPhotos[selectedIdx].bill_date), 'MMM dd, yyyy')}
+                  {format(new Date(billsWithPhotos[selectedIdx].bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
                 </p>
               </div>
             </div>
@@ -141,11 +151,19 @@ export default function BillGallery({ bills, vehicles }) {
             onClick={() => setSelectedIdx(idx)}
           >
             <div className="relative aspect-square overflow-hidden bg-slate-100 flex items-center justify-center">
-              {isPdf(bill.photo_url) ? (
-                <div className="flex flex-col items-center justify-center w-full h-full bg-slate-50">
-                  <FileText className="w-12 h-12 text-slate-400 mb-2" />
-                  <p className="text-xs text-slate-600 text-center px-2">PDF Document</p>
-                </div>
+              {isPdf(bill.photo_url) || isPdfDriveUrl(bill.photo_url) ? (
+                isPdfDriveUrl(bill.photo_url) ? (
+                  <iframe
+                    src={bill.photo_url}
+                    className="w-full h-full pointer-events-none"
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center w-full h-full bg-slate-50">
+                    <FileText className="w-12 h-12 text-slate-400 mb-2" />
+                    <p className="text-xs text-slate-600 text-center px-2">PDF Document</p>
+                  </div>
+                )
               ) : (
                 <img
                   src={bill.photo_url}
@@ -161,7 +179,7 @@ export default function BillGallery({ bills, vehicles }) {
               <p className="text-xs text-slate-600 mb-2">{bill.vendor}</p>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-500">
-                  {format(new Date(bill.bill_date), 'MMM dd, yyyy')}
+                  {format(new Date(bill.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
                 </span>
                 <span className="font-semibold text-sm text-slate-900">
                   ${bill.total_amount?.toFixed(2)}
