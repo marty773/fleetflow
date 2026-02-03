@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { Camera, ChevronRight } from 'lucide-react';
 
 export default function BillList({ bills, vehicles, items, onView, onEdit, onDelete, isDeleting }) {
@@ -47,7 +47,7 @@ export default function BillList({ bills, vehicles, items, onView, onEdit, onDel
                 <p className="text-sm text-slate-600 mb-2">{bill.vendor}</p>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-slate-500">
-                    {format(new Date(bill.bill_date), 'MMM dd, yyyy')}
+                    {format(parseISO(bill.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}
                   </span>
                   <Badge className={categoryColors[bill.category]} variant="outline">
                     {bill.category?.replace('_', ' ')}

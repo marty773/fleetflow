@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import BillForm from '../components/bills/BillForm';
 import BillList from '../components/bills/BillList';
 import BillGallery from '../components/bills/BillGallery';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Bills() {
@@ -137,7 +137,7 @@ export default function Bills() {
       await base44.integrations.Core.SendEmail({
         to: 'manny@fishersbackyardstructures.com',
         subject: `New Bill from ${dataWithCompany.vendor}`,
-        body: `A new bill has been recorded.\n\nCompany: ${selectedCompany}\nVendor: ${dataWithCompany.vendor}\nDate: ${format(new Date(dataWithCompany.bill_date), 'MMM dd, yyyy')}\nCategory: ${dataWithCompany.category?.replace('_', ' ')}\nTotal: $${dataWithCompany.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
+        body: `A new bill has been recorded.\n\nCompany: ${selectedCompany}\nVendor: ${dataWithCompany.vendor}\nDate: ${format(parseISO(dataWithCompany.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}\nCategory: ${dataWithCompany.category?.replace('_', ' ')}\nTotal: $${dataWithCompany.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
       });
     }
   };
@@ -244,7 +244,7 @@ export default function Bills() {
                   </div>
                   <div>
                     <Label className="text-slate-500">Date</Label>
-                    <p className="font-medium">{format(new Date(viewingBill.bill_date), 'MMM dd, yyyy')}</p>
+                    <p className="font-medium">{format(parseISO(viewingBill.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}</p>
                   </div>
                   <div>
                     <Label className="text-slate-500">Bill Number</Label>
