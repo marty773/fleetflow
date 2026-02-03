@@ -41,7 +41,7 @@ export default function Maintenance() {
     queryFn: () => base44.entities.Item.list(),
   });
 
-  const { data: vendors = [] } = useQuery({
+  const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list(),
   });
@@ -57,6 +57,7 @@ export default function Maintenance() {
   });
 
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
   const records = allRecords.filter(r => r.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
 

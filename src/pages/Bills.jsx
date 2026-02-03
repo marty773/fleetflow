@@ -36,7 +36,7 @@ export default function Bills() {
     queryFn: () => base44.entities.Item.list(),
   });
 
-  const { data: vendors = [] } = useQuery({
+  const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list(),
   });
