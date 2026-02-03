@@ -43,8 +43,8 @@ Deno.serve(async (req) => {
 
     return Response.json({
       success: true,
-      inspections: data.data || [],
-      count: data.data?.length || 0
+      inspections: data.inspection_reports || [],
+      count: data.inspection_reports?.length || 0
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
