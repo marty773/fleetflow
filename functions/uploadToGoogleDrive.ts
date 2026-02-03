@@ -9,26 +9,32 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const formData = await req.formData();
-    const file = formData.get('file');
-    const fileName = formData.get('fileName');
+    const { fileUrl, fileName } = await req.json();
 
-    if (!file) {
-      return Response.json({ error: 'No file provided' }, { status: 400 });
+    if (!fileUrl) {
+      return Response.json({ error: 'No file URL provided' }, { status: 400 });
     }
+
+    // Fetch the file from the URL
+    const fileResponse = await fetch(fileUrl);
+    if (!fileResponse.ok) {
+      return Response.json({ error: 'Failed to fetch file' }, { status: 500 });
+    }
+
+    const fileBlob = await fileResponse.blob();
 
     // Get Google Drive access token
     const accessToken = await base44.asServiceRole.connectors.getAccessToken('googledrive');
 
     // Upload to Google Drive
     const metadata = {
-      name: fileName || file.name,
-      mimeType: file.type,
+      name: fileName,
+      mimeType: 'application/pdf',
     };
 
     const formDataUpload = new FormData();
     formDataUpload.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    formDataUpload.append('file', file);
+    formDataUpload.append('file', fileBlob, fileName);
 
     const uploadResponse = await fetch(
       'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,webContentLink',

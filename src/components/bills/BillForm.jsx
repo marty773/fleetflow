@@ -117,12 +117,14 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
     setPhotoUploading(true);
     try {
       if (file.type === 'application/pdf') {
-        // Upload PDF to Google Drive using the backend function
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('fileName', file.name);
+        // First upload to temp storage, then move to Google Drive
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
         
-        const response = await base44.functions.invoke('uploadToGoogleDrive', formData);
+        // Pass the URL to the backend function to upload to Drive
+        const response = await base44.functions.invoke('uploadToGoogleDrive', {
+          fileUrl: file_url,
+          fileName: file.name
+        });
         
         handleChange('photo_url', response.data.preview_url);
         setPhotoPreview(response.data.preview_url);
