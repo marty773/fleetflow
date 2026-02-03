@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
 
     // Fetch maintenance inspections from Motive
     const response = await fetch(
-      `https://api.motive.com/v1/accounts/${cleanAccountId}/maintenance/inspections`,
+      `https://api.gomotive.com/v1/accounts/${cleanAccountId}/maintenance/inspections`,
       {
         method: 'GET',
         headers: {
