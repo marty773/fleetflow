@@ -20,10 +20,6 @@ Deno.serve(async (req) => {
     // Get Google Drive access token
     const accessToken = await base44.asServiceRole.connectors.getAccessToken('googledrive');
 
-    // Convert file to buffer
-    const fileBuffer = await file.arrayBuffer();
-    const fileBlob = new Uint8Array(fileBuffer);
-
     // Upload to Google Drive
     const metadata = {
       name: fileName || file.name,
@@ -32,7 +28,7 @@ Deno.serve(async (req) => {
 
     const formDataUpload = new FormData();
     formDataUpload.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    formDataUpload.append('file', new Blob([fileBlob], { type: file.type }));
+    formDataUpload.append('file', file);
 
     const uploadResponse = await fetch(
       'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,webContentLink',
