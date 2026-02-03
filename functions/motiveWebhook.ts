@@ -65,26 +65,76 @@ Deno.serve(async (req) => {
           message: `Vehicle created: ${vehicleData.name}`
         });
       }
-    } else if (event_type === 'maintenance.inspection.completed') {
-      const { data } = payload;
-      // Create maintenance record from inspection data
+    } else if (event_type === 'inspection_report_upserted') {
+      // Handle inspection report created/updated
+      const vehicleVin = payload.vehicle?.vin;
+      
+      if (!vehicleVin) {
+        return Response.json({ error: 'Missing vehicle VIN in inspection report' }, { status: 400 });
+      }
+
+      // Find the vehicle by VIN
+      const vehicles = await base44.asServiceRole.entities.Vehicle.filter({ vin: vehicleVin });
+      
+      if (vehicles.length === 0) {
+        return Response.json({ error: `Vehicle not found with VIN: ${vehicleVin}` }, { status: 404 });
+      }
+
+      const vehicle = vehicles[0];
+
+      // Build notes with defects information
+      let notes = `Motive Inspection Report ID: ${payload.id}\n`;
+      notes += `Status: ${payload.status}\n`;
+      notes += `Location: ${payload.location || 'N/A'}\n`;
+      notes += `Driver: ${payload.driver?.first_name} ${payload.driver?.last_name}\n`;
+      
+      if (payload.mechanic) {
+        notes += `Mechanic: ${payload.mechanic.first_name} ${payload.mechanic.last_name}\n`;
+      }
+      
+      if (payload.defects && payload.defects.length > 0) {
+        notes += `\nDefects Found:\n`;
+        payload.defects.forEach(defect => {
+          notes += `- ${defect.category} (${defect.area})${defect.notes ? ': ' + defect.notes : ''}\n`;
+        });
+      }
+
       const maintenanceRecord = {
         company_id: "Fisher's Enterprise",
-        vehicle_id: data.vehicle_id || '',
-        title: data.inspection_type || 'Inspection',
-        performed_date: data.completed_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+        vehicle_id: vehicle.id,
+        title: `${payload.status === 'satisfactory' ? 'Passed' : 'Failed'} Inspection`,
+        performed_date: payload.date,
         maintenance_type: 'inspection',
-        vendor: 'Motive',
-        notes: data.notes || `Motive inspection ID: ${data.id}`
+        vendor: payload.carrier_name || 'Motive',
+        odometer_reading: payload.odometer?.toString() || '',
+        notes: notes.trim()
       };
 
-      // Create the record
-      await base44.asServiceRole.entities.MaintenanceRecord.create(maintenanceRecord);
-      
-      return Response.json({ 
-        success: true, 
-        message: 'Maintenance record created from inspection' 
+      // Check if maintenance record already exists by Motive inspection ID
+      const existingRecords = await base44.asServiceRole.entities.MaintenanceRecord.filter({
+        vehicle_id: vehicle.id,
+        notes: { $regex: `Motive Inspection Report ID: ${payload.id}` }
       });
+
+      if (payload.trigger === 'deleted' && existingRecords.length > 0) {
+        await base44.asServiceRole.entities.MaintenanceRecord.delete(existingRecords[0].id);
+        return Response.json({
+          success: true,
+          message: 'Inspection report deleted'
+        });
+      } else if (existingRecords.length > 0) {
+        await base44.asServiceRole.entities.MaintenanceRecord.update(existingRecords[0].id, maintenanceRecord);
+        return Response.json({
+          success: true,
+          message: 'Inspection report updated'
+        });
+      } else {
+        await base44.asServiceRole.entities.MaintenanceRecord.create(maintenanceRecord);
+        return Response.json({
+          success: true,
+          message: 'Inspection report created'
+        });
+      }
     }
 
     return Response.json({ 
