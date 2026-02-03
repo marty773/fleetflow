@@ -116,15 +116,31 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
 
     setPhotoUploading(true);
     try {
-      // Use Google Drive for PDFs, regular upload for images
       if (file.type === 'application/pdf') {
+        // First upload to regular storage, then move to Google Drive
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        
+        // Fetch the file and upload to Google Drive
+        const response = await fetch(file_url);
+        const blob = await response.blob();
+        
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', blob, file.name);
         formData.append('fileName', file.name);
         
-        const { data } = await base44.functions.invoke('uploadToGoogleDrive', formData);
-        handleChange('photo_url', data.preview_url);
-        setPhotoPreview(data.preview_url);
+        // Call the function directly with fetch to support FormData
+        const uploadResponse = await fetch('/api/functions/uploadToGoogleDrive', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const result = await uploadResponse.json();
+        if (!uploadResponse.ok) {
+          throw new Error(result.error || 'Upload failed');
+        }
+        
+        handleChange('photo_url', result.preview_url);
+        setPhotoPreview(result.preview_url);
       } else {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         handleChange('photo_url', file_url);
