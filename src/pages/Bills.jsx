@@ -47,6 +47,7 @@ export default function Bills() {
   });
 
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
   const bills = allBills.filter(b => b.company_id === selectedCompany);
 
   // Check for URL parameter to auto-open a specific bill
