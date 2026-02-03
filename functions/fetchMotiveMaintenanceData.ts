@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
       {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'X-API-Key': apiKey,
           'Content-Type': 'application/json'
         }
       }
