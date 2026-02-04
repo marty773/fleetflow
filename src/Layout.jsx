@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign } from 'lucide-react';
+import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import { useState } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
 import CompanySelector from '@/components/CompanySelector';
@@ -38,6 +39,12 @@ function LayoutContent({ children, currentPageName }) {
       { name: 'Calendar', path: 'Calendar', icon: Calendar },
       { name: 'Reports', path: 'Reports', icon: DollarSign },
     ];
+
+  const [currentUser, setCurrentUser] = React.useState(null);
+
+  React.useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
@@ -87,7 +94,7 @@ function LayoutContent({ children, currentPageName }) {
           </div>
 
           <nav className="space-y-2">
-                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4)].map(item => {
+                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].map(item => {
               const Icon = item.icon;
               const isActive = currentPageName === item.name;
               return (
