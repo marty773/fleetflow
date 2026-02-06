@@ -39,7 +39,10 @@ Deno.serve(async (req) => {
     console.log('Tokens received successfully');
     
     // Initialize Base44 client with service role credentials
-    const base44 = createServiceRoleClient();
+    const base44 = createServiceRoleClient({
+      appId: Deno.env.get("BASE44_APP_ID"),
+      appOwner: Deno.env.get("BASE44_APP_OWNER")
+    });
     
     // Calculate token expiry time
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
