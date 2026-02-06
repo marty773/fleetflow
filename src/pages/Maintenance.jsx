@@ -29,6 +29,7 @@ export default function Maintenance() {
   const [editingInterval, setEditingInterval] = useState(null);
   const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('records');
+  const [calendarConnected, setCalendarConnected] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
@@ -61,12 +62,33 @@ export default function Maintenance() {
   const records = allRecords.filter(r => r.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
 
+  // Check calendar connection status
+  React.useEffect(() => {
+    const checkCalendarConnection = async () => {
+      try {
+        const user = await base44.auth.me();
+        const userAuths = await base44.entities.UserCalendarAuth.filter({ user_email: user.email });
+        setCalendarConnected(userAuths.length > 0);
+      } catch (error) {
+        setCalendarConnected(false);
+      }
+    };
+    checkCalendarConnection();
+  }, []);
+
   // Check for URL parameter to auto-open a specific record or interval
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
     const editId = urlParams.get('edit');
     const editIntervalId = urlParams.get('editInterval');
+    const calendarConnectedParam = urlParams.get('calendar_connected');
+    
+    if (calendarConnectedParam === 'true') {
+      setCalendarConnected(true);
+      toast.success('Google Calendar connected successfully!');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
     
     if (editId && records.length > 0) {
       const record = records.find(r => r.id === editId);
@@ -236,15 +258,29 @@ export default function Maintenance() {
     }
   };
 
-  const handleSyncAll = async () => {
+  const handleConnectCalendar = async () => {
     try {
-      toast.loading('Syncing to Google Calendar...');
-      const result = await base44.functions.invoke('syncMaintenanceToCalendar', {});
+      const result = await base44.functions.invoke('authorizeUserCalendar', {});
+      window.location.href = result.data.authUrl;
+    } catch (error) {
+      toast.error('Failed to connect calendar');
+    }
+  };
+
+  const handleSyncAll = async () => {
+    if (!calendarConnected) {
+      toast.error('Please connect your Google Calendar first');
+      return;
+    }
+    
+    try {
+      toast.loading('Syncing to your Google Calendar...');
+      const result = await base44.functions.invoke('syncUserMaintenanceToCalendar', {});
       toast.dismiss();
-      toast.success(`Synced ${result.data.synced} maintenance dates to Google Calendar`);
+      toast.success(result.data.message);
     } catch (error) {
       toast.dismiss();
-      toast.error('Failed to sync to calendar');
+      toast.error(error.response?.data?.error || 'Failed to sync to calendar');
     }
   };
 
@@ -333,13 +369,23 @@ export default function Maintenance() {
                   <Download className="w-4 h-4 mr-2" /> Import from Motive
                 </Button>
               )}
-              <Button
-                onClick={handleSyncAll}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Google Calendar
-              </Button>
+              {!calendarConnected ? (
+                <Button
+                  onClick={handleConnectCalendar}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect Calendar
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSyncAll}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
+                </Button>
+              )}
               <Button
                 onClick={() => {
                   setEditingInterval(null);
