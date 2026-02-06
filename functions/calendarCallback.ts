@@ -35,24 +35,30 @@ Deno.serve(async (req) => {
 
     const tokens = await tokenResponse.json();
     
-    const base44 = createClientFromRequest(req);
+    // Use service role initialization instead of createClientFromRequest
+    // because OAuth callbacks don't carry app context in the request
+    const { createServiceRoleClient } = await import('npm:@base44/sdk@0.8.6');
+    const base44 = createServiceRoleClient(
+      Deno.env.get('BASE44_APP_ID'),
+      Deno.env.get('BASE44_APP_OWNER')
+    );
     
     // Calculate token expiry time
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
 
     // Check if user already has a calendar auth record
-    const existingAuths = await base44.asServiceRole.entities.UserCalendarAuth.filter({ user_email: userEmail });
+    const existingAuths = await base44.entities.UserCalendarAuth.filter({ user_email: userEmail });
     
     if (existingAuths.length > 0) {
       // Update existing
-      await base44.asServiceRole.entities.UserCalendarAuth.update(existingAuths[0].id, {
+      await base44.entities.UserCalendarAuth.update(existingAuths[0].id, {
         calendar_access_token: tokens.access_token,
         calendar_refresh_token: tokens.refresh_token || existingAuths[0].calendar_refresh_token,
         token_expires_at: expiresAt,
       });
     } else {
       // Create new
-      await base44.asServiceRole.entities.UserCalendarAuth.create({
+      await base44.entities.UserCalendarAuth.create({
         user_email: userEmail,
         calendar_access_token: tokens.access_token,
         calendar_refresh_token: tokens.refresh_token,
