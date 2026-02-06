@@ -70,6 +70,17 @@ export default function Calendar() {
     checkCalendarConnection();
   }, [selectedCompany]);
 
+  // Check for calendar connection success from redirect
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const calendarConnectedParam = urlParams.get('calendar_connected');
+    if (calendarConnectedParam === 'true') {
+      setUserCalendarConnected(true);
+      toast.success('Personal calendar connected!');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
