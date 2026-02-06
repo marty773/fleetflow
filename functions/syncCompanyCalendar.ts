@@ -15,8 +15,38 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'company_id is required' }, { status: 400 });
     }
 
-    // Use app connector to get access token
-    const accessToken = await base44.asServiceRole.connectors.getAccessToken("googlecalendar");
+    // Fetch company calendar auth
+    const companyAuths = await base44.asServiceRole.entities.CompanyCalendarAuth.filter({ company_id });
+    
+    if (!companyAuths || companyAuths.length === 0) {
+      return Response.json({ error: 'Company calendar not connected' }, { status: 400 });
+    }
+
+    const companyAuth = companyAuths[0];
+    let accessToken = companyAuth.calendar_access_token;
+
+    // Check if token is expired and refresh if needed
+    if (new Date(companyAuth.token_expires_at) <= new Date()) {
+      const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: Deno.env.get('GOOGLE_CLIENT_ID'),
+          client_secret: Deno.env.get('GOOGLE_CLIENT_SECRET'),
+          refresh_token: companyAuth.calendar_refresh_token,
+          grant_type: 'refresh_token',
+        }),
+      });
+
+      const refreshData = await refreshResponse.json();
+      accessToken = refreshData.access_token;
+
+      // Update token in database
+      await base44.asServiceRole.entities.CompanyCalendarAuth.update(companyAuth.id, {
+        calendar_access_token: accessToken,
+        token_expires_at: new Date(Date.now() + refreshData.expires_in * 1000).toISOString(),
+      });
+    }
 
     const appointments = await base44.entities.CalendarAppointment.filter({ company_id });
     const vehicles = await base44.entities.Vehicle.filter({ company_id });
@@ -51,7 +81,9 @@ Deno.serve(async (req) => {
         eventData.end = { dateTime, timeZone: 'America/New_York' };
       }
 
-      await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+      const targetCalendarId = calendarId !== 'primary' ? calendarId : (companyAuth.calendar_id || 'primary');
+
+      await fetch(`https://www.googleapis.com/calendar/v3/calendars/${targetCalendarId}/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
