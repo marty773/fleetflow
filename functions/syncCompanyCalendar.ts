@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { company_id } = await req.json();
+    const { company_id, futureOnly = false, calendarId } = await req.json();
 
     if (!company_id) {
       return Response.json({ error: 'company_id is required' }, { status: 400 });
@@ -56,7 +56,18 @@ Deno.serve(async (req) => {
     const vehicleMap = Object.fromEntries(vehicles.map(v => [v.id, v]));
 
     let synced = 0;
+    let skipped = 0;
+    
+    // Use provided calendarId or fall back to stored calendar_id or 'primary'
+    const targetCalendarId = calendarId || auth.calendar_id || 'primary';
+    
     for (const appointment of appointments) {
+      // Skip past dates if futureOnly is enabled
+      if (futureOnly && new Date(appointment.appointment_date) < new Date()) {
+        skipped++;
+        continue;
+      }
+
       const vehicle = vehicleMap[appointment.vehicle_id];
       const eventData = {
         summary: `${appointment.title} - ${vehicle?.name || 'Vehicle'}`,
@@ -76,7 +87,7 @@ Deno.serve(async (req) => {
         eventData.end = { dateTime, timeZone: 'America/New_York' };
       }
 
-      await fetch(`https://www.googleapis.com/calendar/v3/calendars/${auth.calendar_id}/events`, {
+      await fetch(`https://www.googleapis.com/calendar/v3/calendars/${targetCalendarId}/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -90,7 +101,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ 
       success: true, 
-      message: `Synced ${synced} appointments to company calendar`
+      message: `Synced ${synced} appointments to company calendar${skipped > 0 ? ` (${skipped} past appointments skipped)` : ''}`
     });
   } catch (error) {
     console.error('Error syncing calendar:', error);

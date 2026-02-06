@@ -17,6 +17,7 @@ import { ChevronLeft, ChevronRight, AlertCircle, Wrench, Calendar as CalendarIco
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, getDay, startOfWeek, endOfWeek, addDays } from 'date-fns';
 import { toast } from 'sonner';
 import AppointmentForm from '../components/calendar/AppointmentForm';
+import SyncDialog from '../components/calendar/SyncDialog';
 
 export default function Calendar() {
   const { selectedCompany } = useCompany();
@@ -29,6 +30,11 @@ export default function Calendar() {
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showUserSyncDialog, setShowUserSyncDialog] = useState(false);
+  const [showCompanySyncDialog, setShowCompanySyncDialog] = useState(false);
+  const [companyCalendars, setCompanyCalendars] = useState([]);
+  const [isSyncingUser, setIsSyncingUser] = useState(false);
+  const [isSyncingCompany, setIsSyncingCompany] = useState(false);
 
   React.useEffect(() => {
     base44.auth.me().then(setCurrentUser).catch(() => {});
@@ -204,37 +210,60 @@ export default function Calendar() {
     }
   };
 
-  const handleSyncUserCalendar = async () => {
+  const handleOpenUserSync = () => {
     if (!userCalendarConnected) {
       toast.error('Please connect your calendar first');
       return;
     }
-    
-    try {
-      toast.loading('Syncing to your calendar...');
-      const result = await base44.functions.invoke('syncUserMaintenanceToCalendar', {});
-      toast.dismiss();
-      toast.success(result.data.message);
-    } catch (error) {
-      toast.dismiss();
-      toast.error(error.response?.data?.error || 'Failed to sync');
-    }
+    setShowUserSyncDialog(true);
   };
 
-  const handleSyncCompanyCalendar = async () => {
+  const handleOpenCompanySync = async () => {
     if (!companyCalendarConnected) {
       toast.error('Please connect company calendar first');
       return;
     }
     
+    // Fetch available calendars
     try {
-      toast.loading('Syncing to company calendar...');
-      const result = await base44.functions.invoke('syncCompanyCalendar', { company_id: selectedCompany });
-      toast.dismiss();
-      toast.success(result.data.message);
+      const result = await base44.functions.invoke('listCompanyCalendars', { company_id: selectedCompany });
+      setCompanyCalendars(result.data.calendars || []);
+      setShowCompanySyncDialog(true);
     } catch (error) {
-      toast.dismiss();
+      toast.error('Failed to load calendars');
+    }
+  };
+
+  const handleSyncUserCalendar = async ({ futureOnly, calendarId }) => {
+    setIsSyncingUser(true);
+    try {
+      const result = await base44.functions.invoke('syncUserMaintenanceToCalendar', {
+        futureOnly,
+        calendarId
+      });
+      toast.success(result.data.message);
+      setShowUserSyncDialog(false);
+    } catch (error) {
       toast.error(error.response?.data?.error || 'Failed to sync');
+    } finally {
+      setIsSyncingUser(false);
+    }
+  };
+
+  const handleSyncCompanyCalendar = async ({ futureOnly, calendarId }) => {
+    setIsSyncingCompany(true);
+    try {
+      const result = await base44.functions.invoke('syncCompanyCalendar', {
+        company_id: selectedCompany,
+        futureOnly,
+        calendarId
+      });
+      toast.success(result.data.message);
+      setShowCompanySyncDialog(false);
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to sync');
+    } finally {
+      setIsSyncingCompany(false);
     }
   };
 
@@ -309,7 +338,7 @@ export default function Calendar() {
                 </Button>
               ) : (
                 <Button
-                  onClick={handleSyncUserCalendar}
+                  onClick={handleOpenUserSync}
                   variant="outline"
                   className="border-blue-300 text-blue-700 hover:bg-blue-50"
                 >
@@ -329,7 +358,7 @@ export default function Calendar() {
                   </Button>
                 ) : (
                   <Button
-                    onClick={handleSyncCompanyCalendar}
+                    onClick={handleOpenCompanySync}
                     variant="outline"
                     className="border-green-300 text-green-700 hover:bg-green-50"
                   >
@@ -529,6 +558,24 @@ export default function Calendar() {
             </Card>
           </div>
         </div>
+
+        {/* Sync Dialogs */}
+        <SyncDialog
+          open={showUserSyncDialog}
+          onOpenChange={setShowUserSyncDialog}
+          onSync={handleSyncUserCalendar}
+          isLoading={isSyncingUser}
+          syncType="user"
+        />
+
+        <SyncDialog
+          open={showCompanySyncDialog}
+          onOpenChange={setShowCompanySyncDialog}
+          onSync={handleSyncCompanyCalendar}
+          isLoading={isSyncingCompany}
+          syncType="company"
+          availableCalendars={companyCalendars}
+        />
 
         {/* Day View Dialog */}
         {selectedDay && (

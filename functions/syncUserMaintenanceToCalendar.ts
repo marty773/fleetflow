@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { interval_id } = await req.json();
+    const { interval_id, futureOnly = false, calendarId = 'primary' } = await req.json();
 
     // Get user's calendar auth
     const userAuths = await base44.asServiceRole.entities.UserCalendarAuth.filter({ user_email: user.email });
@@ -78,6 +78,16 @@ Deno.serve(async (req) => {
         continue;
       }
 
+      // Skip past dates if futureOnly is enabled
+      if (futureOnly && new Date(interval.next_due_date) < new Date()) {
+        results.push({
+          interval_id: interval.id,
+          success: false,
+          error: 'Skipped (past date)',
+        });
+        continue;
+      }
+
       const vehicleName = vehicleMap[interval.vehicle_id] || 'Unknown Vehicle';
       
       const event = {
@@ -98,7 +108,7 @@ Deno.serve(async (req) => {
         },
       };
 
-      const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
