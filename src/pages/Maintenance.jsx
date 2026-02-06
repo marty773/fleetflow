@@ -61,6 +61,7 @@ export default function Maintenance() {
   const vendors = allVendors.filter(v => v.company_id === selectedCompany);
   const records = allRecords.filter(r => r.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
+  const filteredItems = items.filter(i => i.company_id === selectedCompany);
 
   // Check calendar connection status
   React.useEffect(() => {
