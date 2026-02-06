@@ -52,30 +52,18 @@ export default function Calendar() {
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
   const appointments = allAppointments.filter(a => a.company_id === selectedCompany);
 
-  // Check calendar connection status
+  // Check company calendar connection status
   React.useEffect(() => {
     const checkCalendarConnection = async () => {
       try {
-        const user = await base44.auth.me();
-        const userAuths = await base44.entities.UserCalendarAuth.filter({ user_email: user.email });
-        setCalendarConnected(userAuths.length > 0);
+        const companyAuth = await base44.entities.CompanyCalendarAuth.filter({ company_id: selectedCompany });
+        setCalendarConnected(companyAuth.length > 0);
       } catch (error) {
         setCalendarConnected(false);
       }
     };
     checkCalendarConnection();
-  }, []);
-
-  // Check for calendar connection success
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const calendarConnectedParam = urlParams.get('calendar_connected');
-    if (calendarConnectedParam === 'true') {
-      setCalendarConnected(true);
-      toast.success('Google Calendar connected successfully!');
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, []);
+  }, [selectedCompany]);
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
@@ -167,10 +155,27 @@ export default function Calendar() {
 
   const handleConnectCalendar = async () => {
     try {
-      const result = await base44.functions.invoke('authorizeUserCalendar', {});
-      window.location.href = result.data.authUrl;
+      const result = await base44.functions.invoke('authorizeCompanyCalendar', { company_id: selectedCompany });
+      const authWindow = window.open(result.data.authUrl, '_blank', 'width=600,height=600');
+      
+      const messageHandler = (event) => {
+        if (event.data === 'calendar_connected') {
+          setCalendarConnected(true);
+          toast.success('Company calendar connected successfully!');
+          window.removeEventListener('message', messageHandler);
+        }
+      };
+      
+      window.addEventListener('message', messageHandler);
+      
+      const checkWindow = setInterval(() => {
+        if (authWindow && authWindow.closed) {
+          clearInterval(checkWindow);
+          window.removeEventListener('message', messageHandler);
+        }
+      }, 1000);
     } catch (error) {
-      toast.error('Failed to connect calendar');
+      toast.error(error.response?.data?.error || 'Failed to connect calendar');
     }
   };
 
