@@ -1,8 +1,9 @@
-import { createServiceRoleClient } from 'npm:@base44/sdk@0.8.6';
+import { createClient } from 'npm:@base44/sdk@0.8.6';
 
 const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
 const REDIRECT_URI = `${Deno.env.get("BASE_URL")}/api/functions/calendarCallback`;
+const APP_OWNER = Deno.env.get("BASE44_APP_OWNER");
 
 Deno.serve(async (req) => {
   try {
@@ -35,8 +36,11 @@ Deno.serve(async (req) => {
 
     const tokens = await tokenResponse.json();
     
-    // Initialize Base44 service role client for webhook context
-    const base44 = createServiceRoleClient();
+    // Initialize Base44 client with service role credentials
+    const base44 = createClient({
+      serviceRole: true,
+      appOwner: APP_OWNER
+    });
     
     // Calculate token expiry time
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
