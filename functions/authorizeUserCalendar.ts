@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
+const REDIRECT_URI = `${Deno.env.get("BASE_URL")}/api/functions/calendarCallback`;
 
 Deno.serve(async (req) => {
   try {
@@ -10,10 +11,6 @@ Deno.serve(async (req) => {
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    // Build redirect URI from the current request URL
-    const requestUrl = new URL(req.url);
-    const REDIRECT_URI = `${requestUrl.protocol}//${requestUrl.host}/api/functions/calendarCallback`;
 
     // Generate authorization URL
     const scopes = [

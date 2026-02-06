@@ -2,6 +2,7 @@ import { createServiceRoleClient } from 'npm:@base44/sdk@0.8.6';
 
 const CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
 const CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
+const REDIRECT_URI = Deno.env.get("BASE_URL") + "/api/functions/companyCalendarCallback";
 const APP_ID = Deno.env.get("BASE44_APP_ID");
 const APP_OWNER = Deno.env.get("BASE44_APP_OWNER");
 
@@ -18,9 +19,6 @@ Deno.serve(async (req) => {
     }
 
     const { company_id, user_email } = JSON.parse(state);
-
-    // Build redirect URI from the current request URL
-    const REDIRECT_URI = `${url.protocol}//${url.host}/api/functions/companyCalendarCallback`;
 
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
