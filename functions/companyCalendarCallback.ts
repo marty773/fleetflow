@@ -3,8 +3,6 @@ import { createServiceRoleClient } from 'npm:@base44/sdk@0.8.6';
 const CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
 const CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
 const REDIRECT_URI = Deno.env.get("BASE_URL") + "/api/functions/companyCalendarCallback";
-const APP_ID = Deno.env.get("BASE44_APP_ID");
-const APP_OWNER = Deno.env.get("BASE44_APP_OWNER");
 
 Deno.serve(async (req) => {
   try {
@@ -42,7 +40,7 @@ Deno.serve(async (req) => {
     console.log('Tokens received successfully');
 
     // Initialize Base44 client with service role credentials
-    const base44 = createServiceRoleClient({ appId: APP_ID, appOwner: APP_OWNER });
+    const base44 = createServiceRoleClient();
 
     const existing = await base44.entities.CompanyCalendarAuth.filter({ company_id });
     
