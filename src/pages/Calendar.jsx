@@ -59,32 +59,10 @@ export default function Calendar() {
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
   const appointments = allAppointments.filter(a => a.company_id === selectedCompany);
 
-  // Check calendar connection status
+  // Calendar is always connected via app connectors
   React.useEffect(() => {
-    const checkCalendarConnection = async () => {
-      try {
-        const user = await base44.auth.me();
-        const companyAuth = await base44.entities.CompanyCalendarAuth.filter({ company_id: selectedCompany });
-        const userAuth = await base44.entities.UserCalendarAuth.filter({ user_email: user.email });
-        setCompanyCalendarConnected(companyAuth.length > 0);
-        setUserCalendarConnected(userAuth.length > 0);
-      } catch (error) {
-        setCompanyCalendarConnected(false);
-        setUserCalendarConnected(false);
-      }
-    };
-    checkCalendarConnection();
-  }, [selectedCompany]);
-
-  // Check for calendar connection success from redirect
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const calendarConnectedParam = urlParams.get('calendar_connected');
-    if (calendarConnectedParam === 'true') {
-      setUserCalendarConnected(true);
-      toast.success('Personal calendar connected!');
-      window.history.replaceState({}, '', window.location.pathname);
-    }
+    setUserCalendarConnected(true);
+    setCompanyCalendarConnected(true);
   }, []);
 
   const vehicleMap = vehicles.reduce((acc, v) => {
@@ -175,40 +153,7 @@ export default function Calendar() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
   };
 
-  const handleConnectUserCalendar = async () => {
-    try {
-      const result = await base44.functions.invoke('authorizeUserCalendar', {});
-      window.location.href = result.data.authUrl;
-    } catch (error) {
-      toast.error('Failed to connect personal calendar');
-    }
-  };
 
-  const handleConnectCompanyCalendar = async () => {
-    try {
-      const result = await base44.functions.invoke('authorizeCompanyCalendar', { company_id: selectedCompany });
-      const authWindow = window.open(result.data.authUrl, '_blank', 'width=600,height=600');
-      
-      const messageHandler = (event) => {
-        if (event.data === 'calendar_connected') {
-          setCompanyCalendarConnected(true);
-          toast.success('Company calendar connected!');
-          window.removeEventListener('message', messageHandler);
-        }
-      };
-      
-      window.addEventListener('message', messageHandler);
-      
-      const checkWindow = setInterval(() => {
-        if (authWindow && authWindow.closed) {
-          clearInterval(checkWindow);
-          window.removeEventListener('message', messageHandler);
-        }
-      }, 1000);
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to connect calendar');
-    }
-  };
 
   const handleOpenUserSync = () => {
     setShowUserSyncDialog(true);
@@ -319,43 +264,23 @@ export default function Calendar() {
             {/* Calendar buttons row */}
             <div className="flex flex-col sm:flex-row gap-3">
               {/* User's personal calendar */}
-              {!userCalendarConnected ? (
-                <Button
-                  onClick={handleConnectUserCalendar}
-                  variant="outline"
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect My Calendar
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleOpenUserSync}
-                  variant="outline"
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
-                </Button>
-              )}
+              <Button
+                onClick={handleOpenUserSync}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
+              </Button>
 
               {/* Company calendar (admin only) */}
               {currentUser?.role === 'admin' && (
-                !companyCalendarConnected ? (
-                  <Button
-                    onClick={handleConnectCompanyCalendar}
-                    variant="outline"
-                    className="border-green-300 text-green-700 hover:bg-green-50"
-                  >
-                    <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleOpenCompanySync}
-                    variant="outline"
-                    className="border-green-300 text-green-700 hover:bg-green-50"
-                  >
-                    <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
-                  </Button>
-                )
+                <Button
+                  onClick={handleOpenCompanySync}
+                  variant="outline"
+                  className="border-green-300 text-green-700 hover:bg-green-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
+                </Button>
               )}
             </div>
 
