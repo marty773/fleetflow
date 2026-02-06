@@ -1,0 +1,64 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+
+const CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
+const CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
+const REDIRECT_URI = Deno.env.get("BASE_URL") + "/api/functions/companyCalendarCallback";
+const BASE_URL = Deno.env.get("BASE_URL");
+
+Deno.serve(async (req) => {
+  try {
+    const url = new URL(req.url);
+    const code = url.searchParams.get('code');
+    const state = url.searchParams.get('state');
+
+    if (!code || !state) {
+      return new Response('Missing code or state', { status: 400 });
+    }
+
+    const { company_id, user_email } = JSON.parse(state);
+
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    const tokens = await tokenResponse.json();
+
+    if (!tokens.access_token) {
+      throw new Error('Failed to get access token');
+    }
+
+    const base44 = createClientFromRequest(req);
+
+    const existing = await base44.asServiceRole.entities.CompanyCalendarAuth.filter({ company_id });
+    
+    const authData = {
+      company_id,
+      calendar_access_token: tokens.access_token,
+      calendar_refresh_token: tokens.refresh_token,
+      token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+      calendar_id: 'primary',
+    };
+
+    if (existing.length > 0) {
+      await base44.asServiceRole.entities.CompanyCalendarAuth.update(existing[0].id, authData);
+    } else {
+      await base44.asServiceRole.entities.CompanyCalendarAuth.create(authData);
+    }
+
+    return new Response(
+      `<html><body><script>window.close(); window.opener.postMessage('calendar_connected', '*');</script><p>Calendar connected! You can close this window.</p></body></html>`,
+      { headers: { 'Content-Type': 'text/html' } }
+    );
+  } catch (error) {
+    console.error('Error in callback:', error);
+    return new Response(`Error: ${error.message}`, { status: 500 });
+  }
+});

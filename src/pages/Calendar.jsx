@@ -27,6 +27,11 @@ export default function Calendar() {
   const [calendarConnected, setCalendarConnected] = useState(false);
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  React.useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
 
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -171,13 +176,13 @@ export default function Calendar() {
 
   const handleSyncAll = async () => {
     if (!calendarConnected) {
-      toast.error('Please connect your Google Calendar first');
+      toast.error('Please connect company calendar first');
       return;
     }
     
     try {
-      toast.loading('Syncing to your Google Calendar...');
-      const result = await base44.functions.invoke('syncUserMaintenanceToCalendar', {});
+      toast.loading('Syncing to company calendar...');
+      const result = await base44.functions.invoke('syncCompanyCalendar', { company_id: selectedCompany });
       toast.dismiss();
       toast.success(result.data.message);
     } catch (error) {
@@ -257,22 +262,24 @@ export default function Calendar() {
                 ))}
               </SelectContent>
             </Select>
-            {!calendarConnected ? (
-              <Button
-                onClick={handleConnectCalendar}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" /> Connect Calendar
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSyncAll}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
-              </Button>
+            {currentUser?.role === 'admin' && (
+              !calendarConnected ? (
+                <Button
+                  onClick={handleConnectCalendar}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSyncAll}
+                  variant="outline"
+                  className="border-green-300 text-green-700 hover:bg-green-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
+                </Button>
+              )
             )}
           </div>
         </div>
