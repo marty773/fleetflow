@@ -13,14 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, AlertCircle, Wrench } from 'lucide-react';
+import { ChevronLeft, ChevronRight, AlertCircle, Wrench, Calendar as CalendarIcon } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, getDay, startOfWeek, endOfWeek, addDays } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function Calendar() {
   const { selectedCompany } = useCompany();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState('all');
   const [selectedDay, setSelectedDay] = useState(null);
+  const [calendarConnected, setCalendarConnected] = useState(false);
 
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -34,6 +36,31 @@ export default function Calendar() {
 
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
+
+  // Check calendar connection status
+  React.useEffect(() => {
+    const checkCalendarConnection = async () => {
+      try {
+        const user = await base44.auth.me();
+        const userAuths = await base44.entities.UserCalendarAuth.filter({ user_email: user.email });
+        setCalendarConnected(userAuths.length > 0);
+      } catch (error) {
+        setCalendarConnected(false);
+      }
+    };
+    checkCalendarConnection();
+  }, []);
+
+  // Check for calendar connection success
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const calendarConnectedParam = urlParams.get('calendar_connected');
+    if (calendarConnectedParam === 'true') {
+      setCalendarConnected(true);
+      toast.success('Google Calendar connected successfully!');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
@@ -107,6 +134,32 @@ export default function Calendar() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
   };
 
+  const handleConnectCalendar = async () => {
+    try {
+      const result = await base44.functions.invoke('authorizeUserCalendar', {});
+      window.location.href = result.data.authUrl;
+    } catch (error) {
+      toast.error('Failed to connect calendar');
+    }
+  };
+
+  const handleSyncAll = async () => {
+    if (!calendarConnected) {
+      toast.error('Please connect your Google Calendar first');
+      return;
+    }
+    
+    try {
+      toast.loading('Syncing to your Google Calendar...');
+      const result = await base44.functions.invoke('syncUserMaintenanceToCalendar', {});
+      toast.dismiss();
+      toast.success(result.data.message);
+    } catch (error) {
+      toast.dismiss();
+      toast.error(error.response?.data?.error || 'Failed to sync to calendar');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
@@ -115,19 +168,38 @@ export default function Calendar() {
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance Calendar</h1>
             <p className="text-slate-600 mt-2">Schedule and track upcoming maintenance</p>
           </div>
-          <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Vehicles</SelectItem>
-              {vehicles.map(v => (
-                <SelectItem key={v.id} value={v.id}>
-                  {v.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            {!calendarConnected ? (
+              <Button
+                onClick={handleConnectCalendar}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <CalendarIcon className="w-4 h-4 mr-2" /> Connect Calendar
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSyncAll}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
+              </Button>
+            )}
+            <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Vehicles</SelectItem>
+                {vehicles.map(v => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {v.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
