@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCompany } from '../components/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,16 +13,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, AlertCircle, Wrench, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, AlertCircle, Wrench, Calendar as CalendarIcon, Plus, Clock, MapPin } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, getDay, startOfWeek, endOfWeek, addDays } from 'date-fns';
 import { toast } from 'sonner';
+import AppointmentForm from '../components/calendar/AppointmentForm';
 
 export default function Calendar() {
   const { selectedCompany } = useCompany();
+  const queryClient = useQueryClient();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState('all');
   const [selectedDay, setSelectedDay] = useState(null);
   const [calendarConnected, setCalendarConnected] = useState(false);
+  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState(null);
 
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -34,8 +38,14 @@ export default function Calendar() {
     queryFn: () => base44.entities.MaintenanceInterval.list(),
   });
 
+  const { data: allAppointments = [] } = useQuery({
+    queryKey: ['calendarAppointments'],
+    queryFn: () => base44.entities.CalendarAppointment.list(),
+  });
+
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
+  const appointments = allAppointments.filter(a => a.company_id === selectedCompany);
 
   // Check calendar connection status
   React.useEffect(() => {
@@ -71,6 +81,10 @@ export default function Calendar() {
     ? intervals
     : intervals.filter(i => i.vehicle_id === selectedVehicle);
 
+  const filteredAppointments = selectedVehicle === 'all'
+    ? appointments
+    : appointments.filter(a => a.vehicle_id === selectedVehicle);
+
   // Get all days in the current month plus padding for full weeks
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -78,9 +92,11 @@ export default function Calendar() {
   const calendarEnd = endOfWeek(monthEnd);
   const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-  // Get events for each day
+  // Get events for each day (intervals + appointments)
   const eventsMap = useMemo(() => {
     const map = {};
+    
+    // Add maintenance intervals
     filteredIntervals.forEach(interval => {
       if (interval.next_due_date) {
         const dueDate = new Date(interval.next_due_date);
@@ -88,11 +104,21 @@ export default function Calendar() {
         if (!map[dateKey]) {
           map[dateKey] = [];
         }
-        map[dateKey].push(interval);
+        map[dateKey].push({ ...interval, type: 'interval' });
       }
     });
+    
+    // Add appointments
+    filteredAppointments.forEach(appointment => {
+      const dateKey = appointment.appointment_date;
+      if (!map[dateKey]) {
+        map[dateKey] = [];
+      }
+      map[dateKey].push({ ...appointment, type: 'appointment' });
+    });
+    
     return map;
-  }, [filteredIntervals]);
+  }, [filteredIntervals, filteredAppointments]);
 
   const getDayEvents = (day) => {
     const dateKey = day.toISOString().split('T')[0];
@@ -160,6 +186,43 @@ export default function Calendar() {
     }
   };
 
+  const createAppointmentMutation = useMutation({
+    mutationFn: (data) => base44.entities.CalendarAppointment.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendarAppointments'] });
+      setShowAppointmentForm(false);
+      setEditingAppointment(null);
+      toast.success('Appointment created');
+    },
+  });
+
+  const updateAppointmentMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.CalendarAppointment.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendarAppointments'] });
+      setShowAppointmentForm(false);
+      setEditingAppointment(null);
+      toast.success('Appointment updated');
+    },
+  });
+
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: (id) => base44.entities.CalendarAppointment.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendarAppointments'] });
+      toast.success('Appointment deleted');
+    },
+  });
+
+  const handleSubmitAppointment = (data) => {
+    const dataWithCompany = { ...data, company_id: selectedCompany };
+    if (editingAppointment) {
+      updateAppointmentMutation.mutate({ id: editingAppointment.id, data: dataWithCompany });
+    } else {
+      createAppointmentMutation.mutate(dataWithCompany);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
@@ -168,7 +231,16 @@ export default function Calendar() {
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance Calendar</h1>
             <p className="text-slate-600 mt-2">Schedule and track upcoming maintenance</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() => {
+                setEditingAppointment(null);
+                setShowAppointmentForm(true);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4 mr-2" /> New Appointment
+            </Button>
             {!calendarConnected ? (
               <Button
                 onClick={handleConnectCalendar}
@@ -201,6 +273,19 @@ export default function Calendar() {
             </Select>
           </div>
         </div>
+
+        {showAppointmentForm && (
+          <AppointmentForm
+            appointment={editingAppointment}
+            vehicles={vehicles}
+            onSubmit={handleSubmitAppointment}
+            onCancel={() => {
+              setShowAppointmentForm(false);
+              setEditingAppointment(null);
+            }}
+            isLoading={createAppointmentMutation.isPending || updateAppointmentMutation.isPending}
+          />
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
@@ -249,18 +334,30 @@ export default function Calendar() {
                         </p>
                         <div className="space-y-1">
                           {events.slice(0, 2).map(event => {
-                            const status = getEventStatus(event);
-                            return (
-                              <div
-                                key={event.id}
-                                className={`text-xs px-1 py-0.5 rounded truncate ${
-                                  maintenanceColors[event.maintenance_type]
-                                }`}
-                                title={event.interval_name}
+                            if (event.type === 'appointment') {
+                              return (
+                                <div
+                                  key={event.id}
+                                  className="text-xs px-1 py-0.5 rounded truncate bg-indigo-100 text-indigo-800"
+                                  title={event.title}
                                 >
-                                {event.interval_name}
-                              </div>
-                            );
+                                  📅 {event.title}
+                                </div>
+                              );
+                            } else {
+                              const status = getEventStatus(event);
+                              return (
+                                <div
+                                  key={event.id}
+                                  className={`text-xs px-1 py-0.5 rounded truncate ${
+                                    maintenanceColors[event.maintenance_type]
+                                  }`}
+                                  title={event.interval_name}
+                                >
+                                  {event.interval_name}
+                                </div>
+                              );
+                            }
                           })}
                           {events.length > 2 && (
                             <p className="text-xs text-slate-500 px-1">
@@ -283,35 +380,62 @@ export default function Calendar() {
                 <CardTitle className="text-lg">Upcoming Services</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-3 max-h-96 overflow-y-auto">
-                {filteredIntervals.filter(i => i.next_due_date).length > 0 ? (
-                  [...filteredIntervals]
-                    .filter(i => i.next_due_date)
-                    .sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date))
+                {(filteredIntervals.filter(i => i.next_due_date).length > 0 || filteredAppointments.length > 0) ? (
+                  [
+                    ...filteredIntervals.filter(i => i.next_due_date).map(i => ({ ...i, type: 'interval', sortDate: new Date(i.next_due_date) })),
+                    ...filteredAppointments.map(a => ({ ...a, type: 'appointment', sortDate: new Date(a.appointment_date) }))
+                  ]
+                    .sort((a, b) => a.sortDate - b.sortDate)
                     .slice(0, 10)
-                    .map(interval => {
-                      const status = getEventStatus(interval);
-                      return (
-                        <div
-                          key={interval.id}
-                          className={`p-3 rounded-lg ${statusColors[status]}`}
-                        >
-                          <p className="font-semibold text-sm text-slate-900 mb-1">
-                            {interval.interval_name}
-                          </p>
-                          <p className="text-xs text-slate-600 mb-2">
-                            {vehicleMap[interval.vehicle_id]?.name}
-                          </p>
-                          <p className="text-xs text-slate-700">
-                            {format(new Date(interval.next_due_date), 'MMM dd, yyyy')}
-                          </p>
-                          {status === 'overdue' && (
-                            <div className="flex items-center gap-1 mt-1 text-red-600">
-                              <AlertCircle className="w-3 h-3" />
-                              <span className="text-xs font-semibold">Overdue</span>
-                            </div>
-                          )}
-                        </div>
-                      );
+                    .map(item => {
+                      if (item.type === 'appointment') {
+                        return (
+                          <div
+                            key={item.id}
+                            className="p-3 rounded-lg bg-indigo-100 border-l-4 border-indigo-500"
+                          >
+                            <p className="font-semibold text-sm text-slate-900 mb-1">
+                              📅 {item.title}
+                            </p>
+                            <p className="text-xs text-slate-600 mb-2">
+                              {vehicleMap[item.vehicle_id]?.name}
+                            </p>
+                            <p className="text-xs text-slate-700">
+                              {format(new Date(item.appointment_date), 'MMM dd, yyyy')}
+                              {item.appointment_time && ` at ${item.appointment_time}`}
+                            </p>
+                            {item.location && (
+                              <p className="text-xs text-slate-600 mt-1">
+                                📍 {item.location}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      } else {
+                        const status = getEventStatus(item);
+                        return (
+                          <div
+                            key={item.id}
+                            className={`p-3 rounded-lg ${statusColors[status]}`}
+                          >
+                            <p className="font-semibold text-sm text-slate-900 mb-1">
+                              {item.interval_name}
+                            </p>
+                            <p className="text-xs text-slate-600 mb-2">
+                              {vehicleMap[item.vehicle_id]?.name}
+                            </p>
+                            <p className="text-xs text-slate-700">
+                              {format(new Date(item.next_due_date), 'MMM dd, yyyy')}
+                            </p>
+                            {status === 'overdue' && (
+                              <div className="flex items-center gap-1 mt-1 text-red-600">
+                                <AlertCircle className="w-3 h-3" />
+                                <span className="text-xs font-semibold">Overdue</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
                     })
                 ) : (
                   <div className="text-center py-6">
@@ -334,41 +458,103 @@ export default function Calendar() {
               <div className="space-y-3">
                 {getDayEvents(selectedDay).length > 0 ? (
                   getDayEvents(selectedDay).map(event => {
-                    const status = getEventStatus(event);
-                    return (
-                      <div
-                        key={event.id}
-                        className={`p-4 rounded-lg ${statusColors[status]}`}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-slate-900">{event.interval_name}</h3>
-                            <p className="text-sm text-slate-600 mt-1">
-                              {vehicleMap[event.vehicle_id]?.name}
-                            </p>
+                    if (event.type === 'appointment') {
+                      return (
+                        <div
+                          key={event.id}
+                          className="p-4 rounded-lg bg-indigo-100 border-l-4 border-indigo-500"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <h3 className="font-semibold text-slate-900">📅 {event.title}</h3>
+                              <p className="text-sm text-slate-600 mt-1">
+                                {vehicleMap[event.vehicle_id]?.name}
+                              </p>
+                            </div>
+                            <Badge className="bg-indigo-200 text-indigo-900">Appointment</Badge>
                           </div>
-                          <Badge className={maintenanceColors[event.maintenance_type]}>
-                            {event.maintenance_type?.replace('_', ' ')}
-                          </Badge>
+                          {event.description && (
+                            <p className="text-sm text-slate-700 mb-2">{event.description}</p>
+                          )}
+                          {event.appointment_time && (
+                            <div className="flex items-center gap-1 text-sm text-slate-600 mb-1">
+                              <Clock className="w-4 h-4" />
+                              {event.appointment_time}
+                            </div>
+                          )}
+                          {event.location && (
+                            <div className="flex items-center gap-1 text-sm text-slate-600">
+                              <MapPin className="w-4 h-4" />
+                              {event.location}
+                            </div>
+                          )}
+                          {event.notes && (
+                            <p className="text-xs text-slate-500 mt-2">{event.notes}</p>
+                          )}
+                          <div className="flex gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingAppointment(event);
+                                setShowAppointmentForm(true);
+                                setSelectedDay(null);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                if (confirm('Delete this appointment?')) {
+                                  deleteAppointmentMutation.mutate(event.id);
+                                  setSelectedDay(null);
+                                }
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
                         </div>
-                        {event.interval_months && (
-                          <p className="text-sm text-slate-600">
-                            Every {event.interval_months} months
-                          </p>
-                        )}
-                        {event.interval_miles && (
-                          <p className="text-sm text-slate-600">
-                            Every {event.interval_miles} miles
-                          </p>
-                        )}
-                        {status === 'overdue' && (
-                          <div className="flex items-center gap-1 mt-2 text-red-600">
-                            <AlertCircle className="w-4 h-4" />
-                            <span className="text-sm font-semibold">Overdue</span>
+                      );
+                    } else {
+                      const status = getEventStatus(event);
+                      return (
+                        <div
+                          key={event.id}
+                          className={`p-4 rounded-lg ${statusColors[status]}`}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <h3 className="font-semibold text-slate-900">{event.interval_name}</h3>
+                              <p className="text-sm text-slate-600 mt-1">
+                                {vehicleMap[event.vehicle_id]?.name}
+                              </p>
+                            </div>
+                            <Badge className={maintenanceColors[event.maintenance_type]}>
+                              {event.maintenance_type?.replace('_', ' ')}
+                            </Badge>
                           </div>
-                        )}
-                      </div>
-                    );
+                          {event.interval_months && (
+                            <p className="text-sm text-slate-600">
+                              Every {event.interval_months} months
+                            </p>
+                          )}
+                          {event.interval_miles && (
+                            <p className="text-sm text-slate-600">
+                              Every {event.interval_miles} miles
+                            </p>
+                          )}
+                          {status === 'overdue' && (
+                            <div className="flex items-center gap-1 mt-2 text-red-600">
+                              <AlertCircle className="w-4 h-4" />
+                              <span className="text-sm font-semibold">Overdue</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
                   })
                 ) : (
                   <div className="text-center py-8">
