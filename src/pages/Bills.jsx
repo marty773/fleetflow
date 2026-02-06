@@ -49,6 +49,7 @@ export default function Bills() {
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const vendors = allVendors.filter(v => v.company_id === selectedCompany);
   const bills = allBills.filter(b => b.company_id === selectedCompany);
+  const filteredItems = items.filter(i => i.company_id === selectedCompany);
 
   // Check for URL parameter to auto-open a specific bill
   React.useEffect(() => {
@@ -112,7 +113,7 @@ export default function Bills() {
 
     // Update inventory using atomic operations
     for (const [item_id, quantity_to_add] of Object.entries(itemQuantityMap)) {
-      const currentItem = items.find(i => i.id === item_id);
+      const currentItem = filteredItems.find(i => i.id === item_id);
       if (currentItem) {
         const newQty = (currentItem.quantity_on_hand || 0) + quantity_to_add;
         await base44.entities.Item.update(item_id, { quantity_on_hand: newQty });
@@ -175,7 +176,7 @@ export default function Bills() {
           <BillForm
             bill={editingBill}
             vehicles={vehicles}
-            items={items}
+            items={filteredItems}
             vendors={vendors}
             onSubmit={handleSubmit}
             onCancel={() => {
@@ -198,7 +199,7 @@ export default function Bills() {
             <BillList
               bills={bills}
               vehicles={vehicles}
-              items={items}
+              items={filteredItems}
               onView={setViewingBill}
               onEdit={handleEdit}
               onDelete={(id) => deleteMutation.mutate(id)}
