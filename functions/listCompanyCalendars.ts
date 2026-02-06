@@ -40,12 +40,18 @@ Deno.serve(async (req) => {
       });
 
       const refreshData = await refreshResponse.json();
+      
+      if (!refreshData.access_token) {
+        return Response.json({ error: 'Failed to refresh token' }, { status: 500 });
+      }
+      
       accessToken = refreshData.access_token;
 
       // Update token in database
+      const newExpiry = refreshData.expires_in ? new Date(Date.now() + refreshData.expires_in * 1000).toISOString() : new Date(Date.now() + 3600 * 1000).toISOString();
       await base44.asServiceRole.entities.CompanyCalendarAuth.update(companyAuth.id, {
         calendar_access_token: accessToken,
-        token_expires_at: new Date(Date.now() + refreshData.expires_in * 1000).toISOString(),
+        token_expires_at: newExpiry,
       });
     }
 
