@@ -11,44 +11,8 @@ Deno.serve(async (req) => {
 
     const { interval_id, futureOnly = false, calendarId = 'primary' } = await req.json();
 
-    // Get user's calendar auth
-    const userAuths = await base44.asServiceRole.entities.UserCalendarAuth.filter({ user_email: user.email });
-    
-    if (userAuths.length === 0) {
-      return Response.json({ error: 'Calendar not connected. Please authorize your Google Calendar first.' }, { status: 400 });
-    }
-
-    const userAuth = userAuths[0];
-    let accessToken = userAuth.calendar_access_token;
-
-    // Check if token is expired and refresh if needed
-    if (new Date(userAuth.token_expires_at) < new Date()) {
-      // Refresh the token
-      const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: Deno.env.get("GOOGLE_CLIENT_ID"),
-          client_secret: Deno.env.get("GOOGLE_CLIENT_SECRET"),
-          refresh_token: userAuth.calendar_refresh_token,
-          grant_type: 'refresh_token',
-        }),
-      });
-
-      if (refreshResponse.ok) {
-        const tokens = await refreshResponse.json();
-        accessToken = tokens.access_token;
-        
-        // Update stored token
-        const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
-        await base44.asServiceRole.entities.UserCalendarAuth.update(userAuth.id, {
-          calendar_access_token: accessToken,
-          token_expires_at: expiresAt,
-        });
-      } else {
-        return Response.json({ error: 'Failed to refresh calendar token. Please reconnect your calendar.' }, { status: 401 });
-      }
-    }
+    // Use app connector to get access token
+    const accessToken = await base44.asServiceRole.connectors.getAccessToken("googlecalendar");
 
     // Fetch intervals to sync
     let intervals;

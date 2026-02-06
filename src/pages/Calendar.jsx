@@ -211,22 +211,13 @@ export default function Calendar() {
   };
 
   const handleOpenUserSync = () => {
-    if (!userCalendarConnected) {
-      toast.error('Please connect your calendar first');
-      return;
-    }
     setShowUserSyncDialog(true);
   };
 
   const handleOpenCompanySync = async () => {
-    if (!companyCalendarConnected) {
-      toast.error('Please connect company calendar first');
-      return;
-    }
-    
     // Fetch available calendars
     try {
-      const result = await base44.functions.invoke('listCompanyCalendars', { company_id: selectedCompany });
+      const result = await base44.functions.invoke('listCompanyCalendars', {});
       setCompanyCalendars(result.data.calendars || []);
       setShowCompanySyncDialog(true);
     } catch (error) {

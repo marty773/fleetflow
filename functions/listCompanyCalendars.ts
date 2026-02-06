@@ -1,24 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
-const CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
-const CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
-
-async function refreshAccessToken(refreshToken) {
-  const response = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      refresh_token: refreshToken,
-      grant_type: 'refresh_token',
-    }),
-  });
-
-  const tokens = await response.json();
-  return tokens.access_token;
-}
-
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -28,28 +9,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { company_id } = await req.json();
-
-    if (!company_id) {
-      return Response.json({ error: 'company_id is required' }, { status: 400 });
-    }
-
-    const companyAuth = await base44.asServiceRole.entities.CompanyCalendarAuth.filter({ company_id });
-
-    if (companyAuth.length === 0) {
-      return Response.json({ error: 'Company calendar not connected' }, { status: 400 });
-    }
-
-    const auth = companyAuth[0];
-    let accessToken = auth.calendar_access_token;
-
-    if (new Date(auth.token_expires_at) < new Date()) {
-      accessToken = await refreshAccessToken(auth.calendar_refresh_token);
-      await base44.asServiceRole.entities.CompanyCalendarAuth.update(auth.id, {
-        calendar_access_token: accessToken,
-        token_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-      });
-    }
+    // Use app connector to get access token
+    const accessToken = await base44.asServiceRole.connectors.getAccessToken("googlecalendar");
 
     // Fetch list of calendars
     const response = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
