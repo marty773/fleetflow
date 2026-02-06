@@ -129,9 +129,17 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
         handleChange('photo_url', response.data.preview_url);
         setPhotoPreview(response.data.preview_url);
       } else {
+        // Upload image
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        handleChange('photo_url', file_url);
-        setPhotoPreview(file_url);
+        
+        // Use AI to crop and extract just the document/paper
+        const { url: croppedUrl } = await base44.integrations.Core.GenerateImage({
+          prompt: "Extract and crop only the document/receipt/paper from this image, removing all background and surroundings. The output should be a clean, straight, cropped scan of just the paper document with no background visible. Maintain the original text clarity.",
+          existing_image_urls: [file_url]
+        });
+        
+        handleChange('photo_url', croppedUrl);
+        setPhotoPreview(croppedUrl);
       }
     } catch (error) {
       console.error('Upload error:', error);
