@@ -226,21 +226,37 @@ export default function Calendar() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance Calendar</h1>
-            <p className="text-slate-600 mt-2">Schedule and track upcoming maintenance</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-8 pt-14 lg:pt-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance Calendar</h1>
+              <p className="text-slate-600 mt-2">Schedule and track upcoming maintenance</p>
+            </div>
             <Button
               onClick={() => {
                 setEditingAppointment(null);
                 setShowAppointmentForm(true);
               }}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 mr-2" /> New Appointment
             </Button>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
+              <SelectTrigger className="w-full sm:w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Vehicles</SelectItem>
+                {vehicles.map(v => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {v.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {!calendarConnected ? (
               <Button
                 onClick={handleConnectCalendar}
@@ -258,19 +274,6 @@ export default function Calendar() {
                 <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
               </Button>
             )}
-            <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Vehicles</SelectItem>
-                {vehicles.map(v => (
-                  <SelectItem key={v.id} value={v.id}>
-                    {v.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
