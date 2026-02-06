@@ -1,9 +1,11 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClient } from 'npm:@base44/sdk@0.8.6';
 
 const CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
 const CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
 const REDIRECT_URI = Deno.env.get("BASE_URL") + "/api/functions/companyCalendarCallback";
 const BASE_URL = Deno.env.get("BASE_URL");
+const BASE44_APP_ID = Deno.env.get("BASE44_APP_ID");
+const BASE44_APP_OWNER = Deno.env.get("BASE44_APP_OWNER");
 
 Deno.serve(async (req) => {
   try {
@@ -35,9 +37,10 @@ Deno.serve(async (req) => {
       throw new Error('Failed to get access token');
     }
 
-    const base44 = createClientFromRequest(req);
+    // Initialize Base44 client with app credentials
+    const base44 = createClient(BASE44_APP_OWNER, BASE44_APP_ID);
 
-    const existing = await base44.asServiceRole.entities.CompanyCalendarAuth.filter({ company_id });
+    const existing = await base44.entities.CompanyCalendarAuth.filter({ company_id });
     
     const authData = {
       company_id,
@@ -48,9 +51,9 @@ Deno.serve(async (req) => {
     };
 
     if (existing.length > 0) {
-      await base44.asServiceRole.entities.CompanyCalendarAuth.update(existing[0].id, authData);
+      await base44.entities.CompanyCalendarAuth.update(existing[0].id, authData);
     } else {
-      await base44.asServiceRole.entities.CompanyCalendarAuth.create(authData);
+      await base44.entities.CompanyCalendarAuth.create(authData);
     }
 
     return new Response(
