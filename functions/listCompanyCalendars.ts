@@ -26,7 +26,8 @@ Deno.serve(async (req) => {
     let accessToken = companyAuth.calendar_access_token;
 
     // Check if token is expired and refresh if needed
-    if (new Date(companyAuth.token_expires_at) <= new Date()) {
+    const expiresAt = companyAuth.token_expires_at ? new Date(companyAuth.token_expires_at) : null;
+    if (!expiresAt || isNaN(expiresAt.getTime()) || expiresAt <= new Date()) {
       const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
