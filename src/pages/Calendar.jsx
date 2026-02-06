@@ -40,6 +40,22 @@ export default function Calendar() {
     base44.auth.me().then(setCurrentUser).catch(() => {});
   }, []);
 
+  // Check if user calendar is connected
+  React.useEffect(() => {
+    if (currentUser) {
+      base44.entities.UserCalendarAuth.filter({ user_email: currentUser.email })
+        .then(auths => setUserCalendarConnected(auths && auths.length > 0))
+        .catch(() => setUserCalendarConnected(false));
+    }
+  }, [currentUser]);
+
+  // Check if company calendar is connected
+  React.useEffect(() => {
+    base44.entities.CompanyCalendarAuth.filter({ company_id: selectedCompany })
+      .then(auths => setCompanyCalendarConnected(auths && auths.length > 0))
+      .catch(() => setCompanyCalendarConnected(false));
+  }, [selectedCompany]);
+
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
@@ -58,12 +74,6 @@ export default function Calendar() {
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
   const appointments = allAppointments.filter(a => a.company_id === selectedCompany);
-
-  // Calendar is always connected via app connectors
-  React.useEffect(() => {
-    setUserCalendarConnected(true);
-    setCompanyCalendarConnected(true);
-  }, []);
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
@@ -155,14 +165,40 @@ export default function Calendar() {
 
 
 
+  const handleConnectUserCalendar = async () => {
+    try {
+      const result = await base44.functions.invoke('authorizeUserCalendar', {});
+      window.open(result.data.authUrl, '_blank', 'width=600,height=700');
+    } catch (error) {
+      toast.error('Failed to start authorization');
+    }
+  };
+
+  const handleConnectCompanyCalendar = async () => {
+    try {
+      const result = await base44.functions.invoke('authorizeCompanyCalendar', { company_id: selectedCompany });
+      window.open(result.data.authUrl, '_blank', 'width=600,height=700');
+    } catch (error) {
+      toast.error('Failed to start authorization');
+    }
+  };
+
   const handleOpenUserSync = () => {
+    if (!userCalendarConnected) {
+      toast.error('Please connect your calendar first');
+      return;
+    }
     setShowUserSyncDialog(true);
   };
 
   const handleOpenCompanySync = async () => {
+    if (!companyCalendarConnected) {
+      toast.error('Please connect company calendar first');
+      return;
+    }
     // Fetch available calendars
     try {
-      const result = await base44.functions.invoke('listCompanyCalendars', {});
+      const result = await base44.functions.invoke('listCompanyCalendars', { company_id: selectedCompany });
       setCompanyCalendars(result.data.calendars || []);
       setShowCompanySyncDialog(true);
     } catch (error) {
@@ -264,23 +300,43 @@ export default function Calendar() {
             {/* Calendar buttons row */}
             <div className="flex flex-col sm:flex-row gap-3">
               {/* User's personal calendar */}
-              <Button
-                onClick={handleOpenUserSync}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
-              </Button>
+              {!userCalendarConnected ? (
+                <Button
+                  onClick={handleConnectUserCalendar}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect My Calendar
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleOpenUserSync}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
+                </Button>
+              )}
 
               {/* Company calendar (admin only) */}
               {currentUser?.role === 'admin' && (
-                <Button
-                  onClick={handleOpenCompanySync}
-                  variant="outline"
-                  className="border-green-300 text-green-700 hover:bg-green-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
-                </Button>
+                !companyCalendarConnected ? (
+                  <Button
+                    onClick={handleConnectCompanyCalendar}
+                    variant="outline"
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                  >
+                    <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleOpenCompanySync}
+                    variant="outline"
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                  >
+                    <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
+                  </Button>
+                )
               )}
             </div>
 
