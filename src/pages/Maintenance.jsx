@@ -180,7 +180,7 @@ export default function Maintenance() {
 
       // Deduct inventory using atomic operations
       for (const [item_id, quantity_used] of Object.entries(partQuantityMap)) {
-        const currentItem = items.find(i => i.id === item_id);
+        const currentItem = filteredItems.find(i => i.id === item_id);
         if (currentItem) {
           const newQty = (currentItem.quantity_on_hand || 0) - quantity_used;
           await base44.entities.Item.update(item_id, { quantity_on_hand: Math.max(0, newQty) });
@@ -334,7 +334,7 @@ export default function Maintenance() {
               <MaintenanceForm
                 record={editingRecord}
                 vehicles={vehicles}
-                items={items}
+                items={filteredItems}
                 vendors={vendors}
                 onSubmit={handleSubmitRecord}
                 onCancel={() => {
@@ -348,7 +348,7 @@ export default function Maintenance() {
             <MaintenanceList
               records={records}
               vehicles={vehicles}
-              items={items}
+              items={filteredItems}
               onView={setViewingRecord}
               onEdit={(record) => {
                 setEditingRecord(record);
