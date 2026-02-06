@@ -1,8 +1,9 @@
-import { createClient } from 'npm:@base44/sdk@0.8.6';
+import { createServiceRoleClient } from 'npm:@base44/sdk@0.8.6';
 
 const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
 const REDIRECT_URI = `${Deno.env.get("BASE_URL")}/api/functions/calendarCallback`;
+const APP_ID = Deno.env.get("BASE44_APP_ID");
 const APP_OWNER = Deno.env.get("BASE44_APP_OWNER");
 
 Deno.serve(async (req) => {
@@ -10,6 +11,8 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const code = url.searchParams.get('code');
     const userEmail = url.searchParams.get('state');
+
+    console.log('Callback received:', { code: code?.substring(0, 10), userEmail });
 
     if (!code || !userEmail) {
       return new Response('Missing authorization code or user email', { status: 400 });
@@ -35,12 +38,10 @@ Deno.serve(async (req) => {
     }
 
     const tokens = await tokenResponse.json();
+    console.log('Tokens received successfully');
     
     // Initialize Base44 client with service role credentials
-    const base44 = createClient({
-      serviceRole: true,
-      appOwner: APP_OWNER
-    });
+    const base44 = createServiceRoleClient({ appId: APP_ID, appOwner: APP_OWNER });
     
     // Calculate token expiry time
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
