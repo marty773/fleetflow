@@ -2,7 +2,6 @@ import { createServiceRoleClient } from 'npm:@base44/sdk@0.8.6';
 
 const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
-const REDIRECT_URI = `${Deno.env.get("BASE_URL")}/api/functions/calendarCallback`;
 const APP_ID = Deno.env.get("BASE44_APP_ID");
 const APP_OWNER = Deno.env.get("BASE44_APP_OWNER");
 
@@ -17,6 +16,9 @@ Deno.serve(async (req) => {
     if (!code || !userEmail) {
       return new Response('Missing authorization code or user email', { status: 400 });
     }
+
+    // Build redirect URI from the current request URL
+    const REDIRECT_URI = `${url.protocol}//${url.host}/api/functions/calendarCallback`;
 
     // Exchange code for tokens
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
