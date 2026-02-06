@@ -295,7 +295,51 @@ export default function Calendar() {
             </Button>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col gap-3">
+            {/* Calendar buttons row */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* User's personal calendar */}
+              {!userCalendarConnected ? (
+                <Button
+                  onClick={handleConnectUserCalendar}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect My Calendar
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSyncUserCalendar}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
+                </Button>
+              )}
+
+              {/* Company calendar (admin only) */}
+              {currentUser?.role === 'admin' && (
+                !companyCalendarConnected ? (
+                  <Button
+                    onClick={handleConnectCompanyCalendar}
+                    variant="outline"
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                  >
+                    <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSyncCompanyCalendar}
+                    variant="outline"
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                  >
+                    <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
+                  </Button>
+                )
+              )}
+            </div>
+
+            {/* Vehicle filter below buttons */}
             <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
               <SelectTrigger className="w-full sm:w-64">
                 <SelectValue />
@@ -309,46 +353,6 @@ export default function Calendar() {
                 ))}
               </SelectContent>
             </Select>
-            
-            {/* User's personal calendar */}
-            {!userCalendarConnected ? (
-              <Button
-                onClick={handleConnectUserCalendar}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" /> Connect My Calendar
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSyncUserCalendar}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
-              </Button>
-            )}
-
-            {/* Company calendar (admin only) */}
-            {currentUser?.role === 'admin' && (
-              !companyCalendarConnected ? (
-                <Button
-                  onClick={handleConnectCompanyCalendar}
-                  variant="outline"
-                  className="border-green-300 text-green-700 hover:bg-green-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSyncCompanyCalendar}
-                  variant="outline"
-                  className="border-green-300 text-green-700 hover:bg-green-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
-                </Button>
-              )
-            )}
           </div>
         </div>
 
