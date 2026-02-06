@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,11 +8,67 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Edit2, Truck, Package, CheckCircle, XCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Copy, Edit2, Truck, Package, CheckCircle, XCircle, History, Plus, FileText, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import MaintenanceForm from '../maintenance/MaintenanceForm';
 
 export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit }) {
+  const [showAddMaintenance, setShowAddMaintenance] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Fetch maintenance records for this vehicle
+  const { data: allMaintenanceRecords = [] } = useQuery({
+    queryKey: ['maintenance-records'],
+    queryFn: () => base44.entities.MaintenanceRecord.list('-performed_date'),
+    enabled: open,
+  });
+
+  const { data: allItems = [] } = useQuery({
+    queryKey: ['items'],
+    queryFn: () => base44.entities.Item.list(),
+    enabled: open && showAddMaintenance,
+  });
+
+  const { data: allVendors = [] } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => base44.entities.Vendor.list(),
+    enabled: open && showAddMaintenance,
+  });
+
+  const maintenanceRecords = vehicle 
+    ? allMaintenanceRecords.filter(r => r.vehicle_id === vehicle.id)
+    : [];
+
+  const createMaintenanceMutation = useMutation({
+    mutationFn: (data) => base44.entities.MaintenanceRecord.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['maintenance-records'] });
+      setShowAddMaintenance(false);
+      toast.success('Maintenance record added');
+    },
+  });
+
+  const handleMaintenanceSubmit = async (data) => {
+    // Deduct inventory for parts used
+    if (data.parts_used && data.parts_used.length > 0) {
+      for (const part of data.parts_used) {
+        const item = allItems.find(i => i.id === part.item_id);
+        if (item) {
+          const newQuantity = (item.quantity_on_hand || 0) - part.quantity_used;
+          await base44.entities.Item.update(part.item_id, {
+            quantity_on_hand: Math.max(0, newQuantity)
+          });
+        }
+      }
+    }
+    
+    createMaintenanceMutation.mutate({ ...data, vehicle_id: vehicle.id });
+  };
+
   if (!vehicle) return null;
 
   const copyToClipboard = (text, label) => {
@@ -20,9 +76,22 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
     toast.success(`${label} copied to clipboard`);
   };
 
+  const getCategoryColor = (type) => {
+    const colors = {
+      oil_change: 'bg-blue-100 text-blue-800',
+      filter_change: 'bg-purple-100 text-purple-800',
+      tire_rotation: 'bg-orange-100 text-orange-800',
+      inspection: 'bg-green-100 text-green-800',
+      repair: 'bg-red-100 text-red-800',
+      cleaning: 'bg-cyan-100 text-cyan-800',
+      other: 'bg-slate-100 text-slate-800',
+    };
+    return colors[type] || colors.other;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -42,7 +111,19 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           </div>
         </DialogHeader>
 
-        <div className="space-y-6 mt-4">
+        <Tabs defaultValue="details" className="mt-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="details">
+              <FileText className="w-4 h-4 mr-2" />
+              Details
+            </TabsTrigger>
+            <TabsTrigger value="history">
+              <History className="w-4 h-4 mr-2" />
+              Maintenance History ({maintenanceRecords.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details" className="space-y-6 mt-4">
           {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
@@ -159,7 +240,137 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
               </div>
             </div>
           )}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-4 mt-4">
+            {/* Add Maintenance Form */}
+            {showAddMaintenance ? (
+              <div className="border rounded-lg p-4 bg-white">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Add Maintenance Record</h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowAddMaintenance(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+                <MaintenanceForm
+                  record={null}
+                  vehicles={[vehicle]}
+                  items={allItems}
+                  vendors={allVendors}
+                  onSubmit={handleMaintenanceSubmit}
+                  onCancel={() => setShowAddMaintenance(false)}
+                  isLoading={createMaintenanceMutation.isPending}
+                  hideVehicleSelector={true}
+                />
+              </div>
+            ) : (
+              <Button 
+                onClick={() => setShowAddMaintenance(true)}
+                className="w-full bg-slate-900 hover:bg-slate-800"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Maintenance Record
+              </Button>
+            )}
+
+            {/* Maintenance History List */}
+            {maintenanceRecords.length > 0 ? (
+              <div className="space-y-3">
+                {maintenanceRecords.map((record) => (
+                  <div 
+                    key={record.id} 
+                    className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold text-base">{record.title}</h4>
+                          <Badge className={getCategoryColor(record.maintenance_type)}>
+                            {record.maintenance_type.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-slate-600">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {format(new Date(record.performed_date), 'MMM dd, yyyy')}
+                          </div>
+                          {record.vendor && (
+                            <span>• {record.vendor}</span>
+                          )}
+                          {record.odometer_reading && (
+                            <span>• {record.odometer_reading} miles</span>
+                          )}
+                        </div>
+                      </div>
+                      {record.total_cost && (
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-slate-900">
+                            ${record.total_cost.toFixed(2)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Work Items */}
+                    {record.work_items && record.work_items.length > 0 && (
+                      <div className="mt-3 space-y-1">
+                        <Label className="text-xs text-slate-500">Work Performed:</Label>
+                        {record.work_items.map((item, idx) => (
+                          <div key={idx} className="flex justify-between text-sm bg-slate-50 p-2 rounded">
+                            <span>
+                              {item.description} 
+                              {item.quantity > 1 && ` (×${item.quantity})`}
+                            </span>
+                            {item.total && (
+                              <span className="font-medium">${item.total.toFixed(2)}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Parts Used */}
+                    {record.parts_used && record.parts_used.length > 0 && (
+                      <div className="mt-3 space-y-1">
+                        <Label className="text-xs text-slate-500">Parts Used:</Label>
+                        {record.parts_used.map((part, idx) => {
+                          const item = allItems.find(i => i.id === part.item_id);
+                          return (
+                            <div key={idx} className="flex justify-between text-sm bg-blue-50 p-2 rounded">
+                              <span>
+                                {item?.name || 'Unknown Item'} (×{part.quantity_used})
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {record.notes && (
+                      <div className="mt-3">
+                        <Label className="text-xs text-slate-500">Notes:</Label>
+                        <p className="text-sm text-slate-700 mt-1">{record.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : !showAddMaintenance && (
+              <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                <History className="w-12 h-12 mx-auto text-slate-400 mb-3" />
+                <p className="text-slate-600 mb-4">No maintenance history yet</p>
+                <p className="text-sm text-slate-500">
+                  Add past service records to track this vehicle's maintenance history
+                </p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
         {/* Actions */}
         <div className="flex gap-3 pt-4 border-t mt-6">
