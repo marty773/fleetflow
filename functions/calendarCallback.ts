@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     // Redirect to calendar page with success message
     return new Response(null, {
       status: 302,
-      headers: { 'Location': '/Calendar?calendar_connected=true' },
+      headers: { 'Location': `${Deno.env.get("BASE_URL")}/Calendar?calendar_connected=true` },
     });
   } catch (error) {
     console.error('Callback error:', error);
