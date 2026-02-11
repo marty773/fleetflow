@@ -428,11 +428,11 @@ export default function Items() {
 
       {/* View Item Dialog */}
       <Dialog open={!!viewingItem} onOpenChange={() => setViewingItem(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Item Details</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto flex-1">
             {viewingItem?.photo_url && (
               <div className="flex justify-center">
                 <img
