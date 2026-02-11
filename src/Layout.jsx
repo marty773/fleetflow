@@ -97,7 +97,7 @@ function LayoutContent({ children, currentPageName }) {
           </div>
 
           <nav className="space-y-2">
-                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].map(item => {
+                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), { name: 'Settings', path: 'Settings', icon: Settings }, ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].map(item => {
               const Icon = item.icon;
               const isActive = currentPageName === item.name;
               return (
