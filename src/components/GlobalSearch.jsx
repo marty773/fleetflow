@@ -198,8 +198,8 @@ export default function GlobalSearch() {
       }}>
         <DialogTrigger asChild>
           <button 
-            className="fixed bottom-24 right-6 lg:bottom-auto lg:top-20 lg:right-6 z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110"
-            style={{ backgroundColor: 'var(--color-primary)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+            className="fixed bottom-24 right-6 lg:bottom-6 lg:right-6 z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110"
+            style={{ backgroundColor: 'var(--color-primary)' }}
           >
             <Search className="w-6 h-6" />
           </button>
