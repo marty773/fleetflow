@@ -44,7 +44,7 @@ export default function DashboardStats({ stats }) {
         return (
           <Card key={idx} className="border-0 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-600 mb-2">{stat.label}</p>
                   <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
