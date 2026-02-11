@@ -302,18 +302,18 @@ export default function Calendar() {
               {/* User's personal calendar */}
               {!userCalendarConnected ? (
                 <Button
-                  onClick={handleConnectUserCalendar}
-                  variant="outline"
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect My Calendar
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleOpenUserSync}
-                  variant="outline"
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                >
+                   onClick={handleConnectUserCalendar}
+                   variant="outline"
+                   className="border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                 >
+                   <CalendarIcon className="w-4 h-4 mr-2" /> Connect My Calendar
+                 </Button>
+                ) : (
+                 <Button
+                   onClick={handleOpenUserSync}
+                   variant="outline"
+                   className="border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                 >
                   <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
                 </Button>
               )}
@@ -322,17 +322,17 @@ export default function Calendar() {
               {currentUser?.role === 'admin' && (
                 !companyCalendarConnected ? (
                   <Button
-                    onClick={handleConnectCompanyCalendar}
-                    variant="outline"
-                    className="border-green-300 text-green-700 hover:bg-green-50"
+                   onClick={handleConnectCompanyCalendar}
+                   variant="outline"
+                   className="border-green-300 dark:border-green-700 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"
                   >
-                    <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
+                   <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
                   </Button>
-                ) : (
+                  ) : (
                   <Button
-                    onClick={handleOpenCompanySync}
-                    variant="outline"
-                    className="border-green-300 text-green-700 hover:bg-green-50"
+                   onClick={handleOpenCompanySync}
+                   variant="outline"
+                   className="border-green-300 dark:border-green-700 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"
                   >
                     <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
                   </Button>
@@ -374,17 +374,17 @@ export default function Calendar() {
           {/* Calendar */}
           <div className="lg:col-span-2">
             <Card className="border-0 shadow-sm">
-               <CardHeader className="border-b dark:border-slate-700 flex flex-row items-center justify-between">
-                 <div className="flex items-center gap-4">
-                   <Button variant="outline" size="sm" onClick={prevMonth}>
-                     <ChevronLeft className="w-4 h-4" />
-                   </Button>
-                   <CardTitle className="dark:text-white">{format(currentDate, 'MMMM yyyy')}</CardTitle>
-                   <Button variant="outline" size="sm" onClick={nextMonth}>
-                     <ChevronRight className="w-4 h-4" />
-                   </Button>
-                 </div>
-               </CardHeader>
+               <CardHeader className="border-b border-slate-200 dark:border-slate-700 flex flex-row items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Button variant="outline" size="sm" onClick={prevMonth}>
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <CardTitle className="text-slate-900 dark:text-white">{format(currentDate, 'MMMM yyyy')}</CardTitle>
+                    <Button variant="outline" size="sm" onClick={nextMonth}>
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
               <CardContent className="p-6">
                 {/* Day labels */}
                 <div className="grid grid-cols-7 gap-2 mb-4">
@@ -407,8 +407,8 @@ export default function Calendar() {
                          key={day.toISOString()}
                          onClick={() => setSelectedDay(day)}
                          className={`min-h-24 p-2 border rounded-lg cursor-pointer transition-all ${
-                           isCurrentMonth ? 'bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600' : 'bg-slate-50 dark:bg-slate-800'
-                         } ${isToday ? 'border-blue-500 border-2' : 'border-slate-200 dark:border-slate-600'}`}
+                           isCurrentMonth ? 'bg-white dark:bg-slate-950 hover:bg-slate-50 dark:hover:bg-slate-900' : 'bg-slate-50 dark:bg-slate-900'
+                         } ${isToday ? 'border-blue-500 border-2' : 'border-slate-200 dark:border-slate-700'}`}
                        >
                         <p className={`text-sm font-semibold mb-1 ${
                            isCurrentMonth ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'
@@ -459,8 +459,8 @@ export default function Calendar() {
           {/* Upcoming Events Sidebar */}
           <div>
             <Card className="border-0 shadow-sm">
-              <CardHeader className="border-b dark:border-slate-700">
-                <CardTitle className="text-lg dark:text-white">Upcoming Services</CardTitle>
+              <CardHeader className="border-b border-slate-200 dark:border-slate-700">
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Upcoming Services</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-3 max-h-96 overflow-y-auto">
                 {(filteredIntervals.filter(i => i.next_due_date).length > 0 || filteredAppointments.length > 0) ? (
@@ -522,8 +522,8 @@ export default function Calendar() {
                     })
                 ) : (
                   <div className="text-center py-6">
-                    <Wrench className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                    <p className="text-sm text-slate-500">No scheduled services</p>
+                    <Wrench className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                            <p className="text-sm text-slate-500 dark:text-slate-400">No scheduled services</p>
                   </div>
                 )}
               </CardContent>
@@ -552,9 +552,9 @@ export default function Calendar() {
         {/* Day View Dialog */}
         {selectedDay && (
           <Dialog open={!!selectedDay} onOpenChange={() => setSelectedDay(null)}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
               <DialogHeader>
-                <DialogTitle>Events for {format(selectedDay, 'MMMM d, yyyy')}</DialogTitle>
+                <DialogTitle className="text-slate-900 dark:text-white">Events for {format(selectedDay, 'MMMM d, yyyy')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-3">
                 {getDayEvents(selectedDay).length > 0 ? (
@@ -659,12 +659,12 @@ export default function Calendar() {
                   })
                 ) : (
                   <div className="text-center py-8">
-                    <Wrench className="w-12 h-12 mx-auto text-slate-300 mb-2" />
-                    <p className="text-slate-500">No events scheduled for this day</p>
+                    <Wrench className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                      <p className="text-slate-500 dark:text-slate-400">No events scheduled for this day</p>
                   </div>
                 )}
               </div>
-              <div className="flex gap-2 mt-6 pt-4 border-t">
+              <div className="flex gap-2 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <Button
                   onClick={() => {
                     setEditingAppointment(null);

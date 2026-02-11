@@ -12,9 +12,9 @@ export default function VendorCard({ vendor, onView, onEdit, onDelete, isDeletin
       <CardHeader className="pb-3">
          <div className="flex items-start justify-between">
            <div className="flex-1">
-             <CardTitle className="text-lg dark:text-white">{vendor.name}</CardTitle>
+             <CardTitle className="text-lg text-slate-900 dark:text-white">{vendor.name}</CardTitle>
              {vendor.category && (
-                 <p className="text-sm text-slate-500 dark:text-slate-400 capitalize mt-1">{vendor.category}</p>
+                 <p className="text-sm text-slate-600 dark:text-slate-400 capitalize mt-1">{vendor.category}</p>
                )}
           </div>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

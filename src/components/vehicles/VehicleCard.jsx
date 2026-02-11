@@ -11,14 +11,14 @@ export default function VehicleCard({ vehicle, onView, onEdit, onDelete, isDelet
       onClick={onView}
     >
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg dark:text-white">{vehicle.name}</CardTitle>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              {vehicle.make} {vehicle.model} • {vehicle.year}
-            </p>
-          </div>
-          <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-700 dark:text-white">
+         <div className="flex items-start justify-between">
+           <div>
+             <CardTitle className="text-lg text-slate-900 dark:text-white">{vehicle.name}</CardTitle>
+             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+               {vehicle.make} {vehicle.model} • {vehicle.year}
+             </p>
+           </div>
+           <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
              {vehicle.type === 'truck' ? (
                <Truck className="w-3 h-3 mr-1" />
              ) : (
