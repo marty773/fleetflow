@@ -824,7 +824,9 @@ export default function Items() {
                 Close
               </Button>
               <Button 
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setViewingBill(null);
                   navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`);
                 }}
@@ -834,15 +836,15 @@ export default function Items() {
               </Button>
               {viewingBill.photo_url && (
                 <Button 
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(viewingBill.photo_url, '_blank');
-                  }}
-                  className="flex-1"
-                >
-                  View Photo
-                </Button>
+                   variant="outline"
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     setPhotoLightbox(viewingBill.photo_url);
+                   }}
+                   className="flex-1"
+                 >
+                   View Photo
+                 </Button>
               )}
             </div>
           </DialogContent>
