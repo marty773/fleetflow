@@ -377,11 +377,11 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             {/* Actions - Floating Bottom */}
             <div className="sticky bottom-0 flex gap-3 p-6 bg-white border-t border-slate-200 flex-wrap sm:flex-nowrap">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-             Close
+            Close
             </Button>
             <Button onClick={() => onEdit(vehicle)} className="flex-1 bg-slate-900 hover:bg-slate-800">
-             <Edit2 className="w-4 h-4 mr-2" />
-             Edit Vehicle
+            <Edit2 className="w-4 h-4 mr-2" />
+            Edit Vehicle
             </Button>
             </div>
             </DialogContent>
