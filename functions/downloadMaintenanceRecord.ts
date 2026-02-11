@@ -10,11 +10,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { recordId } = await req.json();
+    const payload = await req.json();
+    const recordId = payload.recordId;
 
-    // Fetch maintenance record
+    if (!recordId) {
+      return Response.json({ error: 'Record ID is required' }, { status: 400 });
+    }
+
+    // Fetch maintenance record directly by ID
     const allRecords = await base44.entities.MaintenanceRecord.list();
     const record = allRecords.find(r => r.id === recordId);
+    
     if (!record) {
       return Response.json({ error: 'Record not found' }, { status: 404 });
     }
