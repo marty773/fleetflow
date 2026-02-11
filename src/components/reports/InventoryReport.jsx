@@ -460,283 +460,32 @@ export default function InventoryReport({ highlightItemId }) {
         </Card>
       )}
 
-      {/* Item Quick View Dialog */}
-      {viewingItem && (
-        <Dialog open={!!viewingItem} onOpenChange={() => setViewingItem(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Item Details</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {viewingItem.photo_url && (
-                <div className="flex justify-center">
-                  <img
-                    src={viewingItem.photo_url}
-                    alt={viewingItem.name}
-                    className="max-h-64 rounded-lg object-cover"
-                  />
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-slate-500">Name</Label>
-                  <p className="font-medium">{viewingItem.name}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Price</Label>
-                  <p className="font-medium">${viewingItem.price?.toFixed(2) || '0.00'}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Item Number</Label>
-                  <p className="font-medium">{viewingItem.item_number || '-'}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Quantity on Hand</Label>
-                  <p className="font-medium">{viewingItem.quantity_on_hand || 0}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Vendor</Label>
-                  <p className="font-medium">{viewingItem.vendor || '-'}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Low Stock Threshold</Label>
-                  <p className="font-medium">{viewingItem.low_stock_threshold || 2}</p>
-                </div>
-              </div>
-              {viewingItem.description && (
-                <div>
-                  <Label className="text-slate-500">Description</Label>
-                  <p className="text-sm mt-1">{viewingItem.description}</p>
-                </div>
-              )}
+      {/* Item Detail Dialog */}
+      <ItemDetailDialog
+        item={viewingItem}
+        transactions={viewingItem ? getItemTransactions(viewingItem.id) : []}
+        onClose={() => setViewingItem(null)}
+        onEdit={() => setViewingItem(null)}
+        onViewBill={() => {}}
+        onViewMaintenance={() => {}}
+      />
 
-              {getItemTransactions(viewingItem.id).length > 0 && (
-                <div className="border-t pt-4">
-                  <Label className="text-slate-500 block mb-3">Transaction History</Label>
-                  <div className="space-y-2 max-h-60 overflow-y-auto">
-                    {getItemTransactions(viewingItem.id).map((txn, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm"
-                      >
-                        <div className="flex items-center gap-3">
-                          {txn.type === 'purchase' ? (
-                            <TrendingUp className="h-4 w-4 text-green-600" />
-                          ) : (
-                            <TrendingDown className="h-4 w-4 text-red-600" />
-                          )}
-                          <div>
-                            <p className="font-medium text-slate-900">
-                              {format(new Date(txn.date), 'MMM dd, yyyy')}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {txn.type === 'purchase'
-                                ? `Purchased from ${txn.vendor}`
-                                : `Used on ${txn.vehicle}`}
-                            </p>
-                          </div>
-                        </div>
-                        <span
-                          className={`font-semibold ${
-                            txn.type === 'purchase' ? 'text-green-600' : 'text-red-600'
-                          }`}
-                        >
-                          {txn.type === 'purchase' ? '+' : '-'}
-                          {txn.quantity}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2 mt-6 pt-4 border-t">
-              <Button 
-                variant="outline" 
-                onClick={() => setViewingItem(null)}
-                className="flex-1"
-              >
-                Close
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Bill Detail Dialog */}
+      <BillDetailDialog
+        bill={viewingBill}
+        vehicles={vehicles}
+        onClose={() => setViewingBill(null)}
+        onEdit={() => setViewingBill(null)}
+      />
 
-      {/* Transaction Detail Dialog */}
-      {viewingTransaction && (
-        <Dialog open={!!viewingTransaction} onOpenChange={() => setViewingTransaction(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{viewingTransaction.transactionType === 'bill' ? 'Bill' : 'Maintenance'} Details</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {viewingTransaction.transactionType === 'bill' ? (
-                <>
-                  {viewingTransaction.fullData.photo_url && (
-                    <div className="flex justify-center">
-                      <img
-                        src={viewingTransaction.fullData.photo_url}
-                        alt="Bill"
-                        className="max-h-64 rounded-lg object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-slate-500">Vendor</Label>
-                      <p className="font-medium">{viewingTransaction.fullData.vendor}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Date</Label>
-                      <p className="font-medium">{format(new Date(viewingTransaction.fullData.bill_date), 'MMM dd, yyyy')}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Bill Number</Label>
-                      <p className="font-medium">{viewingTransaction.fullData.bill_number || '-'}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Category</Label>
-                      <p className="font-medium capitalize">{viewingTransaction.fullData.category?.replace('_', ' ')}</p>
-                    </div>
-                  </div>
-                  {viewingTransaction.fullData.line_items && viewingTransaction.fullData.line_items.length > 0 && (
-                    <div>
-                      <Label className="text-slate-500 mb-2 block">Line Items</Label>
-                      <div className="border rounded-lg overflow-hidden">
-                        <table className="w-full text-sm">
-                          <thead className="bg-slate-50">
-                            <tr>
-                              <th className="text-left p-2">Description</th>
-                              <th className="text-center p-2">Qty</th>
-                              <th className="text-right p-2">Price</th>
-                              <th className="text-right p-2">Total</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {viewingTransaction.fullData.line_items.map((item, idx) => (
-                              <tr key={idx} className="border-t">
-                                <td className="p-2">
-                                  {item.description}
-                                  {item.vehicle_id && (
-                                    <span className="text-xs text-slate-500 block">
-                                      Vehicle: {vehicleMap[item.vehicle_id]?.name}
-                                    </span>
-                                  )}
-                                </td>
-                                <td className="text-center p-2">{item.quantity}</td>
-                                <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                                <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                            <tr className="border-t bg-slate-50 font-semibold">
-                              <td colSpan={3} className="p-2 text-right">Total:</td>
-                              <td className="text-right p-2">${viewingTransaction.fullData.total_amount?.toFixed(2)}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-                  {viewingTransaction.fullData.notes && (
-                    <div>
-                      <Label className="text-slate-500">Notes</Label>
-                      <p className="text-sm mt-1">{viewingTransaction.fullData.notes}</p>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-slate-500">Vehicle</Label>
-                      <p className="font-medium">{vehicleMap[viewingTransaction.fullData.vehicle_id]?.name || '-'}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Date</Label>
-                      <p className="font-medium">{format(new Date(viewingTransaction.fullData.performed_date), 'MMM dd, yyyy')}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Type</Label>
-                      <p className="font-medium capitalize">{viewingTransaction.fullData.maintenance_type?.replace('_', ' ')}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Vendor</Label>
-                      <p className="font-medium">{viewingTransaction.fullData.vendor || '-'}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Odometer</Label>
-                      <p className="font-medium">{viewingTransaction.fullData.odometer_reading || '-'}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-500">Total Cost</Label>
-                      <p className="font-medium text-lg">${viewingTransaction.fullData.total_cost?.toFixed(2) || '0.00'}</p>
-                    </div>
-                  </div>
-                  {viewingTransaction.fullData.work_items && viewingTransaction.fullData.work_items.length > 0 && (
-                    <div>
-                      <Label className="text-slate-500 mb-2 block">Work Items</Label>
-                      <div className="border rounded-lg overflow-hidden">
-                        <table className="w-full text-sm">
-                          <thead className="bg-slate-50">
-                            <tr>
-                              <th className="text-left p-2">Description</th>
-                              <th className="text-center p-2">Qty</th>
-                              <th className="text-right p-2">Price</th>
-                              <th className="text-right p-2">Total</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {viewingTransaction.fullData.work_items.map((item, idx) => (
-                              <tr key={idx} className="border-t">
-                                <td className="p-2">{item.description}</td>
-                                <td className="text-center p-2">{item.quantity}</td>
-                                <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                                <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-                  {viewingTransaction.fullData.parts_used && viewingTransaction.fullData.parts_used.length > 0 && (
-                    <div>
-                      <Label className="text-slate-500 mb-2 block">Parts Used</Label>
-                      <div className="space-y-2">
-                        {viewingTransaction.fullData.parts_used.map((part, idx) => {
-                          const item = items.find(i => i.id === part.item_id);
-                          return (
-                            <div key={idx} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                              <span className="text-sm">{item?.name || 'Unknown item'}</span>
-                              <span className="text-sm font-medium">Qty: {part.quantity_used}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                  {viewingTransaction.fullData.notes && (
-                    <div>
-                      <Label className="text-slate-500">Notes</Label>
-                      <p className="text-sm mt-1">{viewingTransaction.fullData.notes}</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-            <div className="flex gap-2 mt-6 pt-4 border-t">
-              <Button 
-                variant="outline" 
-                onClick={() => setViewingTransaction(null)}
-                className="flex-1"
-              >
-                Close
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Maintenance Detail Dialog */}
+      <MaintenanceRecordDetailDialog
+        record={viewingMaintenance}
+        vehicles={vehicles}
+        items={items}
+        onClose={() => setViewingMaintenance(null)}
+        onEdit={() => setViewingMaintenance(null)}
+      />
     </div>
   );
 }
