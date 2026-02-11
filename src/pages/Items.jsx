@@ -373,7 +373,7 @@ export default function Items() {
              <div
                key={item.id}
                className="flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
-               onClick={() => handleEdit(item)}
+               onClick={() => setViewingItem(item)}
              >
                <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 overflow-hidden flex-shrink-0">
                 {item.photo_url ? (
