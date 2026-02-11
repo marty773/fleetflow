@@ -831,23 +831,15 @@ export default function Items() {
               >
                 Close
               </Button>
-              <Link 
-                to={createPageUrl('Bills') + `?edit=${viewingBill.id}`}
-                className="flex-1"
-                onClick={(e) => {
-                  e.preventDefault();
+              <Button 
+                onClick={() => {
                   setViewingBill(null);
-                  setTimeout(() => navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`), 0);
+                  navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`);
                 }}
+                className="w-full bg-amber-600 hover:bg-amber-700"
               >
-                <Button 
-                  type="button"
-                  className="w-full bg-amber-600 hover:bg-amber-700"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  Edit
-                </Button>
-              </Link>
+                Edit
+              </Button>
               {viewingBill.photo_url && (
                 <Button 
                   variant="outline"
