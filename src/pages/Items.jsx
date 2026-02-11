@@ -729,21 +729,18 @@ export default function Items() {
               >
                 Close
               </Button>
-              <Button 
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const recordId = viewingMaintenanceRecord.id;
-                  setViewingMaintenanceRecord(null);
-                  setTimeout(() => {
-                    navigate(`/Maintenance?edit=${recordId}`);
-                  }, 100);
-                }}
-                className="flex-1 bg-amber-600 hover:bg-amber-700"
+              <Link 
+                to={createPageUrl('Maintenance') + `?edit=${viewingMaintenanceRecord.id}`}
+                onClick={() => setViewingMaintenanceRecord(null)}
+                className="flex-1"
               >
-                Edit
-              </Button>
+                <Button 
+                  type="button"
+                  className="w-full bg-amber-600 hover:bg-amber-700"
+                >
+                  Edit
+                </Button>
+              </Link>
             </div>
           </DialogContent>
         </Dialog>
@@ -828,21 +825,18 @@ export default function Items() {
               >
                 Close
               </Button>
-              <Button 
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const billId = viewingBill.id;
-                  setViewingBill(null);
-                  setTimeout(() => {
-                    navigate(`/Bills?edit=${billId}`);
-                  }, 100);
-                }}
-                className="flex-1 bg-amber-600 hover:bg-amber-700"
+              <Link 
+                to={createPageUrl('Bills') + `?edit=${viewingBill.id}`}
+                onClick={() => setViewingBill(null)}
+                className="flex-1"
               >
-                Edit
-              </Button>
+                <Button 
+                  type="button"
+                  className="w-full bg-amber-600 hover:bg-amber-700"
+                >
+                  Edit
+                </Button>
+              </Link>
               {viewingBill.photo_url && (
                 <Button 
                   variant="outline"
