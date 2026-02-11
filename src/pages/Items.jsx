@@ -94,13 +94,27 @@ export default function Items() {
       if (bill.line_items) {
         bill.line_items.forEach((lineItem) => {
           if (lineItem.item_id === itemId && lineItem.item_quantity > 0) {
-            transactions.push({
-              type: 'purchase',
-              date: bill.bill_date,
-              quantity: lineItem.item_quantity,
-              vendor: bill.vendor,
-              reference: `Bill #${bill.bill_number || 'N/A'}`,
-            });
+            // Item added to inventory (not assigned to vehicle)
+            if (!lineItem.vehicle_id) {
+              transactions.push({
+                type: 'purchase',
+                date: bill.bill_date,
+                quantity: lineItem.item_quantity,
+                vendor: bill.vendor,
+                reference: `Bill #${bill.bill_number || 'N/A'}`,
+                billId: bill.id,
+              });
+            } else {
+              // Item used on a vehicle (deducted from inventory)
+              transactions.push({
+                type: 'usage',
+                date: bill.bill_date,
+                quantity: lineItem.item_quantity,
+                vehicle: vehicleMap[lineItem.vehicle_id]?.name || 'Unknown',
+                reference: `Bill #${bill.bill_number || 'N/A'}`,
+                billId: bill.id,
+              });
+            }
           }
         });
       }
@@ -116,6 +130,7 @@ export default function Items() {
               quantity: part.quantity_used,
               vehicle: vehicleMap[record.vehicle_id]?.name || 'Unknown',
               reference: record.title,
+              maintenanceId: record.id,
             });
           }
         });
@@ -442,7 +457,14 @@ export default function Items() {
                   {getItemTransactions(viewingItem.id).map((txn, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm"
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm hover:bg-slate-100 transition-colors cursor-pointer"
+                      onClick={() => {
+                        if (txn.billId) {
+                          window.location.href = `/Bills?view=${txn.billId}`;
+                        } else if (txn.maintenanceId) {
+                          window.location.href = `/Maintenance?view=${txn.maintenanceId}`;
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-3">
                         {txn.type === 'purchase' ? (
