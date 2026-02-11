@@ -476,7 +476,7 @@ export default function Maintenance() {
                           </tr>
                         </thead>
                         <tbody>
-                          {viewingRecord.work_items.map((item, idx) => (
+                          {viewingRecord.work_items?.map((item, idx) => (
                             <tr key={idx} className="border-t">
                               <td className="p-2">
                                 <div className="flex items-center gap-1">
