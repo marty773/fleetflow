@@ -121,6 +121,7 @@ export default function Items() {
     });
 
     maintenanceRecords.forEach((record) => {
+      // Check parts_used array (new format)
       if (record.parts_used) {
         record.parts_used.forEach((part) => {
           if (part.item_id === itemId) {
@@ -128,6 +129,22 @@ export default function Items() {
               type: 'usage',
               date: record.performed_date,
               quantity: part.quantity_used,
+              vehicle: vehicleMap[record.vehicle_id]?.name || 'Unknown',
+              reference: record.title,
+              maintenanceId: record.id,
+            });
+          }
+        });
+      }
+      
+      // Also check work_items array for item_id (in case it's stored there)
+      if (record.work_items) {
+        record.work_items.forEach((workItem) => {
+          if (workItem.item_id === itemId) {
+            transactions.push({
+              type: 'usage',
+              date: record.performed_date,
+              quantity: workItem.quantity,
               vehicle: vehicleMap[record.vehicle_id]?.name || 'Unknown',
               reference: record.title,
               maintenanceId: record.id,
