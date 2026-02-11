@@ -98,9 +98,9 @@ Deno.serve(async (req) => {
       // Table headers
       doc.setFont(undefined, 'bold');
       doc.text('Description', 20, yPos);
-      doc.text('Vendor/Part #', 80, yPos);
-      doc.text('Qty', 140, yPos);
-      doc.text('Price', 160, yPos);
+      doc.text('Item Number', 80, yPos);
+      doc.text('Qty', 135, yPos);
+      doc.text('Price', 155, yPos);
       doc.text('Total', 180, yPos);
       yPos += 2;
       doc.line(20, yPos, 200, yPos);
@@ -120,24 +120,21 @@ Deno.serve(async (req) => {
         const splitDescription = doc.splitTextToSize(description, 55);
         doc.text(splitDescription, 20, yPos);
 
-        // Vendor and Part Number (if item_id exists)
-        let vendorPartInfo = '-';
+        // Item Number (if item_id exists)
+        let itemNumber = '-';
         if (item.item_id && itemsMap[item.item_id]) {
           const stockItem = itemsMap[item.item_id];
-          const parts = [];
-          if (stockItem.vendor) parts.push(stockItem.vendor);
-          if (stockItem.item_number) parts.push(`#${stockItem.item_number}`);
-          vendorPartInfo = parts.join(' ') || '-';
+          itemNumber = stockItem.item_number || '-';
         }
-        const splitVendor = doc.splitTextToSize(vendorPartInfo, 55);
-        doc.text(splitVendor, 80, yPos);
+        const splitItemNumber = doc.splitTextToSize(itemNumber, 50);
+        doc.text(splitItemNumber, 80, yPos);
 
         // Quantity, Price, Total
-        doc.text(String(item.quantity || 0), 140, yPos);
-        doc.text(`$${(item.unit_price || 0).toFixed(2)}`, 160, yPos);
+        doc.text(String(item.quantity || 0), 135, yPos);
+        doc.text(`$${(item.unit_price || 0).toFixed(2)}`, 155, yPos);
         doc.text(`$${(item.total || 0).toFixed(2)}`, 180, yPos);
 
-        const lineHeight = Math.max(splitDescription.length, splitVendor.length) * 5;
+        const lineHeight = Math.max(splitDescription.length, splitItemNumber.length) * 5;
         yPos += lineHeight + 3;
       });
 
