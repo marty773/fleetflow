@@ -429,144 +429,24 @@ export default function Items() {
       </AlertDialog>
 
       {/* View Item Dialog */}
-      <Dialog open={!!viewingItem} onOpenChange={() => setViewingItem(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Item Details</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 overflow-y-auto flex-1">
-            {viewingItem?.photo_url && (
-              <div className="flex justify-center">
-                <img
-                  src={viewingItem.photo_url}
-                  alt={viewingItem.name}
-                  className="max-h-64 rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => setPhotoLightbox(viewingItem.photo_url)}
-                />
-              </div>
-            )}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-slate-500">Name</Label>
-                <p className="font-medium">{viewingItem?.name}</p>
-              </div>
-              <div>
-                <Label className="text-slate-500">Price</Label>
-                <p className="font-medium">${viewingItem?.price?.toFixed(2) || '0.00'}</p>
-              </div>
-              <div>
-                <Label className="text-slate-500">Item Number</Label>
-                <p className="font-medium">{viewingItem?.item_number || '-'}</p>
-              </div>
-              <div>
-                <Label className="text-slate-500">Quantity on Hand</Label>
-                <p className="font-medium">{viewingItem?.quantity_on_hand || 0}</p>
-              </div>
-              <div>
-                <Label className="text-slate-500">Vendor</Label>
-                <p className="font-medium">{viewingItem?.vendor || '-'}</p>
-              </div>
-            </div>
-            {viewingItem?.description && (
-              <div>
-                <Label className="text-slate-500">Description</Label>
-                <p className="text-sm mt-1">{viewingItem.description}</p>
-              </div>
-            )}
-
-            {viewingItem && getItemTransactions(viewingItem.id).length > 0 && (
-              <div className="border-t pt-4">
-                <Label className="text-slate-500 block mb-3">Transaction History</Label>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {getItemTransactions(viewingItem.id).map((txn, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm hover:bg-slate-100 transition-colors cursor-pointer"
-                      onClick={() => {
-                        // Close item dialog first
-                        setViewingItem(null);
-
-                        // Then open the bill or maintenance dialog
-                        setTimeout(() => {
-                          if (txn.billId) {
-                            const bill = bills.find(b => b.id === txn.billId);
-                            if (bill) setViewingBill(bill);
-                          } else if (txn.maintenanceId) {
-                            const record = maintenanceRecords.find(r => r.id === txn.maintenanceId);
-                            if (record) setViewingMaintenanceRecord(record);
-                          }
-                        }, 100);
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        {txn.type === 'purchase' ? (
-                          <TrendingUp className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4 text-red-600" />
-                        )}
-                        <div>
-                          <p className="font-medium text-slate-900">
-                            {new Date(txn.date).toLocaleDateString()}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            {txn.type === 'purchase'
-                              ? `Purchased from ${txn.vendor}`
-                              : `Used on ${txn.vehicle}`}
-                          </p>
-                        </div>
-                      </div>
-                      <span
-                        className={`font-semibold ${
-                          txn.type === 'purchase' ? 'text-green-600' : 'text-red-600'
-                        }`}
-                      >
-                        {txn.type === 'purchase' ? '+' : '-'}
-                        {txn.quantity}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="flex gap-2 mt-6 pt-4 border-t">
-            <Button 
-              variant="outline" 
-              onClick={() => setViewingItem(null)}
-              className="flex-1"
-            >
-              Close
-            </Button>
-            <Button 
-              onClick={() => {
-                setEditingItem(viewingItem);
-                setViewingItem(null);
-                setFormOpen(true);
-              }}
-              className="flex-1"
-              style={{ backgroundColor: 'var(--color-primary)' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
-            >
-              Edit
-            </Button>
-            {viewingItem?.photo_url && (
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  const link = document.createElement('a');
-                  link.href = viewingItem.photo_url;
-                  link.download = `${viewingItem.name}.jpg`;
-                  link.click();
-                }}
-                className="flex-1"
-              >
-                Download
-              </Button>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ItemDetailDialog
+        item={viewingItem}
+        transactions={viewingItem ? getItemTransactions(viewingItem.id) : []}
+        onClose={() => setViewingItem(null)}
+        onEdit={(item) => {
+          setEditingItem(item);
+          setViewingItem(null);
+          setFormOpen(true);
+        }}
+        onViewBill={(billId) => {
+          const bill = bills.find(b => b.id === billId);
+          if (bill) setViewingBill(bill);
+        }}
+        onViewMaintenance={(maintenanceId) => {
+          const record = maintenanceRecords.find(r => r.id === maintenanceId);
+          if (record) setViewingMaintenanceRecord(record);
+        }}
+      />
 
       {/* Photo Lightbox */}
       {photoLightbox && (
