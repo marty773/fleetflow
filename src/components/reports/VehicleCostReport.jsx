@@ -318,7 +318,13 @@ export default function VehicleCostReport() {
                                   {item.transactions.map((transaction, idx) => (
                                     <div
                                       key={idx}
-                                      onClick={() => setViewingTransaction(transaction)}
+                                      onClick={() => {
+                                        if (transaction.type === 'bill') {
+                                          setViewingBill(transaction.fullData);
+                                        } else {
+                                          setViewingMaintenance(transaction.fullData);
+                                        }
+                                      }}
                                       className="flex justify-between items-center py-2 px-3 bg-white rounded border border-slate-200 hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
                                     >
                                       <div className="flex-1">
