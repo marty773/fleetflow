@@ -91,8 +91,9 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+        <div className="overflow-y-auto flex-1 p-6">
+          <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
               <DialogTitle className="text-2xl">{vehicle.name}</DialogTitle>
