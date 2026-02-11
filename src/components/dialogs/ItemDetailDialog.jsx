@@ -89,8 +89,9 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
               </div>
             </div>
           )}
-        </div>
-        <div className="flex gap-2 mt-6 pt-4 border-t">
+          </div>
+          </div>
+          <div className="sticky bottom-0 flex gap-2 p-6 bg-white border-t border-slate-200 flex-wrap sm:flex-nowrap">
           <Button variant="outline" onClick={onClose} className="flex-1">
             Close
           </Button>
@@ -117,8 +118,8 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
               Download
             </Button>
           )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
+          </div>
+          </DialogContent>
+          </Dialog>
+          );
+          }
