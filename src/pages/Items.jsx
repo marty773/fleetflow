@@ -820,6 +820,7 @@ export default function Items() {
                 Close
               </Button>
               <Button 
+                type="button"
                 onClick={() => {
                   window.location.href = `/Bills?edit=${viewingBill.id}`;
                 }}
