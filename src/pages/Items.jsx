@@ -478,13 +478,19 @@ export default function Items() {
                       key={idx}
                       className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm hover:bg-slate-100 transition-colors cursor-pointer"
                       onClick={() => {
-                        if (txn.billId) {
-                          const bill = bills.find(b => b.id === txn.billId);
-                          if (bill) setViewingBill(bill);
-                        } else if (txn.maintenanceId) {
-                          const record = maintenanceRecords.find(r => r.id === txn.maintenanceId);
-                          if (record) setViewingMaintenanceRecord(record);
-                        }
+                        // Close item dialog first
+                        setViewingItem(null);
+
+                        // Then open the bill or maintenance dialog
+                        setTimeout(() => {
+                          if (txn.billId) {
+                            const bill = bills.find(b => b.id === txn.billId);
+                            if (bill) setViewingBill(bill);
+                          } else if (txn.maintenanceId) {
+                            const record = maintenanceRecords.find(r => r.id === txn.maintenanceId);
+                            if (record) setViewingMaintenanceRecord(record);
+                          }
+                        }, 100);
                       }}
                     >
                       <div className="flex items-center gap-3">
@@ -723,9 +729,7 @@ export default function Items() {
               </Button>
               <Button 
                 onClick={() => {
-                  setViewingMaintenanceRecord(null);
-                  setViewingItem(null);
-                  window.location.href = `/Maintenance?edit=${viewingMaintenanceRecord.id}&returnTo=Items`;
+                  window.location.href = `/Maintenance?edit=${viewingMaintenanceRecord.id}`;
                 }}
                 className="flex-1 bg-amber-600 hover:bg-amber-700"
               >
@@ -817,14 +821,23 @@ export default function Items() {
               </Button>
               <Button 
                 onClick={() => {
-                  setViewingBill(null);
-                  setViewingItem(null);
-                  window.location.href = `/Bills?edit=${viewingBill.id}&returnTo=Items`;
+                  window.location.href = `/Bills?edit=${viewingBill.id}`;
                 }}
                 className="flex-1 bg-amber-600 hover:bg-amber-700"
               >
                 Edit
               </Button>
+              {viewingBill.photo_url && (
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    window.open(viewingBill.photo_url, '_blank');
+                  }}
+                  className="flex-1"
+                >
+                  View Photo
+                </Button>
+              )}
             </div>
           </DialogContent>
         </Dialog>
