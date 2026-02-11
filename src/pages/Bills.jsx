@@ -272,22 +272,29 @@ export default function Bills() {
                         <thead className="bg-slate-50">
                           <tr>
                             <th className="text-left p-2">Description</th>
+                            <th className="text-left p-2">Vehicle</th>
                             <th className="text-center p-2">Qty</th>
                             <th className="text-right p-2">Price</th>
                             <th className="text-right p-2">Total</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {viewingBill.line_items.map((item, idx) => (
-                            <tr key={idx} className="border-t">
-                              <td className="p-2">{item.description}</td>
-                              <td className="text-center p-2">{item.quantity}</td>
-                              <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                              <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                            </tr>
-                          ))}
+                          {viewingBill.line_items.map((item, idx) => {
+                            const vehicle = vehicles.find(v => v.id === item.vehicle_id);
+                            return (
+                              <tr key={idx} className="border-t">
+                                <td className="p-2">{item.description}</td>
+                                <td className="p-2 text-slate-600">
+                                  {vehicle ? vehicle.name : '-'}
+                                </td>
+                                <td className="text-center p-2">{item.quantity}</td>
+                                <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                                <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                              </tr>
+                            );
+                          })}
                           <tr className="border-t bg-slate-50 font-semibold">
-                            <td colSpan={3} className="p-2 text-right">Total:</td>
+                            <td colSpan={4} className="p-2 text-right">Total:</td>
                             <td className="text-right p-2">${viewingBill.total_amount?.toFixed(2)}</td>
                           </tr>
                         </tbody>
