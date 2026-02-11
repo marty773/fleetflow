@@ -106,6 +106,17 @@ Deno.serve(async (req) => {
       doc.line(20, yPos, 200, yPos);
       yPos += 6;
 
+      // Build a map of item_id -> quantity from parts_used for matching
+      const partsUsedMap = {};
+      if (record.parts_used) {
+        record.parts_used.forEach(part => {
+          if (!partsUsedMap[part.item_id]) {
+            partsUsedMap[part.item_id] = 0;
+          }
+          partsUsedMap[part.item_id] += part.quantity_used;
+        });
+      }
+
       // Table rows
       doc.setFont(undefined, 'normal');
       record.work_items.forEach(item => {
@@ -120,12 +131,26 @@ Deno.serve(async (req) => {
         const splitDescription = doc.splitTextToSize(description, 55);
         doc.text(splitDescription, 20, yPos);
 
-        // Item Number (if item_id exists)
+        // Item Number - check both item.item_id and match from parts_used
         let itemNumber = '-';
-        if (item.item_id && itemsMap[item.item_id]) {
-          const stockItem = itemsMap[item.item_id];
+        let matchedItemId = item.item_id;
+        
+        // If no direct item_id, try to match from parts_used by quantity
+        if (!matchedItemId) {
+          for (const [itemId, qty] of Object.entries(partsUsedMap)) {
+            if (qty === item.quantity) {
+              matchedItemId = itemId;
+              delete partsUsedMap[itemId]; // Remove to avoid double matching
+              break;
+            }
+          }
+        }
+        
+        if (matchedItemId && itemsMap[matchedItemId]) {
+          const stockItem = itemsMap[matchedItemId];
           itemNumber = stockItem.item_number || '-';
         }
+        
         const splitItemNumber = doc.splitTextToSize(itemNumber, 50);
         doc.text(splitItemNumber, 80, yPos);
 
