@@ -7,6 +7,8 @@ import { Plus, Trash2, Edit2 } from 'lucide-react';
 import VehicleForm from '../components/vehicles/VehicleForm';
 import VehicleCard from '../components/vehicles/VehicleCard';
 import VehicleViewDialog from '../components/vehicles/VehicleViewDialog';
+import PullToRefresh from '../components/PullToRefresh';
+import PageTransition from '../components/PageTransition';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Vehicles() {
