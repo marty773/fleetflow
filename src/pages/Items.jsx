@@ -35,6 +35,8 @@ export default function Items() {
   const [viewingItem, setViewingItem] = useState(null);
   const [photoLightbox, setPhotoLightbox] = useState(null);
   const [recalculating, setRecalculating] = useState(false);
+  const [viewingMaintenanceRecord, setViewingMaintenanceRecord] = useState(null);
+  const [viewingBill, setViewingBill] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -477,9 +479,11 @@ export default function Items() {
                       className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm hover:bg-slate-100 transition-colors cursor-pointer"
                       onClick={() => {
                         if (txn.billId) {
-                          window.location.href = `/Bills?view=${txn.billId}`;
+                          const bill = bills.find(b => b.id === txn.billId);
+                          if (bill) setViewingBill(bill);
                         } else if (txn.maintenanceId) {
-                          window.location.href = `/Maintenance?view=${txn.maintenanceId}`;
+                          const record = maintenanceRecords.find(r => r.id === txn.maintenanceId);
+                          if (record) setViewingMaintenanceRecord(record);
                         }
                       }}
                     >
@@ -583,6 +587,188 @@ export default function Items() {
                 className="flex-1"
               >
                 Download
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* View Maintenance Record Dialog */}
+      {viewingMaintenanceRecord && (
+        <Dialog open={!!viewingMaintenanceRecord} onOpenChange={() => setViewingMaintenanceRecord(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Maintenance Record Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-slate-500">Vehicle</Label>
+                  <p className="font-medium">{vehicles.find(v => v.id === viewingMaintenanceRecord.vehicle_id)?.name}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Type</Label>
+                  <p className="font-medium capitalize">{viewingMaintenanceRecord.maintenance_type?.replace('_', ' ')}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Title</Label>
+                  <p className="font-medium">{viewingMaintenanceRecord.title}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Date</Label>
+                  <p className="font-medium">{new Date(viewingMaintenanceRecord.performed_date).toLocaleDateString()}</p>
+                </div>
+                {viewingMaintenanceRecord.vendor && (
+                  <div>
+                    <Label className="text-slate-500">Service Provider</Label>
+                    <p className="font-medium">{viewingMaintenanceRecord.vendor}</p>
+                  </div>
+                )}
+                {viewingMaintenanceRecord.odometer_reading && (
+                  <div>
+                    <Label className="text-slate-500">Odometer</Label>
+                    <p className="font-medium">{viewingMaintenanceRecord.odometer_reading} miles</p>
+                  </div>
+                )}
+              </div>
+              {viewingMaintenanceRecord.work_items && viewingMaintenanceRecord.work_items.length > 0 && (
+                <div>
+                  <Label className="text-slate-500">Work Performed</Label>
+                  <div className="border rounded-lg overflow-hidden mt-2">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50">
+                        <tr>
+                          <th className="text-left p-2">Description</th>
+                          <th className="text-center p-2">Qty</th>
+                          <th className="text-right p-2">Price</th>
+                          <th className="text-right p-2">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {viewingMaintenanceRecord.work_items.map((item, idx) => (
+                          <tr key={idx} className="border-t">
+                            <td className="p-2">{item.description}</td>
+                            <td className="text-center p-2">{item.quantity}</td>
+                            <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                            <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-t bg-slate-50 font-semibold">
+                          <td colSpan={3} className="p-2 text-right">Total:</td>
+                          <td className="text-right p-2">${viewingMaintenanceRecord.total_cost?.toFixed(2)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              {viewingMaintenanceRecord.notes && (
+                <div>
+                  <Label className="text-slate-500">Notes</Label>
+                  <p className="text-sm mt-1">{viewingMaintenanceRecord.notes}</p>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 mt-6 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => setViewingMaintenanceRecord(null)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+              <Button 
+                onClick={() => {
+                  window.location.href = `/Maintenance?edit=${viewingMaintenanceRecord.id}`;
+                }}
+                className="flex-1 bg-amber-600 hover:bg-amber-700"
+              >
+                Edit
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* View Bill Dialog */}
+      {viewingBill && (
+        <Dialog open={!!viewingBill} onOpenChange={() => setViewingBill(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Bill Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-slate-500">Vendor</Label>
+                  <p className="font-medium">{viewingBill.vendor}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Date</Label>
+                  <p className="font-medium">{new Date(viewingBill.bill_date).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Bill Number</Label>
+                  <p className="font-medium">{viewingBill.bill_number || '-'}</p>
+                </div>
+                <div>
+                  <Label className="text-slate-500">Category</Label>
+                  <p className="font-medium capitalize">{viewingBill.category?.replace('_', ' ')}</p>
+                </div>
+              </div>
+              {viewingBill.line_items && viewingBill.line_items.length > 0 && (
+                <div>
+                  <Label className="text-slate-500">Line Items</Label>
+                  <div className="border rounded-lg overflow-hidden mt-2">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50">
+                        <tr>
+                          <th className="text-left p-2">Description</th>
+                          <th className="text-center p-2">Qty</th>
+                          <th className="text-right p-2">Price</th>
+                          <th className="text-right p-2">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {viewingBill.line_items.map((item, idx) => (
+                          <tr key={idx} className="border-t">
+                            <td className="p-2">{item.description}</td>
+                            <td className="text-center p-2">{item.quantity}</td>
+                            <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                            <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-t bg-slate-50 font-semibold">
+                          <td colSpan={3} className="p-2 text-right">Total:</td>
+                          <td className="text-right p-2">${viewingBill.total_amount?.toFixed(2)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              {viewingBill.notes && (
+                <div>
+                  <Label className="text-slate-500">Notes</Label>
+                  <p className="text-sm mt-1">{viewingBill.notes}</p>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 mt-6 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => setViewingBill(null)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+              <Button 
+                onClick={() => {
+                  window.location.href = `/Bills?edit=${viewingBill.id}`;
+                }}
+                className="flex-1 bg-amber-600 hover:bg-amber-700"
+              >
+                Edit
               </Button>
             </div>
           </DialogContent>
