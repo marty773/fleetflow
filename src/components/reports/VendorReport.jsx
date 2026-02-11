@@ -22,9 +22,9 @@ import {
 export default function VendorReport() {
   const { selectedCompany } = useCompany();
   const [expandedVendor, setExpandedVendor] = useState(null);
-  const [viewingTransaction, setViewingTransaction] = useState(null);
+  const [viewingBill, setViewingBill] = useState(null);
+  const [viewingMaintenance, setViewingMaintenance] = useState(null);
   const [filterMode, setFilterMode] = useState('all');
-  const queryClient = useQueryClient();
 
   const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors'],
