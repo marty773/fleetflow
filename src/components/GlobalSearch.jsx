@@ -206,35 +206,43 @@ export default function GlobalSearch() {
         </DialogTrigger>
         <DialogContent className="max-w-2xl p-0 max-h-[85vh]">
           <div className="p-4 border-b sticky top-0 bg-white z-10">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Search vehicles, bills, maintenance, items, vendors..."
-                className="pl-10 pr-20 py-6 text-base border-2 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0"
-                style={{ borderColor: 'var(--color-primary)' }}
-                autoFocus
-              />
-              {searchTerm && (
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Search vehicles, bills, maintenance, items, vendors..."
+                  className="pl-10 pr-20 py-6 text-base border-2 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0"
+                  style={{ borderColor: 'var(--color-primary)' }}
+                  autoFocus
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSearchTriggered(false);
+                      setShowResults(false);
+                    }}
+                    className="absolute right-16 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4 text-slate-400" />
+                  </button>
+                )}
                 <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setSearchTriggered(false);
-                    setShowResults(false);
-                  }}
-                  className="absolute right-16 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 rounded-full transition-colors"
+                  onClick={handleSearch}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-white rounded-lg font-medium transition-colors text-sm"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
                 >
-                  <X className="w-4 h-4 text-slate-400" />
+                  Search
                 </button>
-              )}
+              </div>
               <button
-                onClick={handleSearch}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-white rounded-lg font-medium transition-colors text-sm"
-                style={{ backgroundColor: 'var(--color-primary)' }}
+                onClick={() => setDialogOpen(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
               >
-                Search
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
           </div>
