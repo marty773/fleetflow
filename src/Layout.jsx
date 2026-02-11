@@ -50,7 +50,7 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex select-none" style={{ overscrollBehavior: 'none' }}>
       <style>{`
         :root {
           --color-primary: ${themeColors.primary};
