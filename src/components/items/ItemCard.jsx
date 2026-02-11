@@ -6,9 +6,9 @@ import { Pencil, Trash2, Package, DollarSign, Store } from 'lucide-react';
 
 export default function ItemCard({ item, onView, onEdit, onDelete }) {
   return (
-    <Card className="group overflow-hidden bg-white border-0 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => onView(item)}>
+    <Card className="group overflow-hidden bg-white dark:bg-slate-800 border-0 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => onView(item)}>
       {/* Image Section */}
-      <div className="relative aspect-square bg-gradient-to-br from-slate-100 to-slate-50 overflow-hidden">
+      <div className="relative aspect-square bg-gradient-to-br from-slate-100 dark:from-slate-700 to-slate-50 dark:to-slate-600 overflow-hidden">
         {item.photo_url ? (
           <img
             src={item.photo_url}
@@ -60,21 +60,21 @@ export default function ItemCard({ item, onView, onEdit, onDelete }) {
 
       {/* Content Section */}
       <div className="p-4 space-y-2">
-        <h3 className="font-semibold text-slate-900 truncate">{item.name}</h3>
+        <h3 className="font-semibold text-slate-900 dark:text-white truncate">{item.name}</h3>
         
         {item.item_number && (
-           <p className="text-sm text-slate-500 font-mono">#{item.item_number}</p>
+           <p className="text-sm text-slate-500 dark:text-slate-300 font-mono">#{item.item_number}</p>
          )}
 
         {item.vendor && (
-          <div className="flex items-center gap-1.5 text-sm text-slate-600">
-            <Store className="h-3.5 w-3.5 text-slate-400" />
+          <div className="flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-400">
+            <Store className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
             <span className="truncate">{item.vendor}</span>
           </div>
         )}
 
         {item.description && (
-          <p className="text-sm text-slate-500 line-clamp-2">{item.description}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{item.description}</p>
         )}
       </div>
     </Card>
