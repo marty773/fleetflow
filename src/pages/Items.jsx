@@ -730,9 +730,15 @@ export default function Items() {
                 Close
               </Button>
               <Button 
-                onClick={() => {
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const recordId = viewingMaintenanceRecord.id;
                   setViewingMaintenanceRecord(null);
-                  navigate(`/Maintenance?edit=${viewingMaintenanceRecord.id}`);
+                  setTimeout(() => {
+                    navigate(`/Maintenance?edit=${recordId}`);
+                  }, 100);
                 }}
                 className="flex-1 bg-amber-600 hover:bg-amber-700"
               >
@@ -824,9 +830,14 @@ export default function Items() {
               </Button>
               <Button 
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const billId = viewingBill.id;
                   setViewingBill(null);
-                  navigate(`/Bills?edit=${viewingBill.id}`);
+                  setTimeout(() => {
+                    navigate(`/Bills?edit=${billId}`);
+                  }, 100);
                 }}
                 className="flex-1 bg-amber-600 hover:bg-amber-700"
               >
