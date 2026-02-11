@@ -12,8 +12,8 @@ export default function BottomTabs({ currentPageName }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t border-slate-200 z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="flex justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t border-slate-200 z-40" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 1rem)' }}>
+      <div className="flex justify-around py-3">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentPageName === tab.name;
