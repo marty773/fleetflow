@@ -647,7 +647,14 @@ export default function Items() {
                       <tbody>
                         {viewingMaintenanceRecord.work_items.map((item, idx) => (
                           <tr key={idx} className="border-t">
-                            <td className="p-2">{item.description}</td>
+                            <td className="p-2">
+                              <div className="flex items-center gap-1">
+                                {item.item_id && (
+                                  <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                )}
+                                <span>{item.description}</span>
+                              </div>
+                            </td>
                             <td className="text-center p-2">{item.quantity}</td>
                             <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
                             <td className="text-right p-2">${item.total?.toFixed(2)}</td>
@@ -732,7 +739,14 @@ export default function Items() {
                       <tbody>
                         {viewingBill.line_items.map((item, idx) => (
                           <tr key={idx} className="border-t">
-                            <td className="p-2">{item.description}</td>
+                            <td className="p-2">
+                              <div className="flex items-center gap-1">
+                                {item.item_id && (
+                                  <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                )}
+                                <span>{item.description}</span>
+                              </div>
+                            </td>
                             <td className="text-center p-2">{item.quantity}</td>
                             <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
                             <td className="text-right p-2">${item.total?.toFixed(2)}</td>
