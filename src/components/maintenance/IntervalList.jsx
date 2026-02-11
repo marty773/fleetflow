@@ -72,7 +72,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
                     </Badge>
                     <div className="flex items-center gap-1">
                       <StatusIcon className={`w-4 h-4 ${status.color}`} />
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-sm">
                         {status.label}
                       </Badge>
                     </div>
@@ -106,27 +106,26 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
                   </div>
                 </div>
                 <div className="flex gap-2 justify-end md:justify-start">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit(interval)}
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (window.confirm('Delete this interval?')) {
-                        onDelete(interval.id);
-                      }
-                    }}
-                    disabled={isDeleting}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                   <Button
+                     variant="outline"
+                     onClick={() => onEdit(interval)}
+                     className="h-11 w-11 p-0 md:h-9 md:w-9"
+                   >
+                     <Edit2 className="w-4 h-4" />
+                   </Button>
+                   <Button
+                     variant="outline"
+                     onClick={() => {
+                       if (window.confirm('Delete this interval?')) {
+                         onDelete(interval.id);
+                       }
+                     }}
+                     disabled={isDeleting}
+                     className="h-11 w-11 p-0 md:h-9 md:w-9 text-red-600 hover:text-red-700"
+                   >
+                     <Trash2 className="w-4 h-4" />
+                   </Button>
+                 </div>
               </div>
             </CardContent>
           </Card>

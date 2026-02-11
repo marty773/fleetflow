@@ -161,7 +161,7 @@ export default function BillGallery({ bills, vehicles }) {
                 ) : (
                   <div className="flex flex-col items-center justify-center w-full h-full bg-slate-50">
                     <FileText className="w-12 h-12 text-slate-400 mb-2" />
-                    <p className="text-xs text-slate-600 text-center px-2">PDF Document</p>
+                    <p className="text-sm text-slate-600 text-center px-2">PDF Document</p>
                   </div>
                 )
               ) : (
@@ -176,11 +176,11 @@ export default function BillGallery({ bills, vehicles }) {
               <p className="font-semibold text-sm text-slate-900 mb-1">
                 {vehicleMap[bill.vehicle_id]?.name}
               </p>
-              <p className="text-xs text-slate-600 mb-2">{bill.vendor}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-500">
-                  {format(new Date(bill.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
-                </span>
+              <p className="text-sm text-slate-600 mb-2">{bill.vendor}</p>
+               <div className="flex items-center justify-between">
+                 <span className="text-sm text-slate-500">
+                   {format(new Date(bill.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
+                 </span>
                 <span className="font-semibold text-sm text-slate-900">
                   ${bill.total_amount?.toFixed(2)}
                 </span>
