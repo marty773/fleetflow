@@ -267,7 +267,7 @@ export default function Bills() {
                           }
                         }}
                       >
-                        {viewingBill.photo_url.includes('drive.google.com') ? 'Download PDF' : 'Download Photo'}
+                        {viewingBill.photo_url.includes('drive.google.com') || viewingBill.photo_url.includes('.pdf') ? 'Download PDF' : 'Download Photo'}
                       </Button>
                     </div>
                     <div className="flex justify-center">
