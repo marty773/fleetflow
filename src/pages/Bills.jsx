@@ -241,20 +241,52 @@ export default function Bills() {
               </DialogHeader>
               <div className="space-y-4">
                 {viewingBill.photo_url && (
-                  <div className="flex justify-center">
-                    {viewingBill.photo_url.includes('drive.google.com') ? (
-                      <iframe
-                        src={viewingBill.photo_url}
-                        className="w-full h-96 rounded-lg border"
-                        title="Bill Preview"
-                      />
-                    ) : (
-                      <img
-                        src={viewingBill.photo_url}
-                        alt="Bill"
-                        className="max-h-64 rounded-lg object-cover"
-                      />
-                    )}
+                  <div>
+                    <div className="flex justify-end mb-2">
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          if (viewingBill.photo_url.includes('drive.google.com')) {
+                            // For Google Drive PDFs, open in new tab
+                            window.open(viewingBill.photo_url, '_blank');
+                          } else {
+                            // For images, force download
+                            try {
+                              const response = await fetch(viewingBill.photo_url);
+                              const blob = await response.blob();
+                              const url = window.URL.createObjectURL(blob);
+                              const link = document.createElement('a');
+                              link.href = url;
+                              link.download = `bill_${viewingBill.bill_number || viewingBill.id}.${blob.type.includes('pdf') ? 'pdf' : 'jpg'}`;
+                              document.body.appendChild(link);
+                              link.click();
+                              window.URL.revokeObjectURL(url);
+                              link.remove();
+                            } catch (error) {
+                              console.error('Download failed:', error);
+                            }
+                          }
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </div>
+                    <div className="flex justify-center">
+                      {viewingBill.photo_url.includes('drive.google.com') ? (
+                        <iframe
+                          src={viewingBill.photo_url}
+                          className="w-full h-96 rounded-lg border"
+                          title="Bill Preview"
+                        />
+                      ) : (
+                        <img
+                          src={viewingBill.photo_url}
+                          alt="Bill"
+                          className="max-h-64 rounded-lg object-cover"
+                        />
+                      )}
+                    </div>
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-4">
@@ -357,20 +389,6 @@ export default function Bills() {
                 >
                   Edit
                 </Button>
-                {viewingBill.photo_url && (
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = viewingBill.photo_url;
-                      link.download = `bill_${viewingBill.bill_number || viewingBill.id}.jpg`;
-                      link.click();
-                    }}
-                    className="flex-1"
-                  >
-                    Download
-                  </Button>
-                )}
               </div>
             </DialogContent>
           </Dialog>
