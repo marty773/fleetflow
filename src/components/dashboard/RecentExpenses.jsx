@@ -120,7 +120,7 @@ export default function RecentExpenses({ bills, vehicles }) {
                 <div>
                   <Label className="text-slate-500 mb-2 block">Line Items</Label>
                   <div className="border rounded-lg overflow-hidden">
-                    <table className="w-full text-sm">
+                    <table className="w-full">
                       <thead className="bg-slate-50">
                         <tr>
                           <th className="text-left p-2">Description</th>
@@ -150,7 +150,7 @@ export default function RecentExpenses({ bills, vehicles }) {
               {viewingBill.notes && (
                 <div>
                   <Label className="text-slate-500">Notes</Label>
-                  <p className="text-sm mt-1">{viewingBill.notes}</p>
+                  <p className="mt-1">{viewingBill.notes}</p>
                 </div>
               )}
             </div>

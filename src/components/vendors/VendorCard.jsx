@@ -14,36 +14,36 @@ export default function VendorCard({ vendor, onView, onEdit, onDelete, isDeletin
           <div className="flex-1">
             <CardTitle className="text-lg">{vendor.name}</CardTitle>
             {vendor.category && (
-              <p className="text-xs text-slate-500 capitalize mt-1">{vendor.category}</p>
-            )}
+                <p className="text-sm text-slate-500 capitalize mt-1">{vendor.category}</p>
+              )}
           </div>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(vendor);
-              }}
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (window.confirm(`Delete vendor "${vendor.name}"?`)) {
-                  onDelete(vendor.id);
-                }
-              }}
-              disabled={isDeleting}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
+             <Button
+               size="icon"
+               variant="ghost"
+               className="h-11 w-11 md:h-8 md:w-8"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 onEdit(vendor);
+               }}
+             >
+               <Edit className="w-4 h-4" />
+             </Button>
+             <Button
+               size="icon"
+               variant="ghost"
+               className="h-11 w-11 md:h-8 md:w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 if (window.confirm(`Delete vendor "${vendor.name}"?`)) {
+                   onDelete(vendor.id);
+                 }
+               }}
+               disabled={isDeleting}
+             >
+               <Trash2 className="w-4 h-4" />
+             </Button>
+           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
