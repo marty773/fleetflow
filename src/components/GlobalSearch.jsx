@@ -188,7 +188,14 @@ export default function GlobalSearch() {
   return (
     <>
       {/* Floating Search Button */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(open) => {
+        setDialogOpen(open);
+        if (!open) {
+          setSearchTerm('');
+          setSearchTriggered(false);
+          setShowResults(false);
+        }
+      }}>
         <DialogTrigger asChild>
           <button 
             className="fixed bottom-6 right-6 z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110"
