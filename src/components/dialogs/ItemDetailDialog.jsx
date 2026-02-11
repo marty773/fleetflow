@@ -9,11 +9,12 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
 
   return (
     <Dialog open={!!item} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Item Details</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 overflow-y-auto flex-1">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+        <div className="overflow-y-auto flex-1 p-6">
+          <DialogHeader className="mb-4">
+            <DialogTitle>Item Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
           {item.photo_url && (
             <div className="flex justify-center">
               <img src={item.photo_url} alt={item.name} className="max-h-64 rounded-lg object-cover" />
