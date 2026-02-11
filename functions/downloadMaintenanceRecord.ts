@@ -13,15 +13,15 @@ Deno.serve(async (req) => {
     const { recordId } = await req.json();
 
     // Fetch maintenance record
-    const records = await base44.entities.MaintenanceRecord.filter({ id: recordId });
-    if (!records || records.length === 0) {
+    const allRecords = await base44.entities.MaintenanceRecord.list();
+    const record = allRecords.find(r => r.id === recordId);
+    if (!record) {
       return Response.json({ error: 'Record not found' }, { status: 404 });
     }
-    const record = records[0];
 
     // Fetch vehicle details
-    const vehicles = await base44.entities.Vehicle.filter({ id: record.vehicle_id });
-    const vehicle = vehicles[0];
+    const allVehicles = await base44.entities.Vehicle.list();
+    const vehicle = allVehicles.find(v => v.id === record.vehicle_id);
 
     // Fetch all items to get vendor and item numbers
     const allItems = await base44.entities.Item.list();
