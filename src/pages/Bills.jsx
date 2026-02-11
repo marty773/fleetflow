@@ -100,10 +100,10 @@ export default function Bills() {
   const handleSubmit = async (data) => {
     const dataWithCompany = { ...data, company_id: selectedCompany };
     
-    // Group line items by item_id and sum quantities
+    // Group line items by item_id and sum quantities (only for items NOT assigned to vehicles)
     const itemQuantityMap = {};
     dataWithCompany.line_items
-      .filter(item => item.item_id && item.item_quantity > 0)
+      .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
       .forEach(item => {
         if (!itemQuantityMap[item.item_id]) {
           itemQuantityMap[item.item_id] = 0;
