@@ -120,6 +120,20 @@ export default function Maintenance() {
 
   const createRecordMutation = useMutation({
     mutationFn: (data) => base44.entities.MaintenanceRecord.create(data),
+    onMutate: async (newRecord) => {
+      await queryClient.cancelQueries({ queryKey: ['maintenanceRecords'] });
+      const previousRecords = queryClient.getQueryData(['maintenanceRecords']);
+      queryClient.setQueryData(['maintenanceRecords'], (old) => [
+        ...(old || []),
+        { ...newRecord, id: `temp-${Date.now()}`, created_date: new Date().toISOString() }
+      ]);
+      return { previousRecords };
+    },
+    onError: (err, newRecord, context) => {
+      if (context?.previousRecords) {
+        queryClient.setQueryData(['maintenanceRecords'], context.previousRecords);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
       setShowRecordForm(false);
@@ -128,6 +142,19 @@ export default function Maintenance() {
 
   const updateRecordMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.MaintenanceRecord.update(id, data),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['maintenanceRecords'] });
+      const previousRecords = queryClient.getQueryData(['maintenanceRecords']);
+      queryClient.setQueryData(['maintenanceRecords'], (old) =>
+        old?.map((r) => (r.id === id ? { ...r, ...data } : r)) || []
+      );
+      return { previousRecords };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousRecords) {
+        queryClient.setQueryData(['maintenanceRecords'], context.previousRecords);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
       setEditingRecord(null);
