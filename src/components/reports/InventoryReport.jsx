@@ -202,7 +202,7 @@ export default function InventoryReport({ highlightItemId }) {
   return (
     <div className="space-y-6" id="inventory-report">
       <div className="flex items-center justify-between">
-         <h2 className="text-xl font-semibold dark:text-white">Inventory Overview</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Inventory Overview</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function InventoryReport({ highlightItemId }) {
           <CardContent className="p-4 md:p-6">
             <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
               <div className="flex-1 md:flex-none md:w-full">
-                 <CardTitle className="text-base md:text-lg dark:text-white mb-1 md:mb-2">Total Inventory Value</CardTitle>
+                 <CardTitle className="text-base md:text-lg text-slate-900 dark:text-white mb-1 md:mb-2">Total Inventory Value</CardTitle>
                  <p className="text-sm text-slate-500 dark:text-slate-400 md:mt-2">Tap to view top items</p>
                </div>
                <p className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white shrink-0">${totalValue.toFixed(2)}</p>
@@ -247,7 +247,7 @@ export default function InventoryReport({ highlightItemId }) {
           <CardContent className="p-4 md:p-6">
             <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
               <div className="flex-1 md:flex-none md:w-full">
-                <CardTitle className="text-base md:text-lg dark:text-white flex items-center gap-2 mb-1 md:mb-2">
+                <CardTitle className="text-base md:text-lg text-slate-900 dark:text-white flex items-center gap-2 mb-1 md:mb-2">
                   <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
                   Low Stock Items
                 </CardTitle>
@@ -269,7 +269,7 @@ export default function InventoryReport({ highlightItemId }) {
                 <CardContent className="p-4 md:p-6">
                 <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
                 <div className="flex-1 md:flex-none md:w-full">
-                 <CardTitle className="text-base md:text-lg dark:text-white flex items-center gap-2 mb-1 md:mb-2">
+                 <CardTitle className="text-base md:text-lg text-slate-900 dark:text-white flex items-center gap-2 mb-1 md:mb-2">
                    <Package className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
                    Out of Stock
                  </CardTitle>
@@ -291,7 +291,7 @@ export default function InventoryReport({ highlightItemId }) {
       ) : (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-             <CardTitle className="dark:text-white">
+             <CardTitle className="text-slate-900 dark:text-white">
                {filterMode === 'all' && 'All Inventory Items'}
                {filterMode === 'value' && 'Top 5 Items by Value'}
                {filterMode === 'low' && 'Low Stock Items'}
@@ -313,15 +313,15 @@ export default function InventoryReport({ highlightItemId }) {
           <CardContent>
             <Table>
               <TableHeader>
-                 <TableRow className="dark:border-slate-700">
-                   <TableHead className="w-10 dark:text-slate-300"></TableHead>
-                   <TableHead className="dark:text-slate-300">Item Name</TableHead>
-                   <TableHead className="dark:text-slate-300">Item Number</TableHead>
-                   <TableHead className="dark:text-slate-300">Vendor</TableHead>
-                   <TableHead className="text-right dark:text-slate-300">Price</TableHead>
-                   <TableHead className="text-right dark:text-slate-300">Qty on Hand</TableHead>
-                   <TableHead className="text-right dark:text-slate-300">Total Value</TableHead>
-                   <TableHead className="dark:text-slate-300">Status</TableHead>
+                 <TableRow className="border-b border-slate-200 dark:border-slate-700">
+                   <TableHead className="w-10 text-slate-700 dark:text-slate-300"></TableHead>
+                   <TableHead className="text-slate-700 dark:text-slate-300">Item Name</TableHead>
+                   <TableHead className="text-slate-700 dark:text-slate-300">Item Number</TableHead>
+                   <TableHead className="text-slate-700 dark:text-slate-300">Vendor</TableHead>
+                   <TableHead className="text-right text-slate-700 dark:text-slate-300">Price</TableHead>
+                   <TableHead className="text-right text-slate-700 dark:text-slate-300">Qty on Hand</TableHead>
+                   <TableHead className="text-right text-slate-700 dark:text-slate-300">Total Value</TableHead>
+                   <TableHead className="text-slate-700 dark:text-slate-300">Status</TableHead>
                  </TableRow>
                </TableHeader>
               <TableBody>
@@ -379,7 +379,7 @@ export default function InventoryReport({ highlightItemId }) {
                           )}
                         </TableCell>
                         <TableCell 
-                          className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer underline"
+                          className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer underline"
                           onClick={(e) => {
                             e.stopPropagation();
                             setViewingItem(item);
@@ -387,13 +387,13 @@ export default function InventoryReport({ highlightItemId }) {
                         >
                           {item.name}
                         </TableCell>
-                        <TableCell className="font-mono text-sm dark:text-slate-300">
+                        <TableCell className="font-mono text-sm text-slate-900 dark:text-slate-300">
                            {item.item_number || '-'}
                          </TableCell>
-                         <TableCell className="dark:text-slate-300">{item.vendor || '-'}</TableCell>
-                         <TableCell className="text-right dark:text-slate-300">${item.price?.toFixed(2) || '0.00'}</TableCell>
-                         <TableCell className="text-right font-semibold dark:text-white">{qty}</TableCell>
-                         <TableCell className="text-right font-semibold dark:text-white">
+                         <TableCell className="text-slate-900 dark:text-slate-300">{item.vendor || '-'}</TableCell>
+                         <TableCell className="text-right text-slate-900 dark:text-slate-300">${item.price?.toFixed(2) || '0.00'}</TableCell>
+                         <TableCell className="text-right font-semibold text-slate-900 dark:text-white">{qty}</TableCell>
+                         <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
                            ${value.toFixed(2)}
                          </TableCell>
                         <TableCell>
@@ -404,9 +404,9 @@ export default function InventoryReport({ highlightItemId }) {
                       </TableRow>
                       {isExpanded && transactions.length > 0 && (
                         <TableRow>
-                          <TableCell colSpan={8} className="bg-slate-50 dark:bg-slate-700 p-0">
+                          <TableCell colSpan={8} className="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 p-0">
                             <div className="p-4">
-                              <h4 className="font-semibold dark:text-white mb-3">Transaction History</h4>
+                              <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Transaction History</h4>
                               <div className="space-y-2">
                                 {transactions.map((txn, idx) => (
                                   <div
@@ -418,7 +418,7 @@ export default function InventoryReport({ highlightItemId }) {
                                         setViewingMaintenance(txn.fullData);
                                       }
                                     }}
-                                    className="flex items-center justify-between p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                                    className="flex items-center justify-between p-2 bg-white dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
                                   >
                                     <div className="flex items-center gap-3">
                                       {txn.type === 'purchase' ? (

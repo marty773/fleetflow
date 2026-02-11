@@ -342,10 +342,10 @@ export default function Calendar() {
 
             {/* Vehicle filter below buttons */}
             <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-              <SelectTrigger className="w-full sm:w-64 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+              <SelectTrigger className="w-full sm:w-64 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
                 <SelectItem value="all">All Vehicles</SelectItem>
                 {vehicles.map(v => (
                   <SelectItem key={v.id} value={v.id}>

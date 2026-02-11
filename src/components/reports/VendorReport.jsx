@@ -172,7 +172,7 @@ export default function VendorReport() {
   return (
     <div className="space-y-6" id="vendor-report">
       <div className="flex items-center justify-between">
-         <h2 className="text-xl font-semibold dark:text-white">Vendor Report</h2>
+         <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Vendor Report</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
@@ -252,7 +252,7 @@ export default function VendorReport() {
                   setExpandedVendor(expandedVendor === vendor.id ? null : vendor.id);
                 }
               }}
-              className="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700"
+              className="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900"
               >
                <div className="flex-1">
                  <h3 className="font-semibold text-slate-900 dark:text-white">{vendor.name}</h3>
@@ -279,48 +279,48 @@ export default function VendorReport() {
             </button>
 
             {expandedVendor === vendor.id && (
-               <div className="border-t p-4 bg-slate-50 dark:bg-slate-700">
-                 <div className="space-y-2 mb-4">
-                   {vendor.email && (
-                     <p className="text-sm dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Email:</span> <a href={`mailto:${vendor.email}`} className="text-blue-600 dark:text-blue-400 hover:underline">{vendor.email}</a></p>
-                   )}
-                   {vendor.phone && (
-                     <p className="text-sm dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Phone:</span> <a href={`tel:${vendor.phone}`} className="text-blue-600 dark:text-blue-400 hover:underline">{vendor.phone}</a></p>
-                   )}
-                   {vendor.contact_person && (
-                     <p className="text-sm dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Contact:</span> {vendor.contact_person}</p>
-                   )}
-                 </div>
-
-                 {vendor.transactions.length > 0 && (
-                   <div>
-                     <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Recent Transactions</p>
-                    <div className="space-y-2">
-                      {vendor.transactions.slice(0, 5).map((txn, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => {
-                            if (txn.type === 'bill') {
-                              setViewingBill(txn.fullData);
-                            } else {
-                              setViewingMaintenance(txn.fullData);
-                            }
-                          }}
-                          className="flex items-center justify-between p-2 bg-white rounded border hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
-                        >
-                          <div>
-                             <Badge className={categoryColors[txn.category]} variant="outline">{txn.type === 'bill' ? 'Bill' : 'Maintenance'}</Badge>
-                             <p className="text-sm font-medium mt-1 dark:text-white">{txn.description}</p>
-                             <p className="text-xs text-slate-500 dark:text-slate-400">{format(new Date(txn.date), 'MMM dd, yyyy')}</p>
-                           </div>
-                           <p className="font-semibold text-slate-900 dark:text-white">${txn.amount.toFixed(2)}</p>
-                        </div>
-                      ))}
-                    </div>
+               <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-900">
+                  <div className="space-y-2 mb-4">
+                    {vendor.email && (
+                      <p className="text-sm text-slate-900 dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Email:</span> <a href={`mailto:${vendor.email}`} className="text-blue-600 dark:text-blue-400 hover:underline">{vendor.email}</a></p>
+                    )}
+                    {vendor.phone && (
+                      <p className="text-sm text-slate-900 dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Phone:</span> <a href={`tel:${vendor.phone}`} className="text-blue-600 dark:text-blue-400 hover:underline">{vendor.phone}</a></p>
+                    )}
+                    {vendor.contact_person && (
+                      <p className="text-sm text-slate-900 dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Contact:</span> {vendor.contact_person}</p>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+
+                  {vendor.transactions.length > 0 && (
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-300 mb-3">Recent Transactions</p>
+                     <div className="space-y-2">
+                       {vendor.transactions.slice(0, 5).map((txn, idx) => (
+                         <div
+                           key={idx}
+                           onClick={() => {
+                             if (txn.type === 'bill') {
+                               setViewingBill(txn.fullData);
+                             } else {
+                               setViewingMaintenance(txn.fullData);
+                             }
+                           }}
+                           className="flex items-center justify-between p-2 bg-white dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
+                         >
+                           <div>
+                              <Badge className={categoryColors[txn.category]} variant="outline">{txn.type === 'bill' ? 'Bill' : 'Maintenance'}</Badge>
+                              <p className="text-sm font-medium mt-1 text-slate-900 dark:text-white">{txn.description}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">{format(new Date(txn.date), 'MMM dd, yyyy')}</p>
+                            </div>
+                            <p className="font-semibold text-slate-900 dark:text-white">${txn.amount.toFixed(2)}</p>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+               </div>
+             )}
           </Card>
         ))}
       </div>

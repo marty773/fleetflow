@@ -181,13 +181,13 @@ export default function VehicleCostReport() {
   return (
     <div className="space-y-6" id="vehicle-cost-report">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold dark:text-white">Vehicle Costs by Timeframe</h2>
-        <div className="flex items-center gap-2">
-          <Select value={timeframe} onValueChange={setTimeframe}>
-            <SelectTrigger className="w-48 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+         <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Vehicle Costs by Timeframe</h2>
+         <div className="flex items-center gap-2">
+           <Select value={timeframe} onValueChange={setTimeframe}>
+             <SelectTrigger className="w-48 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
               <SelectItem value="7">Last 7 days</SelectItem>
               <SelectItem value="30">Last 30 days</SelectItem>
               <SelectItem value="90">Last 90 days</SelectItem>
@@ -228,7 +228,7 @@ export default function VehicleCostReport() {
             <CardContent className="p-4 md:p-6">
               <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
                 <div className="flex-1 md:flex-none md:w-full">
-                  <CardTitle className="text-base md:text-lg dark:text-white mb-1 md:mb-2">Total Expenses</CardTitle>
+                  <CardTitle className="text-base md:text-lg text-slate-900 dark:text-white mb-1 md:mb-2">Total Expenses</CardTitle>
                   <p className="text-xs text-slate-500 dark:text-slate-400 md:mt-2">Tap to view top vehicle</p>
                 </div>
                 <p className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white shrink-0">
@@ -240,7 +240,7 @@ export default function VehicleCostReport() {
 
           <Card>
             <CardContent className="p-4 md:p-6">
-              <CardTitle className="text-base md:text-lg dark:text-white mb-4">Cost Distribution</CardTitle>
+              <CardTitle className="text-base md:text-lg text-slate-900 dark:text-white mb-4">Cost Distribution</CardTitle>
               <div className="h-48 md:h-64">
                 <VehicleCostChart data={costData} />
               </div>
@@ -250,7 +250,7 @@ export default function VehicleCostReport() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="dark:text-white">Cost Breakdown by Vehicle</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Cost Breakdown by Vehicle</CardTitle>
               {filterMode !== 'all' && (
                 <Button 
                   variant="outline" 
@@ -267,13 +267,13 @@ export default function VehicleCostReport() {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow className="dark:border-slate-700">
-                    <TableHead className="w-10 dark:text-slate-300"></TableHead>
-                    <TableHead className="dark:text-slate-300">Vehicle</TableHead>
-                    <TableHead className="dark:text-slate-300">Type</TableHead>
-                    <TableHead className="dark:text-slate-300">License Plate</TableHead>
-                    <TableHead className="text-right dark:text-slate-300">Total Cost</TableHead>
-                    <TableHead className="text-right dark:text-slate-300">% of Total</TableHead>
+                  <TableRow className="border-b border-slate-200 dark:border-slate-700">
+                    <TableHead className="w-10 text-slate-700 dark:text-slate-300"></TableHead>
+                    <TableHead className="text-slate-700 dark:text-slate-300">Vehicle</TableHead>
+                    <TableHead className="text-slate-700 dark:text-slate-300">Type</TableHead>
+                    <TableHead className="text-slate-700 dark:text-slate-300">License Plate</TableHead>
+                    <TableHead className="text-right text-slate-700 dark:text-slate-300">Total Cost</TableHead>
+                    <TableHead className="text-right text-slate-700 dark:text-slate-300">% of Total</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -284,7 +284,7 @@ export default function VehicleCostReport() {
                     const isExpanded = expandedVehicles.has(item.vehicle.id);
                     return (
                       <React.Fragment key={item.vehicle.id}>
-                        <TableRow className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700" onClick={(e) => {
+                        <TableRow className="border-t border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900" onClick={(e) => {
                           if (window.innerWidth < 768 && item.transactions.length > 0) {
                             setViewingTransaction(item.transactions[0]);
                           } else {
@@ -299,21 +299,21 @@ export default function VehicleCostReport() {
                               {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                             </Button>
                           </TableCell>
-                          <TableCell className="font-medium dark:text-white">{item.vehicle.name}</TableCell>
-                          <TableCell className="capitalize dark:text-slate-300">{item.vehicle.type}</TableCell>
-                          <TableCell className="dark:text-slate-300">{item.vehicle.license_plate || '-'}</TableCell>
-                          <TableCell className="text-right font-semibold dark:text-white">
+                          <TableCell className="font-medium text-slate-900 dark:text-white">{item.vehicle.name}</TableCell>
+                          <TableCell className="capitalize text-slate-900 dark:text-slate-300">{item.vehicle.type}</TableCell>
+                          <TableCell className="text-slate-900 dark:text-slate-300">{item.vehicle.license_plate || '-'}</TableCell>
+                          <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
                             ${item.totalCost.toFixed(2)}
                           </TableCell>
-                          <TableCell className="text-right dark:text-slate-300">
+                          <TableCell className="text-right text-slate-900 dark:text-slate-300">
                             {((item.totalCost / totalExpenses) * 100).toFixed(1)}%
                           </TableCell>
                         </TableRow>
                         {isExpanded && (
                           <TableRow>
-                            <TableCell colSpan={6} className="bg-slate-50 dark:bg-slate-700 p-0">
+                            <TableCell colSpan={6} className="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 p-0">
                               <div className="p-4">
-                                <h4 className="font-semibold text-sm text-slate-700 dark:text-slate-200 mb-3">Transaction Details</h4>
+                                <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-200 mb-3">Transaction Details</h4>
                                 <div className="space-y-2">
                                   {item.transactions.map((transaction, idx) => (
                                     <div
@@ -325,7 +325,7 @@ export default function VehicleCostReport() {
                                           setViewingMaintenance(transaction.fullData);
                                         }
                                       }}
-                                      className="flex justify-between items-center py-2 px-3 bg-white rounded border border-slate-200 hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
+                                      className="flex justify-between items-center py-2 px-3 bg-white dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
                                     >
                                       <div className="flex-1">
                                         <p className="text-sm font-medium text-slate-900 dark:text-white">{transaction.description}</p>
