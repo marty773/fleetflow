@@ -271,12 +271,19 @@ export default function Bills() {
                       </Button>
                     </div>
                     <div className="flex justify-center">
-                      {viewingBill.photo_url.includes('drive.google.com') || viewingBill.photo_url.includes('.pdf') ? (
-                        <iframe
-                          src={viewingBill.photo_url}
-                          className="w-full h-96 rounded-lg border"
-                          title="Bill Preview"
-                        />
+                      {viewingBill.photo_url.includes('drive.google.com') ? (
+                        <div className="w-full">
+                          <iframe
+                            src={`${viewingBill.photo_url}#toolbar=0&navpanes=0&view=FitH`}
+                            className="w-full h-96 rounded-lg border pointer-events-none"
+                            title="PDF Preview"
+                          />
+                        </div>
+                      ) : viewingBill.photo_url.includes('.pdf') || viewingBill.photo_url.toLowerCase().endsWith('.pdf') ? (
+                        <div className="w-full border rounded-lg p-6 bg-slate-50 flex flex-col items-center justify-center gap-3">
+                          <ImageIcon className="w-8 h-8 text-slate-400" />
+                          <p className="text-sm text-slate-600">PDF uploaded</p>
+                        </div>
                       ) : (
                         <img
                           src={viewingBill.photo_url}
