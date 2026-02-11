@@ -91,7 +91,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto relative">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -372,22 +372,14 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           </TabsContent>
         </Tabs>
 
-        {/* Floating Actions */}
-        <div className="absolute top-4 right-4 flex gap-2">
-          <Button 
-            size="icon"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="rounded-full bg-white/90 backdrop-blur"
-          >
-            ✕
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t mt-6">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+            Close
           </Button>
-          <Button 
-            size="icon"
-            onClick={() => onEdit(vehicle)}
-            className="rounded-full bg-slate-900 hover:bg-slate-800"
-          >
-            <Edit2 className="w-4 h-4" />
+          <Button onClick={() => onEdit(vehicle)} className="flex-1 bg-slate-900 hover:bg-slate-800">
+            <Edit2 className="w-4 h-4 mr-2" />
+            Edit Vehicle
           </Button>
         </div>
       </DialogContent>

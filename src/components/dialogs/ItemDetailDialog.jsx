@@ -2,14 +2,14 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, TrendingDown, Edit2, Download } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 export default function ItemDetailDialog({ item, transactions = [], onClose, onEdit, onViewBill, onViewMaintenance }) {
   if (!item) return null;
 
   return (
     <Dialog open={!!item} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col relative">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Item Details</DialogTitle>
         </DialogHeader>
@@ -89,29 +89,21 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
             </div>
           )}
         </div>
-        {/* Floating Actions */}
-        <div className="absolute top-4 right-4 flex gap-2">
-          <Button 
-            size="icon"
-            variant="outline"
-            onClick={onClose}
-            className="rounded-full bg-white/90 backdrop-blur"
-          >
-            ✕
+        <div className="flex gap-2 mt-6 pt-4 border-t">
+          <Button variant="outline" onClick={onClose} className="flex-1">
+            Close
           </Button>
-          <Button 
-            size="icon"
+          <Button
             onClick={() => onEdit?.(item)}
-            className="rounded-full"
+            className="flex-1"
             style={{ backgroundColor: 'var(--color-primary)' }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
           >
-            <Edit2 className="w-4 h-4" />
+            Edit
           </Button>
           {item.photo_url && (
             <Button
-              size="icon"
               variant="outline"
               onClick={() => {
                 const link = document.createElement('a');
@@ -119,9 +111,9 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
                 link.download = `${item.name}.jpg`;
                 link.click();
               }}
-              className="rounded-full bg-white/90 backdrop-blur"
+              className="flex-1"
             >
-              <Download className="w-4 h-4" />
+              Download
             </Button>
           )}
         </div>
