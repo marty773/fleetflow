@@ -496,115 +496,18 @@ export default function Items() {
       />
 
       {/* View Bill Dialog */}
-      {viewingBill && (
-        <Dialog open={!!viewingBill} onOpenChange={() => setViewingBill(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Bill Details</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-slate-500">Vendor</Label>
-                  <p className="font-medium">{viewingBill.vendor}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Date</Label>
-                  <p className="font-medium">{new Date(viewingBill.bill_date).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Bill Number</Label>
-                  <p className="font-medium">{viewingBill.bill_number || '-'}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Category</Label>
-                  <p className="font-medium capitalize">{viewingBill.category?.replace('_', ' ')}</p>
-                </div>
-              </div>
-              {viewingBill.line_items && viewingBill.line_items.length > 0 && (
-                <div>
-                  <Label className="text-slate-500">Line Items</Label>
-                  <div className="border rounded-lg overflow-hidden mt-2">
-                    <table className="w-full text-sm">
-                      <thead className="bg-slate-50">
-                        <tr>
-                          <th className="text-left p-2">Description</th>
-                          <th className="text-left p-2">Vehicle</th>
-                          <th className="text-center p-2">Qty</th>
-                          <th className="text-right p-2">Price</th>
-                          <th className="text-right p-2">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {viewingBill.line_items.map((item, idx) => {
-                          const linkedVehicle = vehicles.find(v => v.id === item.vehicle_id);
-                          return (
-                            <tr key={idx} className="border-t">
-                              <td className="p-2">
-                                <div className="flex items-center gap-1">
-                                  {item.item_id && (
-                                    <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                                  )}
-                                  <span>{item.description}</span>
-                                </div>
-                              </td>
-                              <td className="p-2 text-slate-600">{linkedVehicle?.name || '-'}</td>
-                              <td className="text-center p-2">{item.quantity}</td>
-                              <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                              <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                            </tr>
-                          );
-                        })}
-                        <tr className="border-t bg-slate-50 font-semibold">
-                          <td colSpan={4} className="p-2 text-right">Total:</td>
-                          <td className="text-right p-2">${viewingBill.total_amount?.toFixed(2)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-              {viewingBill.notes && (
-                <div>
-                  <Label className="text-slate-500">Notes</Label>
-                  <p className="text-sm mt-1">{viewingBill.notes}</p>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2 mt-6 pt-4 border-t">
-              <Button 
-                variant="outline" 
-                onClick={() => setViewingBill(null)}
-                className="flex-1"
-              >
-                Close
-              </Button>
-              <Button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`);
-                }}
-                className="w-full bg-amber-600 hover:bg-amber-700"
-              >
-                Edit
-              </Button>
-              {viewingBill.photo_url && (
-                <Button 
-                   variant="outline"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     setPhotoLightbox(viewingBill.photo_url);
-                   }}
-                   className="flex-1"
-                 >
-                   View Photo
-                 </Button>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <BillDetailDialog
+        bill={viewingBill}
+        vehicles={vehicles}
+        onClose={() => setViewingBill(null)}
+        onEdit={() => {
+          navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`);
+        }}
+        onViewPhoto={(url) => {
+          setViewingBill(null);
+          setPhotoLightbox(url);
+        }}
+      />
     </div>
   );
 }
