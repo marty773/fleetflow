@@ -827,11 +827,7 @@ export default function Items() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  const billId = viewingBill.id;
-                  setViewingBill(null);
-                  setTimeout(() => {
-                    navigate(createPageUrl('Bills') + `?edit=${billId}`);
-                  }, 0);
+                  navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`);
                 }}
                 className="w-full bg-amber-600 hover:bg-amber-700"
               >
