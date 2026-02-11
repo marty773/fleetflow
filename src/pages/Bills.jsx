@@ -11,6 +11,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import BillForm from '../components/bills/BillForm';
 import BillList from '../components/bills/BillList';
@@ -24,6 +34,7 @@ export default function Bills() {
   const [editingBill, setEditingBill] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
+  const [deletingBill, setDeletingBill] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
@@ -325,6 +336,15 @@ export default function Bills() {
                   Close
                 </Button>
                 <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setDeletingBill(viewingBill);
+                  }}
+                  className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  Delete
+                </Button>
+                <Button 
                   onClick={() => {
                     setEditingBill(viewingBill);
                     setViewingBill(null);
@@ -355,6 +375,31 @@ export default function Bills() {
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deletingBill} onOpenChange={() => setDeletingBill(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Bill</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this bill? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  deleteMutation.mutate(deletingBill.id);
+                  setDeletingBill(null);
+                  setViewingBill(null);
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
