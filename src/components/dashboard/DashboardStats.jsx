@@ -9,16 +9,16 @@ export default function DashboardStats({ stats }) {
       value: stats.totalVehicles,
       icon: TrendingUp,
       color: 'slate',
-      bgColor: 'bg-slate-50',
-      iconColor: 'text-slate-700',
+      bgColor: 'bg-slate-100 dark:bg-slate-700',
+      iconColor: 'text-slate-700 dark:text-slate-300',
     },
     {
       label: 'Expenses (30 Days)',
       value: `$${stats.totalExpenses.toFixed(2)}`,
       icon: DollarSign,
       color: 'green',
-      bgColor: 'bg-green-50',
-      iconColor: 'text-green-600',
+      bgColor: 'bg-green-100 dark:bg-green-900/30',
+      iconColor: 'text-green-600 dark:text-green-400',
       hideIcon: true,
     },
     {
@@ -33,8 +33,8 @@ export default function DashboardStats({ stats }) {
       value: stats.overdueServices,
       icon: AlertCircle,
       color: 'red',
-      bgColor: 'bg-red-50',
-      iconColor: 'text-red-600',
+      bgColor: 'bg-red-100 dark:bg-red-900/30',
+      iconColor: 'text-red-600 dark:text-red-400',
     },
   ];
 
@@ -47,8 +47,8 @@ export default function DashboardStats({ stats }) {
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600 mb-2">{stat.label}</p>
-                  <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">{stat.label}</p>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
                 </div>
                 {!stat.hideIcon && (
                   <div 
