@@ -319,7 +319,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                  {photoPreview.includes('drive.google.com') || photoPreview.toLowerCase().endsWith('.pdf') ? (
                    <div className="relative w-full border rounded-lg overflow-hidden">
                      <iframe
-                       src={photoPreview}
+                       src={`${photoPreview}#toolbar=0&navpanes=0&view=FitH`}
                        className="w-full h-96 pointer-events-none"
                        title="PDF Preview"
                      />
