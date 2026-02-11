@@ -105,20 +105,20 @@ export default function VendorReport() {
   const totalTransactions = vendorMetrics.reduce((sum, v) => sum + v.billCount + v.maintenanceCount, 0);
 
   const categoryColors = {
-    fuel: 'bg-orange-100 text-orange-800',
-    maintenance: 'bg-blue-100 text-blue-800',
-    repairs: 'bg-red-100 text-red-800',
-    insurance: 'bg-purple-100 text-purple-800',
-    parts: 'bg-green-100 text-green-800',
-    labor: 'bg-amber-100 text-amber-800',
-    other: 'bg-slate-100 text-slate-800',
-    oil_change: 'bg-orange-100 text-orange-800',
-    filter_change: 'bg-blue-100 text-blue-800',
-    tire_rotation: 'bg-yellow-100 text-yellow-800',
-    inspection: 'bg-indigo-100 text-indigo-800',
-    repair: 'bg-red-100 text-red-800',
-    cleaning: 'bg-green-100 text-green-800',
-  };
+     fuel: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300',
+     maintenance: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+     repairs: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+     insurance: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
+     parts: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+     labor: 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300',
+     other: 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300',
+     oil_change: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300',
+     filter_change: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+     tire_rotation: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+     inspection: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300',
+     repair: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+     cleaning: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+   };
 
   const handleDownloadPdf = async () => {
     const element = document.getElementById('vendor-report');
@@ -172,7 +172,7 @@ export default function VendorReport() {
   return (
     <div className="space-y-6" id="vendor-report">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Vendor Report</h2>
+         <h2 className="text-xl font-semibold dark:text-white">Vendor Report</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
@@ -197,10 +197,10 @@ export default function VendorReport() {
           <CardContent className="p-4 md:p-6">
             <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
               <div className="flex-1 md:flex-none md:w-full">
-                <CardTitle className="text-sm font-medium text-slate-600 mb-1 md:mb-2">Total Spent</CardTitle>
-                <p className="text-xs text-slate-500 md:mt-2">Tap to view top vendor</p>
-              </div>
-              <p className="text-xl md:text-2xl font-bold text-slate-900 shrink-0">${totalSpent.toFixed(2)}</p>
+                 <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 md:mb-2">Total Spent</CardTitle>
+                 <p className="text-xs text-slate-500 dark:text-slate-400 md:mt-2">Tap to view top vendor</p>
+               </div>
+               <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white shrink-0">${totalSpent.toFixed(2)}</p>
             </div>
           </CardContent>
         </Card>
@@ -208,8 +208,8 @@ export default function VendorReport() {
         <Card className="border-0 shadow-sm">
           <CardContent className="p-4 md:p-6">
             <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
-              <CardTitle className="text-sm font-medium text-slate-600 flex-1 md:flex-none md:w-full">Active Vendors</CardTitle>
-              <p className="text-xl md:text-2xl font-bold text-slate-900 shrink-0">{vendors.length}</p>
+              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300 flex-1 md:flex-none md:w-full">Active Vendors</CardTitle>
+              <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white shrink-0">{vendors.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -217,8 +217,8 @@ export default function VendorReport() {
         <Card className="border-0 shadow-sm">
           <CardContent className="p-4 md:p-6">
             <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
-              <CardTitle className="text-sm font-medium text-slate-600 flex-1 md:flex-none md:w-full">Total Transactions</CardTitle>
-              <p className="text-xl md:text-2xl font-bold text-slate-900 shrink-0">{totalTransactions}</p>
+              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300 flex-1 md:flex-none md:w-full">Total Transactions</CardTitle>
+              <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white shrink-0">{totalTransactions}</p>
             </div>
           </CardContent>
         </Card>
@@ -252,49 +252,49 @@ export default function VendorReport() {
                   setExpandedVendor(expandedVendor === vendor.id ? null : vendor.id);
                 }
               }}
-              className="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50"
-            >
-              <div className="flex-1">
-                <h3 className="font-semibold text-slate-900">{vendor.name}</h3>
-                <div className="flex items-center gap-3 mt-1">
-                  {vendor.billCount > 0 && (
-                    <span className="text-xs text-slate-600">{vendor.billCount} bills</span>
-                  )}
-                  {vendor.maintenanceCount > 0 && (
-                    <span className="text-xs text-slate-600">{vendor.maintenanceCount} maintenance</span>
-                  )}
-                  {vendor.category && (
-                    <Badge variant="outline" className="text-xs">{vendor.category}</Badge>
-                  )}
-                </div>
-              </div>
-              <div className="text-right mr-4">
-                <p className="font-semibold text-slate-900">${vendor.total.toFixed(2)}</p>
-              </div>
-              {expandedVendor === vendor.id ? (
-                <ChevronUp className="w-5 h-5 text-slate-400" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-slate-400" />
-              )}
+              className="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700"
+              >
+               <div className="flex-1">
+                 <h3 className="font-semibold text-slate-900 dark:text-white">{vendor.name}</h3>
+                 <div className="flex items-center gap-3 mt-1">
+                   {vendor.billCount > 0 && (
+                     <span className="text-xs text-slate-600 dark:text-slate-400">{vendor.billCount} bills</span>
+                   )}
+                   {vendor.maintenanceCount > 0 && (
+                     <span className="text-xs text-slate-600 dark:text-slate-400">{vendor.maintenanceCount} maintenance</span>
+                   )}
+                   {vendor.category && (
+                     <Badge variant="outline" className="text-xs">{vendor.category}</Badge>
+                   )}
+                 </div>
+               </div>
+               <div className="text-right mr-4">
+                 <p className="font-semibold text-slate-900 dark:text-white">${vendor.total.toFixed(2)}</p>
+               </div>
+               {expandedVendor === vendor.id ? (
+                 <ChevronUp className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+               ) : (
+                 <ChevronDown className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+               )}
             </button>
 
             {expandedVendor === vendor.id && (
-              <div className="border-t p-4 bg-slate-50">
-                <div className="space-y-2 mb-4">
-                  {vendor.email && (
-                    <p className="text-sm"><span className="text-slate-600">Email:</span> <a href={`mailto:${vendor.email}`} className="text-blue-600 hover:underline">{vendor.email}</a></p>
-                  )}
-                  {vendor.phone && (
-                    <p className="text-sm"><span className="text-slate-600">Phone:</span> <a href={`tel:${vendor.phone}`} className="text-blue-600 hover:underline">{vendor.phone}</a></p>
-                  )}
-                  {vendor.contact_person && (
-                    <p className="text-sm"><span className="text-slate-600">Contact:</span> {vendor.contact_person}</p>
-                  )}
-                </div>
+               <div className="border-t p-4 bg-slate-50 dark:bg-slate-700">
+                 <div className="space-y-2 mb-4">
+                   {vendor.email && (
+                     <p className="text-sm dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Email:</span> <a href={`mailto:${vendor.email}`} className="text-blue-600 dark:text-blue-400 hover:underline">{vendor.email}</a></p>
+                   )}
+                   {vendor.phone && (
+                     <p className="text-sm dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Phone:</span> <a href={`tel:${vendor.phone}`} className="text-blue-600 dark:text-blue-400 hover:underline">{vendor.phone}</a></p>
+                   )}
+                   {vendor.contact_person && (
+                     <p className="text-sm dark:text-slate-300"><span className="text-slate-600 dark:text-slate-400">Contact:</span> {vendor.contact_person}</p>
+                   )}
+                 </div>
 
-                {vendor.transactions.length > 0 && (
-                  <div>
-                    <p className="text-sm font-semibold text-slate-700 mb-3">Recent Transactions</p>
+                 {vendor.transactions.length > 0 && (
+                   <div>
+                     <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Recent Transactions</p>
                     <div className="space-y-2">
                       {vendor.transactions.slice(0, 5).map((txn, idx) => (
                         <div
@@ -309,11 +309,11 @@ export default function VendorReport() {
                           className="flex items-center justify-between p-2 bg-white rounded border hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
                         >
                           <div>
-                            <Badge className={categoryColors[txn.category]} variant="outline">{txn.type === 'bill' ? 'Bill' : 'Maintenance'}</Badge>
-                            <p className="text-sm font-medium mt-1">{txn.description}</p>
-                            <p className="text-xs text-slate-500">{format(new Date(txn.date), 'MMM dd, yyyy')}</p>
-                          </div>
-                          <p className="font-semibold text-slate-900">${txn.amount.toFixed(2)}</p>
+                             <Badge className={categoryColors[txn.category]} variant="outline">{txn.type === 'bill' ? 'Bill' : 'Maintenance'}</Badge>
+                             <p className="text-sm font-medium mt-1 dark:text-white">{txn.description}</p>
+                             <p className="text-xs text-slate-500 dark:text-slate-400">{format(new Date(txn.date), 'MMM dd, yyyy')}</p>
+                           </div>
+                           <p className="font-semibold text-slate-900 dark:text-white">${txn.amount.toFixed(2)}</p>
                         </div>
                       ))}
                     </div>
