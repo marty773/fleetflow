@@ -134,15 +134,18 @@ function LayoutContent({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full pb-24">
+      <main className="flex-1 w-full pb-24 lg:pb-0 select-none overflow-x-hidden" style={{ overscrollBehavior: 'none' }}>
         <div 
           className="mt-14 lg:mt-0 hidden lg:flex items-center justify-center h-14 text-base font-semibold"
-          style={{ color: themeColors.primary }}
+          style={{ color: themeColors.primary, paddingTop: 'env(safe-area-inset-top)' }}
         >
           {selectedCompany}
         </div>
         {children}
       </main>
+
+      {/* Mobile Bottom Tabs */}
+      <BottomTabs currentPageName={currentPageName} />
 
       {/* Global Search */}
       <GlobalSearch />
