@@ -9,7 +9,7 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
 
   return (
     <Dialog open={!!item} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col relative">
         <DialogHeader>
           <DialogTitle>Item Details</DialogTitle>
         </DialogHeader>
