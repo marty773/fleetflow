@@ -371,12 +371,12 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
               <div className="border-t pt-3 mt-3">
                 <p className="text-sm font-medium text-slate-700 mb-2">Optional: Link to Vehicle or Stock Item</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Select value={newItem.vehicle_id} onValueChange={(value) => setNewItem({ ...newItem, vehicle_id: value })}>
+                  <Select value={newItem.vehicle_id || ''} onValueChange={(value) => setNewItem({ ...newItem, vehicle_id: value === 'none' ? '' : value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Vehicle (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={null}>None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {vehicles.map(v => (
                         <SelectItem key={v.id} value={v.id}>
                           {v.name} ({v.license_plate})
