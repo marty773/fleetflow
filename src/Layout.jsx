@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings, Moon, Sun } from 'lucide-react';
+import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
@@ -106,16 +106,7 @@ function LayoutContent({ children, currentPageName }) {
         >
           {selectedCompany}
         </div>
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
-        >
-          {darkMode ? (
-            <Sun className="w-5 h-5 text-slate-900 dark:text-slate-100" />
-          ) : (
-            <Moon className="w-5 h-5 text-slate-900 dark:text-slate-100" />
-          )}
-        </button>
+
       </div>
 
       {/* Sidebar */}
@@ -178,16 +169,7 @@ function LayoutContent({ children, currentPageName }) {
           style={{ color: themeColors.primary }}
         >
           <span>{selectedCompany}</span>
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition ml-auto"
-          >
-            {darkMode ? (
-              <Sun className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-            ) : (
-              <Moon className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-            )}
-          </button>
+
         </div>
         {children}
       </main>
