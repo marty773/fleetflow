@@ -53,10 +53,10 @@ import Dashboard from './pages/Dashboard';
 import Items from './pages/Items';
 import Maintenance from './pages/Maintenance';
 import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 import UserManagement from './pages/UserManagement';
 import Vehicles from './pages/Vehicles';
 import Vendors from './pages/Vendors';
-import Settings from './pages/Settings';
 import __Layout from './Layout.jsx';
 
 
@@ -67,10 +67,10 @@ export const PAGES = {
     "Items": Items,
     "Maintenance": Maintenance,
     "Reports": Reports,
+    "Settings": Settings,
     "UserManagement": UserManagement,
     "Vehicles": Vehicles,
     "Vendors": Vendors,
-    "Settings": Settings,
 }
 
 export const pagesConfig = {

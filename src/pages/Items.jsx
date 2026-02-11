@@ -33,7 +33,9 @@ export default function Items() {
   const navigate = useNavigate();
   const { selectedCompany } = useCompany();
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('itemsViewMode') || 'list';
+  });
   const [formOpen, setFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
@@ -275,7 +277,10 @@ export default function Items() {
               variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
               size="icon"
               className="h-9 w-9"
-              onClick={() => setViewMode('grid')}
+              onClick={() => {
+                setViewMode('grid');
+                localStorage.setItem('itemsViewMode', 'grid');
+              }}
             >
               <Grid3X3 className="h-4 w-4" />
             </Button>
@@ -283,7 +288,10 @@ export default function Items() {
               variant={viewMode === 'list' ? 'secondary' : 'ghost'}
               size="icon"
               className="h-9 w-9"
-              onClick={() => setViewMode('list')}
+              onClick={() => {
+                setViewMode('list');
+                localStorage.setItem('itemsViewMode', 'list');
+              }}
             >
               <List className="h-4 w-4" />
             </Button>
