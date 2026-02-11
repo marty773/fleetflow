@@ -338,17 +338,42 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                    <div className="relative w-full border rounded-lg p-6 bg-slate-50 flex flex-col items-center justify-center gap-3">
                      <ImageIcon className="w-8 h-8 text-slate-400" />
                      <p className="text-sm text-slate-600">PDF uploaded</p>
-                     <Button 
-                       type="button"
-                       variant="outline"
-                       size="sm"
-                       onClick={() => {
-                         setPhotoPreview('');
-                         handleChange('photo_url', '');
-                       }}
-                     >
-                       Remove
-                     </Button>
+                     <div className="flex gap-2">
+                       <Button 
+                         type="button"
+                         variant="outline"
+                         size="sm"
+                         onClick={async () => {
+                           try {
+                             const response = await fetch(photoPreview);
+                             const blob = await response.blob();
+                             const url = window.URL.createObjectURL(blob);
+                             const link = document.createElement('a');
+                             link.href = url;
+                             link.download = `bill.pdf`;
+                             document.body.appendChild(link);
+                             link.click();
+                             window.URL.revokeObjectURL(url);
+                             link.remove();
+                           } catch (error) {
+                             console.error('Download failed:', error);
+                           }
+                         }}
+                       >
+                         Download PDF
+                       </Button>
+                       <Button 
+                         type="button"
+                         variant="outline"
+                         size="sm"
+                         onClick={() => {
+                           setPhotoPreview('');
+                           handleChange('photo_url', '');
+                         }}
+                       >
+                         Remove
+                       </Button>
+                     </div>
                    </div>
                  ) : (
                    <div className="relative inline-block">
