@@ -205,7 +205,7 @@ export default function Bills() {
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Bills & Expenses</h1>
-            <p className="text-slate-600 dark:text-slate-400 mt-2">Scan and track all your fleet expenses</p>
+             <p className="text-slate-600 dark:text-slate-300 mt-2">Scan and track all your fleet expenses</p>
           </div>
           <Button
             onClick={() => {
@@ -263,7 +263,7 @@ export default function Bills() {
               <Card className="border-2 border-dashed">
                 <CardContent className="p-12 text-center">
                   <ImageIcon className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-                  <p className="text-slate-600">No bill photos yet</p>
+                  <p className="text-slate-600 dark:text-slate-400">No bill photos yet</p>
                 </CardContent>
               </Card>
             )}

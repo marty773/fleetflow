@@ -32,7 +32,7 @@ export default function Reports() {
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
            <div>
              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Reports</h1>
-             <p className="text-slate-600 dark:text-slate-400 mt-2">View detailed reports and analytics</p>
+             <p className="text-slate-600 dark:text-slate-300 mt-2">View detailed reports and analytics</p>
            </div>
            <div className="w-full sm:w-64">
              <Select value={selectedReport} onValueChange={setSelectedReport}>

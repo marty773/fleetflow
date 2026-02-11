@@ -173,15 +173,15 @@ export default function BillGallery({ bills, vehicles }) {
               )}
             </div>
             <CardContent className="p-4">
-              <p className="font-semibold text-sm text-slate-900 mb-1">
+              <p className="font-semibold text-sm text-slate-900 dark:text-white mb-1">
                 {vehicleMap[bill.vehicle_id]?.name}
               </p>
-              <p className="text-sm text-slate-600 mb-2">{bill.vendor}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">{bill.vendor}</p>
                <div className="flex items-center justify-between">
-                 <span className="text-sm text-slate-500">
+                 <span className="text-sm text-slate-500 dark:text-slate-400">
                    {format(new Date(bill.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
                  </span>
-                <span className="font-semibold text-sm text-slate-900">
+                <span className="font-semibold text-sm text-slate-900 dark:text-white">
                   ${bill.total_amount?.toFixed(2)}
                 </span>
               </div>
