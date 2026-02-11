@@ -37,7 +37,7 @@ export default function VehicleCard({ vehicle, onView, onEdit, onDelete, isDelet
           {vehicle.vin && (
             <div>
               <p className="text-slate-600">VIN</p>
-              <p className="font-mono text-xs text-slate-700 truncate">{vehicle.vin}</p>
+              <p className="font-mono text-sm text-slate-700 truncate">{vehicle.vin}</p>
             </div>
           )}
         </div>
