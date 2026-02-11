@@ -32,9 +32,9 @@ export default function VehicleCostReport() {
   const { selectedCompany } = useCompany();
   const [timeframe, setTimeframe] = useState('30');
   const [expandedVehicles, setExpandedVehicles] = useState(new Set());
-  const [viewingTransaction, setViewingTransaction] = useState(null);
+  const [viewingBill, setViewingBill] = useState(null);
+  const [viewingMaintenance, setViewingMaintenance] = useState(null);
   const [filterMode, setFilterMode] = useState('all');
-  const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
