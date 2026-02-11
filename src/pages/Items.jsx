@@ -21,10 +21,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Plus, Search, Package, Grid3X3, List, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Search, Package, Grid3X3, List, Loader2 } from 'lucide-react';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
+import ItemDetailDialog from '@/components/dialogs/ItemDetailDialog';
+import BillDetailDialog from '@/components/dialogs/BillDetailDialog';
+import MaintenanceRecordDetailDialog from '@/components/dialogs/MaintenanceRecordDetailDialog';
 import { useCompany } from '@/components/CompanyContext';
 
 export default function Items() {
