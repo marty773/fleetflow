@@ -299,7 +299,13 @@ export default function VendorReport() {
                       {vendor.transactions.slice(0, 5).map((txn, idx) => (
                         <div
                           key={idx}
-                          onClick={() => setViewingTransaction(txn)}
+                          onClick={() => {
+                            if (txn.type === 'bill') {
+                              setViewingBill(txn.fullData);
+                            } else {
+                              setViewingMaintenance(txn.fullData);
+                            }
+                          }}
                           className="flex items-center justify-between p-2 bg-white rounded border hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
                         >
                           <div>
