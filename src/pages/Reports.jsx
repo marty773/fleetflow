@@ -36,16 +36,16 @@ export default function Reports() {
            </div>
            <div className="w-full sm:w-64">
              <Select value={selectedReport} onValueChange={setSelectedReport}>
-               <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
+               <SelectTrigger className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                  <SelectValue placeholder="Select report" />
                </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
-                <SelectItem value="vehicle-costs">Vehicle Costs</SelectItem>
-                <SelectItem value="inventory">Inventory</SelectItem>
-                <SelectItem value="vendors">Vendors</SelectItem>
+              <SelectContent className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700">
+                <SelectItem value="vehicle-costs" className="text-slate-900 dark:text-white">Vehicle Costs</SelectItem>
+                <SelectItem value="inventory" className="text-slate-900 dark:text-white">Inventory</SelectItem>
+                <SelectItem value="vendors" className="text-slate-900 dark:text-white">Vendors</SelectItem>
               </SelectContent>
-             </Select>
-          </div>
+            </Select>
+           </div>
         </div>
 
         {selectedReport === 'vehicle-costs' && <VehicleCostReport />}
