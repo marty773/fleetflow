@@ -73,11 +73,15 @@ export default function Bills() {
       if (bill) {
         setEditingBill(bill);
         setShowForm(true);
+        // Clean up URL to prevent conflicts
+        window.history.replaceState({}, '', window.location.pathname);
       }
     } else if (viewId && bills.length > 0) {
       const bill = bills.find(b => b.id === viewId);
       if (bill) {
         setViewingBill(bill);
+        // Clean up URL to prevent conflicts
+        window.history.replaceState({}, '', window.location.pathname);
       }
     }
   }, [bills]);
