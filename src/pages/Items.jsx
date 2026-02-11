@@ -732,12 +732,17 @@ export default function Items() {
               </Button>
               <Link 
                 to={createPageUrl('Maintenance') + `?edit=${viewingMaintenanceRecord.id}`}
-                onClick={() => setViewingMaintenanceRecord(null)}
                 className="flex-1"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setViewingMaintenanceRecord(null);
+                  setTimeout(() => navigate(createPageUrl('Maintenance') + `?edit=${viewingMaintenanceRecord.id}`), 0);
+                }}
               >
                 <Button 
                   type="button"
                   className="w-full bg-amber-600 hover:bg-amber-700"
+                  onClick={(e) => e.preventDefault()}
                 >
                   Edit
                 </Button>
