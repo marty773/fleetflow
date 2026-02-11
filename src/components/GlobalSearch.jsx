@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Search, Truck, FileText, Wrench, Package, Users, Calendar, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ export default function GlobalSearch() {
   const [showResults, setShowResults] = useState(false);
   const [viewingItem, setViewingItem] = useState(null);
   const [searchTriggered, setSearchTriggered] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { selectedCompany } = useCompany();
 
@@ -61,7 +62,6 @@ export default function GlobalSearch() {
       intervals: [],
     };
 
-    // Search vehicles - filtered by company
     results.vehicles = vehicles.filter(v => 
       v.company_id === selectedCompany &&
       (v.name?.toLowerCase().includes(term) ||
@@ -73,7 +73,6 @@ export default function GlobalSearch() {
       v.year?.toString().includes(term))
     );
 
-    // Search bills - filtered by company
     results.bills = bills.filter(b =>
       b.company_id === selectedCompany &&
       (b.vendor?.toLowerCase().includes(term) ||
@@ -85,7 +84,6 @@ export default function GlobalSearch() {
       ))
     );
 
-    // Search maintenance records - filtered by company
     results.maintenance = maintenanceRecords.filter(m =>
       m.company_id === selectedCompany &&
       (m.title?.toLowerCase().includes(term) ||
@@ -95,7 +93,6 @@ export default function GlobalSearch() {
       m.odometer_reading?.toLowerCase().includes(term))
     );
 
-    // Search items - filtered by company
     results.items = items.filter(i =>
       i.company_id === selectedCompany &&
       (i.name?.toLowerCase().includes(term) ||
@@ -104,7 +101,6 @@ export default function GlobalSearch() {
       i.description?.toLowerCase().includes(term))
     );
 
-    // Search vendors - filtered by company
     results.vendors = vendors.filter(v =>
       v.company_id === selectedCompany &&
       (v.name?.toLowerCase().includes(term) ||
@@ -116,7 +112,6 @@ export default function GlobalSearch() {
       v.state?.toLowerCase().includes(term))
     );
 
-    // Search intervals - filtered by company
     results.intervals = intervals.filter(i =>
       i.company_id === selectedCompany &&
       (i.interval_name?.toLowerCase().includes(term) ||
@@ -155,6 +150,7 @@ export default function GlobalSearch() {
     setShowResults(false);
     setSearchTerm('');
     setSearchTriggered(false);
+    setDialogOpen(false);
 
     switch(type) {
       case 'vehicles':
@@ -191,203 +187,222 @@ export default function GlobalSearch() {
 
   return (
     <>
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-xl px-4">
-        <div className="relative flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Search vehicles, bills, maintenance, items, vendors..."
-              className="pl-12 pr-10 py-6 text-base bg-white shadow-2xl border-2 border-slate-200 rounded-2xl"
-              style={{ borderColor: 'var(--color-primary, #f59e0b)' }}
-              onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-              onBlur={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
-            />
-            {searchTerm && (
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setSearchTriggered(false);
-                  setShowResults(false);
-                }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 rounded-full transition-colors"
-              >
-                <X className="w-4 h-4 text-slate-400" />
-              </button>
-            )}
-          </div>
-          <button
-            onClick={handleSearch}
-            className="px-6 py-3 text-white rounded-2xl shadow-2xl font-medium transition-colors"
+      {/* Floating Search Button */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogTrigger asChild>
+          <button 
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110"
             style={{ backgroundColor: 'var(--color-primary)' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
           >
-            Search
+            <Search className="w-6 h-6" />
           </button>
-        </div>
-      </div>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl p-0 max-h-[85vh]">
+          <div className="p-4 border-b sticky top-0 bg-white z-10">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Search vehicles, bills, maintenance, items, vendors..."
+                className="pl-10 pr-20 py-6 text-base border-2 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0"
+                style={{ borderColor: 'var(--color-primary)' }}
+                autoFocus
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSearchTriggered(false);
+                    setShowResults(false);
+                  }}
+                  className="absolute right-16 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 rounded-full transition-colors"
+                >
+                  <X className="w-4 h-4 text-slate-400" />
+                </button>
+              )}
+              <button
+                onClick={handleSearch}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-white rounded-lg font-medium transition-colors text-sm"
+                style={{ backgroundColor: 'var(--color-primary)' }}
+              >
+                Search
+              </button>
+            </div>
+          </div>
 
-      <Dialog open={showResults && totalResults > 0} onOpenChange={setShowResults}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Search Results ({totalResults})</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-6">
-            {results && results.vehicles.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <Truck className="w-4 h-4" />
-                  Vehicles ({results.vehicles.length})
-                </h3>
-                <div className="space-y-2">
-                  {results.vehicles.map(vehicle => (
-                    <button
-                      key={vehicle.id}
-                      onClick={() => handleResultClick('vehicles', vehicle)}
-                      className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      <p className="font-medium">{vehicle.name}</p>
-                      <p className="text-sm text-slate-600">
-                        {vehicle.make} {vehicle.model} {vehicle.year} • {vehicle.license_plate}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {results && results.bills.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Bills ({results.bills.length})
-                </h3>
-                <div className="space-y-2">
-                  {results.bills.map(bill => (
-                    <button
-                      key={bill.id}
-                      onClick={() => handleResultClick('bills', bill)}
-                      className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">{bill.vendor}</p>
+          <div className="overflow-y-auto max-h-[calc(85vh-100px)]">
+            {showResults && totalResults > 0 && (
+              <div className="p-4 space-y-6">
+                {results && results.vehicles.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <Truck className="w-4 h-4" />
+                      Vehicles ({results.vehicles.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {results.vehicles.map(vehicle => (
+                        <button
+                          key={vehicle.id}
+                          onClick={() => handleResultClick('vehicles', vehicle)}
+                          className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                          <p className="font-medium">{vehicle.name}</p>
                           <p className="text-sm text-slate-600">
-                            {bill.bill_number && `#${bill.bill_number} • `}
-                            {format(new Date(bill.bill_date), 'MMM dd, yyyy')}
+                            {vehicle.make} {vehicle.model} {vehicle.year} • {vehicle.license_plate}
                           </p>
-                        </div>
-                        <p className="font-semibold">${bill.total_amount?.toFixed(2)}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {results && results.maintenance.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <Wrench className="w-4 h-4" />
-                  Maintenance Records ({results.maintenance.length})
-                </h3>
-                <div className="space-y-2">
-                  {results.maintenance.map(record => (
-                    <button
-                      key={record.id}
-                      onClick={() => handleResultClick('maintenance', record)}
-                      className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      <p className="font-medium">{record.title}</p>
-                      <p className="text-sm text-slate-600">
-                        {vehicleMap[record.vehicle_id]?.name} • {format(new Date(record.performed_date), 'MMM dd, yyyy')}
-                        {record.vendor && ` • ${record.vendor}`}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                {results && results.bills.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Bills ({results.bills.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {results.bills.map(bill => (
+                        <button
+                          key={bill.id}
+                          onClick={() => handleResultClick('bills', bill)}
+                          className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium">{bill.vendor}</p>
+                              <p className="text-sm text-slate-600">
+                                {bill.bill_number && `#${bill.bill_number} • `}
+                                {format(new Date(bill.bill_date), 'MMM dd, yyyy')}
+                              </p>
+                            </div>
+                            <p className="font-semibold">${bill.total_amount?.toFixed(2)}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {results && results.items.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <Package className="w-4 h-4" />
-                  Items ({results.items.length})
-                </h3>
-                <div className="space-y-2">
-                  {results.items.map(item => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleResultClick('items', item)}
-                      className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">{item.name}</p>
+                {results && results.maintenance.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <Wrench className="w-4 h-4" />
+                      Maintenance Records ({results.maintenance.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {results.maintenance.map(record => (
+                        <button
+                          key={record.id}
+                          onClick={() => handleResultClick('maintenance', record)}
+                          className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                          <p className="font-medium">{record.title}</p>
                           <p className="text-sm text-slate-600">
-                            {item.item_number && `${item.item_number} • `}
-                            {item.vendor}
+                            {vehicleMap[record.vehicle_id]?.name} • {format(new Date(record.performed_date), 'MMM dd, yyyy')}
+                            {record.vendor && ` • ${record.vendor}`}
                           </p>
-                        </div>
-                        <Badge variant="outline">{item.quantity_on_hand} in stock</Badge>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {results && results.items.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <Package className="w-4 h-4" />
+                      Items ({results.items.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {results.items.map(item => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleResultClick('items', item)}
+                          className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium">{item.name}</p>
+                              <p className="text-sm text-slate-600">
+                                {item.item_number && `${item.item_number} • `}
+                                {item.vendor}
+                              </p>
+                            </div>
+                            <Badge variant="outline">{item.quantity_on_hand} in stock</Badge>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {results && results.vendors.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Vendors ({results.vendors.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {results.vendors.map(vendor => (
+                        <button
+                          key={vendor.id}
+                          onClick={() => handleResultClick('vendors', vendor)}
+                          className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                          <p className="font-medium">{vendor.name}</p>
+                          <p className="text-sm text-slate-600">
+                            {vendor.category && <Badge variant="outline" className="mr-2 capitalize">{vendor.category}</Badge>}
+                            {vendor.contact_person && vendor.contact_person}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {results && results.intervals.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      Scheduled Intervals ({results.intervals.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {results.intervals.map(interval => (
+                        <button
+                          key={interval.id}
+                          onClick={() => handleResultClick('intervals', interval)}
+                          className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                          <p className="font-medium">{interval.interval_name}</p>
+                          <p className="text-sm text-slate-600">
+                            {vehicleMap[interval.vehicle_id]?.name}
+                            {interval.interval_months && ` • Every ${interval.interval_months} months`}
+                            {interval.interval_miles && ` • Every ${interval.interval_miles} miles`}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {results && results.vendors.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Vendors ({results.vendors.length})
-                </h3>
-                <div className="space-y-2">
-                  {results.vendors.map(vendor => (
-                    <button
-                      key={vendor.id}
-                      onClick={() => handleResultClick('vendors', vendor)}
-                      className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      <p className="font-medium">{vendor.name}</p>
-                      <p className="text-sm text-slate-600">
-                        {vendor.category && <Badge variant="outline" className="mr-2 capitalize">{vendor.category}</Badge>}
-                        {vendor.contact_person && vendor.contact_person}
-                      </p>
-                    </button>
-                  ))}
-                </div>
+            {showResults && totalResults === 0 && searchTerm.length >= 2 && (
+              <div className="text-center py-12 text-slate-500">
+                <Search className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                <p>No results found for "{searchTerm}"</p>
               </div>
             )}
 
-            {results && results.intervals.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Scheduled Intervals ({results.intervals.length})
-                </h3>
-                <div className="space-y-2">
-                  {results.intervals.map(interval => (
-                    <button
-                      key={interval.id}
-                      onClick={() => handleResultClick('intervals', interval)}
-                      className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      <p className="font-medium">{interval.interval_name}</p>
-                      <p className="text-sm text-slate-600">
-                        {vehicleMap[interval.vehicle_id]?.name}
-                        {interval.interval_months && ` • Every ${interval.interval_months} months`}
-                        {interval.interval_miles && ` • Every ${interval.interval_miles} miles`}
-                      </p>
-                    </button>
-                  ))}
-                </div>
+            {!showResults && (
+              <div className="text-center py-12 text-slate-500">
+                <Search className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                <p>Search across all your fleet data</p>
+                <p className="text-sm mt-1">Vehicles • Bills • Maintenance • Items • Vendors</p>
               </div>
             )}
           </div>
