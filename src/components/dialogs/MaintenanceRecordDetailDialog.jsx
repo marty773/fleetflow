@@ -11,11 +11,11 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
 
   return (
     <Dialog open={!!record} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Maintenance Record Details</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-slate-500">Vehicle</Label>
