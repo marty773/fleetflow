@@ -519,23 +519,63 @@ export default function Maintenance() {
                           </tr>
                         </thead>
                         <tbody>
-                          {viewingRecord.work_items?.map((item, idx) => {
-                            return (
-                              <tr key={idx} className="border-t">
-                                <td className="p-2">
-                                  <div className="flex items-center gap-1">
-                                    {item.item_id && (
-                                      <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                                    )}
-                                    <span>{item.description}</span>
-                                  </div>
-                                </td>
-                                <td className="text-center p-2">{item.quantity}</td>
-                                <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                                <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                              </tr>
-                            );
-                          })}
+                          {(() => {
+                            // Reconstruct work items with item_id from parts_used for display
+                            const partsUsedMap = {};
+                            const itemNamesMap = {};
+                            
+                            // Build maps of item_id to quantity and name
+                            if (viewingRecord.parts_used) {
+                              viewingRecord.parts_used.forEach(part => {
+                                partsUsedMap[part.item_id] = part.quantity_used;
+                                const matchedItem = items.find(i => i.id === part.item_id);
+                                if (matchedItem) {
+                                  itemNamesMap[part.item_id] = matchedItem.name.toLowerCase();
+                                }
+                              });
+                            }
+                            
+                            return viewingRecord.work_items?.map((item, idx) => {
+                              let itemId = item.item_id;
+                              
+                              // If no item_id on work item, try to match from parts_used
+                              if (!itemId && viewingRecord.parts_used) {
+                                // First try to match by description containing item name
+                                for (const [id, name] of Object.entries(itemNamesMap)) {
+                                  if (item.description.toLowerCase().includes(name) || name.includes(item.description.toLowerCase())) {
+                                    itemId = id;
+                                    break;
+                                  }
+                                }
+                                
+                                // If no match by name, try quantity (but only if there's exactly one match)
+                                if (!itemId) {
+                                  const matchingIds = Object.entries(partsUsedMap)
+                                    .filter(([_, qty]) => qty === item.quantity)
+                                    .map(([id]) => id);
+                                  if (matchingIds.length === 1) {
+                                    itemId = matchingIds[0];
+                                  }
+                                }
+                              }
+                              
+                              return (
+                                <tr key={idx} className="border-t">
+                                  <td className="p-2">
+                                    <div className="flex items-center gap-1">
+                                      {itemId && (
+                                        <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                      )}
+                                      <span>{item.description}</span>
+                                    </div>
+                                  </td>
+                                  <td className="text-center p-2">{item.quantity}</td>
+                                  <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                                  <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                                </tr>
+                              );
+                            });
+                          })()}
                           <tr className="border-t bg-slate-50 font-semibold">
                             <td colSpan={3} className="p-2 text-right">Total:</td>
                             <td className="text-right p-2">${viewingRecord.total_cost?.toFixed(2)}</td>
