@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Edit2, Download } from 'lucide-react';
 
 export default function ItemDetailDialog({ item, transactions = [], onClose, onEdit, onViewBill, onViewMaintenance }) {
   if (!item) return null;
