@@ -288,5 +288,7 @@ export default function Bills() {
         </AlertDialog>
       </div>
     </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }
