@@ -51,31 +51,9 @@ export default function VehicleCostReport() {
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
-  const { data: allItems = [] } = useQuery({
-    queryKey: ['items'],
-    queryFn: () => base44.entities.Item.list(),
-  });
-
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const bills = allBills.filter(b => b.company_id === selectedCompany);
   const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
-  const items = allItems.filter(i => i.company_id === selectedCompany);
-
-  const updateBillMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Bill.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bills'] });
-      setViewingTransaction(null);
-    },
-  });
-
-  const updateMaintenanceMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.MaintenanceRecord.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
-      setViewingTransaction(null);
-    },
-  });
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
