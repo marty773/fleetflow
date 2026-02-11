@@ -157,5 +157,7 @@ export default function Vehicles() {
         />
       </div>
     </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }
