@@ -229,7 +229,7 @@ export default function InventoryReport({ highlightItemId }) {
             <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
               <div className="flex-1 md:flex-none md:w-full">
                 <CardTitle className="text-base md:text-lg mb-1 md:mb-2">Total Inventory Value</CardTitle>
-                <p className="text-xs text-slate-500 md:mt-2">Tap to view top items</p>
+                <p className="text-sm text-slate-500 md:mt-2">Tap to view top items</p>
               </div>
               <p className="text-2xl md:text-3xl font-bold text-slate-900 shrink-0">${totalValue.toFixed(2)}</p>
             </div>
@@ -251,29 +251,29 @@ export default function InventoryReport({ highlightItemId }) {
                   <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
                   Low Stock Items
                 </CardTitle>
-                <p className="text-xs text-slate-500 md:mt-2">Tap to view details</p>
-              </div>
-              <p className="text-2xl md:text-3xl font-bold text-amber-600 shrink-0">{lowStockItems.length}</p>
-            </div>
-          </CardContent>
-        </Card>
+                <p className="text-sm text-slate-500 md:mt-2">Tap to view details</p>
+                </div>
+                <p className="text-2xl md:text-3xl font-bold text-amber-600 shrink-0">{lowStockItems.length}</p>
+                </div>
+                </CardContent>
+                </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-          setFilterMode('out');
-          const itemsToExpand = {};
-          outOfStockItems.forEach(item => {
-            itemsToExpand[item.id] = true;
-          });
-          setExpandedItems(itemsToExpand);
-        }}>
-          <CardContent className="p-4 md:p-6">
-            <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
-              <div className="flex-1 md:flex-none md:w-full">
-                <CardTitle className="text-base md:text-lg flex items-center gap-2 mb-1 md:mb-2">
-                  <Package className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
-                  Out of Stock
-                </CardTitle>
-                <p className="text-xs text-slate-500 md:mt-2">Tap to view details</p>
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
+                setFilterMode('out');
+                const itemsToExpand = {};
+                outOfStockItems.forEach(item => {
+                itemsToExpand[item.id] = true;
+                });
+                setExpandedItems(itemsToExpand);
+                }}>
+                <CardContent className="p-4 md:p-6">
+                <div className="flex md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+                <div className="flex-1 md:flex-none md:w-full">
+                 <CardTitle className="text-base md:text-lg flex items-center gap-2 mb-1 md:mb-2">
+                   <Package className="w-4 h-4 md:w-5 md:h-5 text-red-500" />
+                   Out of Stock
+                 </CardTitle>
+                 <p className="text-sm text-slate-500 md:mt-2">Tap to view details</p>
               </div>
               <p className="text-2xl md:text-3xl font-bold text-red-600 shrink-0">{outOfStockItems.length}</p>
             </div>
@@ -406,7 +406,7 @@ export default function InventoryReport({ highlightItemId }) {
                         <TableRow>
                           <TableCell colSpan={8} className="bg-slate-50 p-0">
                             <div className="p-4">
-                              <h4 className="font-semibold text-sm mb-3">Transaction History</h4>
+                              <h4 className="font-semibold mb-3">Transaction History</h4>
                               <div className="space-y-2">
                                 {transactions.map((txn, idx) => (
                                   <div
@@ -418,7 +418,7 @@ export default function InventoryReport({ highlightItemId }) {
                                         setViewingMaintenance(txn.fullData);
                                       }
                                     }}
-                                    className="flex items-center justify-between p-2 bg-white rounded border text-sm cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                                    className="flex items-center justify-between p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
                                   >
                                     <div className="flex items-center gap-3">
                                       {txn.type === 'purchase' ? (
