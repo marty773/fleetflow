@@ -320,7 +320,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                    <div className="relative w-full border rounded-lg overflow-hidden">
                      <iframe
                        src={photoPreview}
-                       className="w-full h-96"
+                       className="w-full h-96 pointer-events-none"
                        title="PDF Preview"
                      />
                      <button
