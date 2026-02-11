@@ -481,16 +481,27 @@ export default function Maintenance() {
                         variant="ghost"
                         size="icon"
                         onClick={async () => {
-                          const response = await base44.functions.invoke('downloadMaintenanceRecord', { recordId: viewingRecord.id });
-                          const blob = new Blob([response.data], { type: 'application/pdf' });
-                          const url = window.URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `maintenance_${viewingRecord.title?.replace(/[^a-z0-9]/gi, '_')}_${viewingRecord.performed_date}.pdf`;
-                          document.body.appendChild(a);
-                          a.click();
-                          window.URL.revokeObjectURL(url);
-                          a.remove();
+                          try {
+                            toast.loading('Generating PDF...');
+                            const response = await base44.functions.invoke('downloadMaintenanceRecord', { recordId: viewingRecord.id });
+                            toast.dismiss();
+                            
+                            // The response.data is already the binary data
+                            const blob = new Blob([response.data], { type: 'application/pdf' });
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `maintenance_${viewingRecord.title?.replace(/[^a-z0-9]/gi, '_')}_${viewingRecord.performed_date}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            a.remove();
+                            toast.success('PDF downloaded');
+                          } catch (error) {
+                            toast.dismiss();
+                            toast.error('Failed to generate PDF: ' + (error.response?.data?.error || error.message));
+                            console.error('PDF generation error:', error);
+                          }
                         }}
                         className="text-slate-500 hover:text-slate-700"
                       >

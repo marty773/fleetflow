@@ -10,7 +10,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const payload = await req.json();
+    let payload;
+    try {
+      payload = await req.json();
+    } catch (e) {
+      return Response.json({ error: 'Invalid request body' }, { status: 400 });
+    }
+
     const recordId = payload.recordId;
 
     if (!recordId) {
@@ -18,7 +24,13 @@ Deno.serve(async (req) => {
     }
 
     // Fetch maintenance record directly by ID
-    const allRecords = await base44.entities.MaintenanceRecord.list();
+    let allRecords;
+    try {
+      allRecords = await base44.entities.MaintenanceRecord.list();
+    } catch (e) {
+      return Response.json({ error: 'Failed to fetch records: ' + e.message }, { status: 500 });
+    }
+    
     const record = allRecords.find(r => r.id === recordId);
     
     if (!record) {
@@ -26,15 +38,24 @@ Deno.serve(async (req) => {
     }
 
     // Fetch vehicle details
-    const allVehicles = await base44.entities.Vehicle.list();
-    const vehicle = allVehicles.find(v => v.id === record.vehicle_id);
+    let vehicle = null;
+    try {
+      const allVehicles = await base44.entities.Vehicle.list();
+      vehicle = allVehicles.find(v => v.id === record.vehicle_id);
+    } catch (e) {
+      console.error('Failed to fetch vehicles:', e);
+    }
 
     // Fetch all items to get vendor and item numbers
-    const allItems = await base44.entities.Item.list();
     const itemsMap = {};
-    allItems.forEach(item => {
-      itemsMap[item.id] = item;
-    });
+    try {
+      const allItems = await base44.entities.Item.list();
+      allItems.forEach(item => {
+        itemsMap[item.id] = item;
+      });
+    } catch (e) {
+      console.error('Failed to fetch items:', e);
+    }
 
     // Create PDF
     const doc = new jsPDF();
