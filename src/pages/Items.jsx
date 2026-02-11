@@ -293,15 +293,14 @@ export default function Items() {
             onClick={recalculateInventory}
             disabled={recalculating}
             variant="outline"
-            className="h-11"
+            size="icon"
+            className="h-11 w-11"
+            title="Recalculate Inventory"
           >
             {recalculating ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Recalculating...
-              </>
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              'Recalculate Inventory'
+              <RotateCw className="h-4 w-4" />
             )}
           </Button>
 
