@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Image as ImageIcon } from 'lucide-react';
+import { Plus, Image as ImageIcon, Package } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -283,7 +283,14 @@ export default function Bills() {
                             const vehicle = vehicles.find(v => v.id === item.vehicle_id);
                             return (
                               <tr key={idx} className="border-t">
-                                <td className="p-2">{item.description}</td>
+                                <td className="p-2">
+                                  <div className="flex items-center gap-1">
+                                    {item.item_id && (
+                                      <Package className="w-3 h-3 text-slate-400" />
+                                    )}
+                                    <span>{item.description}</span>
+                                  </div>
+                                </td>
                                 <td className="p-2 text-slate-600">
                                   {vehicle ? vehicle.name : '-'}
                                 </td>
