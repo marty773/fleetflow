@@ -141,7 +141,21 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
       .filter(item => item.item_id && item.quantity > 0)
       .map(item => ({ item_id: item.item_id, quantity_used: item.quantity }));
 
-    onSubmit({ ...formData, total_cost: total, parts_used: partsUsedForSubmission });
+    // Keep item_id on work_items for proper display later
+    const workItemsForSubmission = formData.work_items.map(item => ({
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      total: item.total,
+      ...(item.item_id && { item_id: item.item_id })
+    }));
+
+    onSubmit({ 
+      ...formData, 
+      work_items: workItemsForSubmission,
+      total_cost: total, 
+      parts_used: partsUsedForSubmission 
+    });
   };
 
   return (

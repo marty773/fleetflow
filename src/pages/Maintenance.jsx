@@ -520,15 +520,11 @@ export default function Maintenance() {
                         </thead>
                         <tbody>
                           {viewingRecord.work_items?.map((item, idx) => {
-                            // Check if this work item has a corresponding part in parts_used
-                            const hasPart = viewingRecord.parts_used?.some(
-                              part => part.quantity_used === item.quantity
-                            );
                             return (
                               <tr key={idx} className="border-t">
                                 <td className="p-2">
                                   <div className="flex items-center gap-1">
-                                    {(item.item_id || hasPart) && (
+                                    {item.item_id && (
                                       <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
                                     )}
                                     <span>{item.description}</span>
