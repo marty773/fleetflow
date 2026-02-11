@@ -645,21 +645,58 @@ export default function Items() {
                         </tr>
                       </thead>
                       <tbody>
-                        {viewingMaintenanceRecord.work_items.map((item, idx) => (
-                          <tr key={idx} className="border-t">
-                            <td className="p-2">
-                              <div className="flex items-center gap-1">
-                                {item.item_id && (
-                                  <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                                )}
-                                <span>{item.description}</span>
-                              </div>
-                            </td>
-                            <td className="text-center p-2">{item.quantity}</td>
-                            <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                            <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                          </tr>
-                        ))}
+                        {(() => {
+                          const partsUsedMap = {};
+                          const itemNamesMap = {};
+                          
+                          if (viewingMaintenanceRecord.parts_used) {
+                            viewingMaintenanceRecord.parts_used.forEach(part => {
+                              partsUsedMap[part.item_id] = part.quantity_used;
+                              const matchedItem = items.find(i => i.id === part.item_id);
+                              if (matchedItem) {
+                                itemNamesMap[part.item_id] = matchedItem.name.toLowerCase();
+                              }
+                            });
+                          }
+                          
+                          return viewingMaintenanceRecord.work_items.map((item, idx) => {
+                            let itemId = item.item_id;
+                            
+                            if (!itemId && viewingMaintenanceRecord.parts_used) {
+                              for (const [id, name] of Object.entries(itemNamesMap)) {
+                                if (item.description.toLowerCase().includes(name) || name.includes(item.description.toLowerCase())) {
+                                  itemId = id;
+                                  break;
+                                }
+                              }
+                              
+                              if (!itemId) {
+                                const matchingIds = Object.entries(partsUsedMap)
+                                  .filter(([_, qty]) => qty === item.quantity)
+                                  .map(([id]) => id);
+                                if (matchingIds.length === 1) {
+                                  itemId = matchingIds[0];
+                                }
+                              }
+                            }
+                            
+                            return (
+                              <tr key={idx} className="border-t">
+                                <td className="p-2">
+                                  <div className="flex items-center gap-1">
+                                    {itemId && (
+                                      <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                    )}
+                                    <span>{item.description}</span>
+                                  </div>
+                                </td>
+                                <td className="text-center p-2">{item.quantity}</td>
+                                <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                                <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                              </tr>
+                            );
+                          });
+                        })()}
                         <tr className="border-t bg-slate-50 font-semibold">
                           <td colSpan={3} className="p-2 text-right">Total:</td>
                           <td className="text-right p-2">${viewingMaintenanceRecord.total_cost?.toFixed(2)}</td>
