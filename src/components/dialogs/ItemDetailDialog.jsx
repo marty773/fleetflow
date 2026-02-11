@@ -89,21 +89,29 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
             </div>
           )}
         </div>
-        <div className="flex gap-2 mt-6 pt-4 border-t">
-          <Button variant="outline" onClick={onClose} className="flex-1">
-            Close
+        {/* Floating Actions */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          <Button 
+            size="icon"
+            variant="outline"
+            onClick={onClose}
+            className="rounded-full bg-white/90 backdrop-blur"
+          >
+            ✕
           </Button>
-          <Button
+          <Button 
+            size="icon"
             onClick={() => onEdit?.(item)}
-            className="flex-1"
+            className="rounded-full"
             style={{ backgroundColor: 'var(--color-primary)' }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
           >
-            Edit
+            <Edit2 className="w-4 h-4" />
           </Button>
           {item.photo_url && (
             <Button
+              size="icon"
               variant="outline"
               onClick={() => {
                 const link = document.createElement('a');
@@ -111,9 +119,9 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
                 link.download = `${item.name}.jpg`;
                 link.click();
               }}
-              className="flex-1"
+              className="rounded-full bg-white/90 backdrop-blur"
             >
-              Download
+              <Download className="w-4 h-4" />
             </Button>
           )}
         </div>
