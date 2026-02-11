@@ -439,27 +439,8 @@ export default function Maintenance() {
           {viewingRecord && (
           <Dialog open={!!viewingRecord} onOpenChange={() => setViewingRecord(null)}>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader className="flex flex-row items-center justify-between pr-6">
+              <DialogHeader>
                 <DialogTitle>Maintenance Record Details</DialogTitle>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={async () => {
-                    const response = await base44.functions.invoke('downloadMaintenanceRecord', { recordId: viewingRecord.id });
-                    const blob = new Blob([response.data], { type: 'application/pdf' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `maintenance_${viewingRecord.title?.replace(/[^a-z0-9]/gi, '_')}_${viewingRecord.performed_date}.pdf`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    a.remove();
-                  }}
-                  className="text-slate-500 hover:text-slate-700"
-                >
-                  <Download className="w-4 h-4" />
-                </Button>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -494,7 +475,28 @@ export default function Maintenance() {
                 </div>
                 {viewingRecord.work_items && viewingRecord.work_items.length > 0 && (
                   <div>
-                    <Label className="text-slate-500 mb-2 block">Work Performed</Label>
+                    <div className="flex justify-between items-center mb-2">
+                      <Label className="text-slate-500">Work Performed</Label>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={async () => {
+                          const response = await base44.functions.invoke('downloadMaintenanceRecord', { recordId: viewingRecord.id });
+                          const blob = new Blob([response.data], { type: 'application/pdf' });
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `maintenance_${viewingRecord.title?.replace(/[^a-z0-9]/gi, '_')}_${viewingRecord.performed_date}.pdf`;
+                          document.body.appendChild(a);
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                          a.remove();
+                        }}
+                        className="text-slate-500 hover:text-slate-700"
+                      >
+                        <Download className="w-4 h-4" />
+                      </Button>
+                    </div>
                     <div className="border rounded-lg overflow-hidden">
                       <table className="w-full text-sm">
                         <thead className="bg-slate-50">
