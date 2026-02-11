@@ -22,18 +22,39 @@ import {
 } from '@/components/ui/table';
 
 export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
-  const [formData, setFormData] = useState(record || {
-    vehicle_id: '',
-    maintenance_type: 'oil_change',
-    title: '',
-    performed_date: new Date().toISOString().split('T')[0],
-    vendor: '',
-    work_items: [],
-    parts_used: [],
-    total_cost: 0,
-    odometer_reading: '',
-    notes: '',
-  });
+  // When editing, ensure work_items have item_id properly set from parts_used
+  const initializeFormData = () => {
+    if (!record) {
+      return {
+        vehicle_id: '',
+        maintenance_type: 'oil_change',
+        title: '',
+        performed_date: new Date().toISOString().split('T')[0],
+        vendor: '',
+        work_items: [],
+        parts_used: [],
+        total_cost: 0,
+        odometer_reading: '',
+        notes: '',
+      };
+    }
+    
+    // If editing, ensure work_items maintain their item_id from the database
+    const workItems = (record.work_items || []).map(item => ({
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      total: item.total,
+      ...(item.item_id && { item_id: item.item_id })
+    }));
+    
+    return {
+      ...record,
+      work_items: workItems
+    };
+  };
+  
+  const [formData, setFormData] = useState(initializeFormData());
 
   const [newItem, setNewItem] = useState({
     description: '',
