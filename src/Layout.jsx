@@ -75,7 +75,7 @@ function LayoutContent({ children, currentPageName }) {
         }
       `}</style>
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-[env(safe-area-inset-top)]">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
@@ -158,10 +158,10 @@ function LayoutContent({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full pb-24 lg:pb-0 select-none overflow-x-hidden" style={{ overscrollBehavior: 'none' }}>
+      <main className="flex-1 w-full pb-24 lg:pb-0 select-none overflow-x-hidden" style={{ overscrollBehavior: 'none', marginTop: 'env(safe-area-inset-top)' }}>
         <div 
           className="mt-14 lg:mt-0 hidden lg:flex items-center justify-between px-6 h-14 text-base font-semibold"
-          style={{ color: themeColors.primary, paddingTop: 'env(safe-area-inset-top)' }}
+          style={{ color: themeColors.primary }}
         >
           <span>{selectedCompany}</span>
           <button
