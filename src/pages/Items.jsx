@@ -485,146 +485,15 @@ export default function Items() {
       )}
 
       {/* View Maintenance Record Dialog */}
-      {viewingMaintenanceRecord && (
-        <Dialog open={!!viewingMaintenanceRecord} onOpenChange={() => setViewingMaintenanceRecord(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Maintenance Record Details</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-slate-500">Vehicle</Label>
-                  <p className="font-medium">{vehicles.find(v => v.id === viewingMaintenanceRecord.vehicle_id)?.name}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Type</Label>
-                  <p className="font-medium capitalize">{viewingMaintenanceRecord.maintenance_type?.replace('_', ' ')}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Title</Label>
-                  <p className="font-medium">{viewingMaintenanceRecord.title}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500">Date</Label>
-                  <p className="font-medium">{new Date(viewingMaintenanceRecord.performed_date).toLocaleDateString()}</p>
-                </div>
-                {viewingMaintenanceRecord.vendor && (
-                  <div>
-                    <Label className="text-slate-500">Service Provider</Label>
-                    <p className="font-medium">{viewingMaintenanceRecord.vendor}</p>
-                  </div>
-                )}
-                {viewingMaintenanceRecord.odometer_reading && (
-                  <div>
-                    <Label className="text-slate-500">Odometer</Label>
-                    <p className="font-medium">{viewingMaintenanceRecord.odometer_reading} miles</p>
-                  </div>
-                )}
-              </div>
-              {viewingMaintenanceRecord.work_items && viewingMaintenanceRecord.work_items.length > 0 && (
-                <div>
-                  <Label className="text-slate-500">Work Performed</Label>
-                  <div className="border rounded-lg overflow-hidden mt-2">
-                    <table className="w-full text-sm">
-                      <thead className="bg-slate-50">
-                        <tr>
-                          <th className="text-left p-2">Description</th>
-                          <th className="text-center p-2">Qty</th>
-                          <th className="text-right p-2">Price</th>
-                          <th className="text-right p-2">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(() => {
-                          const partsUsedMap = {};
-                          const itemNamesMap = {};
-                          
-                          if (viewingMaintenanceRecord.parts_used) {
-                            viewingMaintenanceRecord.parts_used.forEach(part => {
-                              partsUsedMap[part.item_id] = part.quantity_used;
-                              const matchedItem = items.find(i => i.id === part.item_id);
-                              if (matchedItem) {
-                                itemNamesMap[part.item_id] = matchedItem.name.toLowerCase();
-                              }
-                            });
-                          }
-                          
-                          return viewingMaintenanceRecord.work_items.map((item, idx) => {
-                            let itemId = item.item_id;
-                            
-                            if (!itemId && viewingMaintenanceRecord.parts_used) {
-                              for (const [id, name] of Object.entries(itemNamesMap)) {
-                                if (item.description.toLowerCase().includes(name) || name.includes(item.description.toLowerCase())) {
-                                  itemId = id;
-                                  break;
-                                }
-                              }
-                              
-                              if (!itemId) {
-                                const matchingIds = Object.entries(partsUsedMap)
-                                  .filter(([_, qty]) => qty === item.quantity)
-                                  .map(([id]) => id);
-                                if (matchingIds.length === 1) {
-                                  itemId = matchingIds[0];
-                                }
-                              }
-                            }
-                            
-                            return (
-                              <tr key={idx} className="border-t">
-                                <td className="p-2">
-                                  <div className="flex items-center gap-1">
-                                    {itemId && (
-                                      <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                                    )}
-                                    <span>{item.description}</span>
-                                  </div>
-                                </td>
-                                <td className="text-center p-2">{item.quantity}</td>
-                                <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                                <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                              </tr>
-                            );
-                          });
-                        })()}
-                        <tr className="border-t bg-slate-50 font-semibold">
-                          <td colSpan={3} className="p-2 text-right">Total:</td>
-                          <td className="text-right p-2">${viewingMaintenanceRecord.total_cost?.toFixed(2)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-              {viewingMaintenanceRecord.notes && (
-                <div>
-                  <Label className="text-slate-500">Notes</Label>
-                  <p className="text-sm mt-1">{viewingMaintenanceRecord.notes}</p>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2 mt-6 pt-4 border-t">
-              <Button 
-                variant="outline" 
-                onClick={() => setViewingMaintenanceRecord(null)}
-                className="flex-1"
-              >
-                Close
-              </Button>
-              <Button 
-                onClick={() => {
-                  setViewingMaintenanceRecord(null);
-                  navigate(createPageUrl('Maintenance') + `?edit=${viewingMaintenanceRecord.id}`);
-                }}
-                className="w-full bg-amber-600 hover:bg-amber-700"
-              >
-                Edit
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <MaintenanceRecordDetailDialog
+        record={viewingMaintenanceRecord}
+        vehicles={vehicles}
+        items={items}
+        onClose={() => setViewingMaintenanceRecord(null)}
+        onEdit={(record) => {
+          navigate(createPageUrl('Maintenance') + `?edit=${record.id}`);
+        }}
+      />
 
       {/* View Bill Dialog */}
       {viewingBill && (
