@@ -312,36 +312,58 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
 
           {/* Photo/PDF Upload */}
           <div>
-            <Label>Bill Photo or PDF</Label>
-            <div className="mt-2">
-              {photoPreview ? (
-                <div className="relative inline-block">
-                  {photoPreview.includes('drive.google.com') || photoPreview.toLowerCase().endsWith('.pdf') ? (
-                    <div className="relative w-full border rounded-lg overflow-hidden">
-                      <iframe
-                        src={photoPreview.includes('drive.google.com') ? photoPreview : photoPreview}
-                        className="w-full h-96"
-                        title="PDF Preview"
-                      />
-                    </div>
-                  ) : (
-                    <img
-                      src={photoPreview}
-                      alt="Bill preview"
-                      className="h-40 rounded-lg object-cover border"
-                    />
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhotoPreview('');
-                      handleChange('photo_url', '');
-                    }}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-lg hover:bg-red-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
+           <Label>Bill Photo or PDF</Label>
+           <div className="mt-2">
+             {photoPreview ? (
+               <div className="relative inline-block">
+                 {photoPreview.includes('drive.google.com') || photoPreview.toLowerCase().endsWith('.pdf') ? (
+                   <div className="flex items-center gap-3 p-4 border rounded-lg bg-slate-50">
+                     <div className="flex-1">
+                       <p className="font-medium text-slate-900">PDF Attached</p>
+                       <p className="text-sm text-slate-500">Click "View PDF" to open</p>
+                     </div>
+                     <div className="flex gap-2">
+                       <Button
+                         type="button"
+                         variant="outline"
+                         size="sm"
+                         onClick={() => window.open(photoPreview, '_blank')}
+                       >
+                         View PDF
+                       </Button>
+                       <Button
+                         type="button"
+                         variant="outline"
+                         size="sm"
+                         onClick={() => {
+                           setPhotoPreview('');
+                           handleChange('photo_url', '');
+                         }}
+                       >
+                         <X className="w-4 h-4" />
+                       </Button>
+                     </div>
+                   </div>
+                 ) : (
+                   <div className="relative inline-block">
+                     <img
+                       src={photoPreview}
+                       alt="Bill preview"
+                       className="h-40 rounded-lg object-cover border"
+                     />
+                     <button
+                       type="button"
+                       onClick={() => {
+                         setPhotoPreview('');
+                         handleChange('photo_url', '');
+                       }}
+                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-lg hover:bg-red-600"
+                     >
+                       <X className="w-4 h-4" />
+                     </button>
+                   </div>
+                 )}
+               </div>
               ) : (
                 <label className="flex items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-slate-50">
                   <div className="text-center">
