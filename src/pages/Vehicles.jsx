@@ -155,8 +155,8 @@ export default function Vehicles() {
             handleEdit(vehicle);
           }}
         />
-      </div>
-    </div>
+          </div>
+        </div>
       </PullToRefresh>
     </PageTransition>
   );
