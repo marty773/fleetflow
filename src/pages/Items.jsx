@@ -686,7 +686,9 @@ export default function Items() {
               </Button>
               <Button 
                 onClick={() => {
-                  window.location.href = `/Maintenance?edit=${viewingMaintenanceRecord.id}`;
+                  setViewingMaintenanceRecord(null);
+                  setViewingItem(null);
+                  window.location.href = `/Maintenance?edit=${viewingMaintenanceRecord.id}&returnTo=Items`;
                 }}
                 className="flex-1 bg-amber-600 hover:bg-amber-700"
               >
@@ -778,7 +780,9 @@ export default function Items() {
               </Button>
               <Button 
                 onClick={() => {
-                  window.location.href = `/Bills?edit=${viewingBill.id}`;
+                  setViewingBill(null);
+                  setViewingItem(null);
+                  window.location.href = `/Bills?edit=${viewingBill.id}&returnTo=Items`;
                 }}
                 className="flex-1 bg-amber-600 hover:bg-amber-700"
               >

@@ -95,6 +95,7 @@ export default function Maintenance() {
     const editId = urlParams.get('edit');
     const editIntervalId = urlParams.get('editInterval');
     const calendarConnectedParam = urlParams.get('calendar_connected');
+    const returnTo = urlParams.get('returnTo');
     
     if (calendarConnectedParam === 'true') {
       setCalendarConnected(true);
@@ -350,8 +351,14 @@ export default function Maintenance() {
                 vendors={vendors}
                 onSubmit={handleSubmitRecord}
                 onCancel={() => {
-                  setShowRecordForm(false);
-                  setEditingRecord(null);
+                  const urlParams = new URLSearchParams(window.location.search);
+                  const returnTo = urlParams.get('returnTo');
+                  if (returnTo) {
+                    window.location.href = `/${returnTo}`;
+                  } else {
+                    setShowRecordForm(false);
+                    setEditingRecord(null);
+                  }
                 }}
                 isLoading={createRecordMutation.isPending || updateRecordMutation.isPending}
               />
