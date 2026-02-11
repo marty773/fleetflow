@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2, Check, ChevronsUpDown } from 'lucide-react';
+import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2, Check, ChevronsUpDown, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Table,
@@ -496,7 +496,14 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                       const linkedItem = items.find(i => i.id === item.item_id);
                       return (
                         <TableRow key={idx}>
-                          <TableCell>{item.description}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              {item.item_id && (
+                                <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                              )}
+                              <span>{item.description}</span>
+                            </div>
+                          </TableCell>
                           <TableCell>{item.quantity}</TableCell>
                           <TableCell>${item.unit_price.toFixed(2)}</TableCell>
                           <TableCell>${item.total.toFixed(2)}</TableCell>
