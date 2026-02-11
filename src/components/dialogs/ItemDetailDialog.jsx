@@ -55,7 +55,7 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
                 {transactions.map((txn, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm hover:bg-slate-100 transition-colors cursor-pointer"
+                    className="flex items-center justify-between p-3 bg-slate-900 dark:bg-slate-800 rounded-lg text-sm hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer border border-slate-700 dark:border-slate-600"
                     onClick={() => {
                       onClose();
                       setTimeout(() => {
@@ -69,18 +69,18 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
                   >
                     <div className="flex items-center gap-3">
                       {txn.type === 'purchase' ? (
-                        <TrendingUp className="h-4 w-4 text-green-600" />
+                        <TrendingUp className="h-4 w-4 text-green-500" />
                       ) : (
-                        <TrendingDown className="h-4 w-4 text-red-600" />
+                        <TrendingDown className="h-4 w-4 text-red-500" />
                       )}
                       <div>
-                        <p className="font-medium text-slate-900">{new Date(txn.date).toLocaleDateString()}</p>
-                        <p className="text-xs text-slate-500">
+                        <p className="font-medium text-slate-100">{new Date(txn.date).toLocaleDateString()}</p>
+                        <p className="text-xs text-slate-400">
                           {txn.type === 'purchase' ? `Purchased from ${txn.vendor}` : `Used on ${txn.vehicle}`}
                         </p>
                       </div>
                     </div>
-                    <span className={`font-semibold ${txn.type === 'purchase' ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`font-semibold ${txn.type === 'purchase' ? 'text-green-500' : 'text-red-500'}`}>
                       {txn.type === 'purchase' ? '+' : '-'}
                       {txn.quantity}
                     </span>
@@ -91,7 +91,7 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           )}
           </div>
           </div>
-          <div className="sticky bottom-0 flex gap-2 p-6 bg-white border-t border-slate-200 flex-wrap sm:flex-nowrap">
+          <div className="sticky bottom-0 flex gap-2 p-6 bg-slate-950 dark:bg-slate-900 border-t border-slate-700 dark:border-slate-700 flex-wrap sm:flex-nowrap">
           <Button variant="outline" onClick={onClose} className="flex-1">
            Close
           </Button>
