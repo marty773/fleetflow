@@ -89,6 +89,20 @@ export default function Bills() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Bill.create(data),
+    onMutate: async (newBill) => {
+      await queryClient.cancelQueries({ queryKey: ['bills'] });
+      const previousBills = queryClient.getQueryData(['bills']);
+      queryClient.setQueryData(['bills'], (old) => [
+        ...(old || []),
+        { ...newBill, id: `temp-${Date.now()}`, created_date: new Date().toISOString() }
+      ]);
+      return { previousBills };
+    },
+    onError: (err, newBill, context) => {
+      if (context?.previousBills) {
+        queryClient.setQueryData(['bills'], context.previousBills);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bills'] });
       setShowForm(false);
@@ -98,6 +112,19 @@ export default function Bills() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Bill.update(id, data),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['bills'] });
+      const previousBills = queryClient.getQueryData(['bills']);
+      queryClient.setQueryData(['bills'], (old) =>
+        old?.map((b) => (b.id === id ? { ...b, ...data } : b)) || []
+      );
+      return { previousBills };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousBills) {
+        queryClient.setQueryData(['bills'], context.previousBills);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bills'] });
       setEditingBill(null);
