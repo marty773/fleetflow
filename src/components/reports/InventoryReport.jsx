@@ -24,10 +24,10 @@ import {
 export default function InventoryReport({ highlightItemId }) {
   const { selectedCompany } = useCompany();
   const [expandedItems, setExpandedItems] = useState({});
-  const [viewingTransaction, setViewingTransaction] = useState(null);
+  const [viewingBill, setViewingBill] = useState(null);
+  const [viewingMaintenance, setViewingMaintenance] = useState(null);
   const [viewingItem, setViewingItem] = useState(null);
   const [filterMode, setFilterMode] = useState('all');
-  const queryClient = useQueryClient();
 
   React.useEffect(() => {
     if (highlightItemId) {
