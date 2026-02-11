@@ -439,8 +439,27 @@ export default function Maintenance() {
           {viewingRecord && (
           <Dialog open={!!viewingRecord} onOpenChange={() => setViewingRecord(null)}>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
+              <DialogHeader className="flex flex-row items-center justify-between pr-6">
                 <DialogTitle>Maintenance Record Details</DialogTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={async () => {
+                    const response = await base44.functions.invoke('downloadMaintenanceRecord', { recordId: viewingRecord.id });
+                    const blob = new Blob([response.data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `maintenance_${viewingRecord.title?.replace(/[^a-z0-9]/gi, '_')}_${viewingRecord.performed_date}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                  }}
+                  className="text-slate-500 hover:text-slate-700"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
