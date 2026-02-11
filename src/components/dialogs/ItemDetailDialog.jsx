@@ -93,30 +93,30 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           </div>
           <div className="sticky bottom-0 flex gap-2 p-6 bg-white border-t border-slate-200 flex-wrap sm:flex-nowrap">
           <Button variant="outline" onClick={onClose} className="flex-1">
-            Close
+           Close
           </Button>
           <Button
-            onClick={() => onEdit?.(item)}
-            className="flex-1"
-            style={{ backgroundColor: 'var(--color-primary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
+           onClick={() => onEdit?.(item)}
+           className="flex-1"
+           style={{ backgroundColor: 'var(--color-primary)' }}
+           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
           >
-            Edit
+           Edit
           </Button>
           {item.photo_url && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                const link = document.createElement('a');
-                link.href = item.photo_url;
-                link.download = `${item.name}.jpg`;
-                link.click();
-              }}
-              className="flex-1"
-            >
-              Download
-            </Button>
+           <Button
+             variant="outline"
+             onClick={() => {
+               const link = document.createElement('a');
+               link.href = item.photo_url;
+               link.download = `${item.name}.jpg`;
+               link.click();
+             }}
+             className="flex-1"
+           >
+             Download
+           </Button>
           )}
           </div>
           </DialogContent>
