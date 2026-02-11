@@ -41,10 +41,10 @@ export default function SettingsPage() {
         </div>
 
         {user && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg dark:text-white">Account Information</CardTitle>
-            </CardHeader>
+           <Card className="mb-6">
+             <CardHeader>
+               <CardTitle className="text-lg text-slate-900 dark:text-white">Account Information</CardTitle>
+             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Name</p>
@@ -64,7 +64,7 @@ export default function SettingsPage() {
 
         <Card className="mb-6">
            <CardHeader>
-             <CardTitle className="text-lg dark:text-white">Preferences</CardTitle>
+             <CardTitle className="text-lg text-slate-900 dark:text-white">Preferences</CardTitle>
            </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
@@ -92,7 +92,7 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg dark:text-white">Danger Zone</CardTitle>
+            <CardTitle className="text-lg text-slate-900 dark:text-white">Danger Zone</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button
@@ -116,10 +116,10 @@ export default function SettingsPage() {
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Account</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-slate-900 dark:text-white">Delete Account</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
               This action cannot be undone. All your data will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
