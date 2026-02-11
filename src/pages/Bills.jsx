@@ -263,7 +263,7 @@ export default function Bills() {
                           }
                         }}
                       >
-                        Download Photo
+                        {viewingBill.photo_url.includes('drive.google.com') ? 'Download PDF' : 'Download Photo'}
                       </Button>
                     </div>
                     <div className="flex justify-center">
