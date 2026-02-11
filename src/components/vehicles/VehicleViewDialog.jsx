@@ -372,14 +372,22 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           </TabsContent>
         </Tabs>
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-4 border-t mt-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-            Close
+        {/* Floating Actions */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          <Button 
+            size="icon"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="rounded-full bg-white/90 backdrop-blur"
+          >
+            ✕
           </Button>
-          <Button onClick={() => onEdit(vehicle)} className="flex-1 bg-slate-900 hover:bg-slate-800">
-            <Edit2 className="w-4 h-4 mr-2" />
-            Edit Vehicle
+          <Button 
+            size="icon"
+            onClick={() => onEdit(vehicle)}
+            className="rounded-full bg-slate-900 hover:bg-slate-800"
+          >
+            <Edit2 className="w-4 h-4" />
           </Button>
         </div>
       </DialogContent>
