@@ -426,6 +426,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                     <Popover open={itemSearchOpen} onOpenChange={setItemSearchOpen}>
                       <PopoverTrigger asChild>
                         <Button
+                          type="button"
                           variant="outline"
                           role="combobox"
                           aria-expanded={itemSearchOpen}
@@ -592,7 +593,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
               Cancel
             </Button>
             <Button
