@@ -271,7 +271,7 @@ export default function Bills() {
                       </Button>
                     </div>
                     <div className="flex justify-center">
-                      {viewingBill.photo_url.includes('drive.google.com') ? (
+                      {viewingBill.photo_url.includes('drive.google.com') || viewingBill.photo_url.includes('.pdf') ? (
                         <iframe
                           src={viewingBill.photo_url}
                           className="w-full h-96 rounded-lg border"
