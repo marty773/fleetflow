@@ -315,34 +315,26 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
            <Label>Bill Photo or PDF</Label>
            <div className="mt-2">
              {photoPreview ? (
-               <div className="relative inline-block">
+               <div className="relative inline-block w-full">
                  {photoPreview.includes('drive.google.com') || photoPreview.toLowerCase().endsWith('.pdf') ? (
-                   <div className="flex items-center gap-3 p-4 border rounded-lg bg-slate-50">
-                     <div className="flex-1">
-                       <p className="font-medium text-slate-900">PDF Attached</p>
-                       <p className="text-sm text-slate-500">Click "View PDF" to open</p>
-                     </div>
-                     <div className="flex gap-2">
-                       <Button
-                         type="button"
-                         variant="outline"
-                         size="sm"
-                         onClick={() => window.open(photoPreview, '_blank')}
-                       >
-                         View PDF
-                       </Button>
-                       <Button
-                         type="button"
-                         variant="outline"
-                         size="sm"
-                         onClick={() => {
-                           setPhotoPreview('');
-                           handleChange('photo_url', '');
-                         }}
-                       >
-                         <X className="w-4 h-4" />
-                       </Button>
-                     </div>
+                   <div className="relative w-full border rounded-lg overflow-hidden">
+                     <iframe
+                       src={photoPreview}
+                       className="w-full h-96"
+                       title="PDF Preview"
+                     />
+                     <button
+                       type="button"
+                       onClick={(e) => {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         setPhotoPreview('');
+                         handleChange('photo_url', '');
+                       }}
+                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-lg hover:bg-red-600"
+                     >
+                       <X className="w-4 h-4" />
+                     </button>
                    </div>
                  ) : (
                    <div className="relative inline-block">
