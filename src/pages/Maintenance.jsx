@@ -476,21 +476,27 @@ export default function Maintenance() {
                           </tr>
                         </thead>
                         <tbody>
-                          {viewingRecord.work_items?.map((item, idx) => (
-                            <tr key={idx} className="border-t">
-                              <td className="p-2">
-                                <div className="flex items-center gap-1">
-                                  {item.item_id && (
-                                    <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                                  )}
-                                  <span>{item.description}</span>
-                                </div>
-                              </td>
-                              <td className="text-center p-2">{item.quantity}</td>
-                              <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                              <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                            </tr>
-                          ))}
+                          {viewingRecord.work_items?.map((item, idx) => {
+                            // Check if this work item has a corresponding part in parts_used
+                            const hasPart = viewingRecord.parts_used?.some(
+                              part => part.quantity_used === item.quantity
+                            );
+                            return (
+                              <tr key={idx} className="border-t">
+                                <td className="p-2">
+                                  <div className="flex items-center gap-1">
+                                    {(item.item_id || hasPart) && (
+                                      <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                    )}
+                                    <span>{item.description}</span>
+                                  </div>
+                                </td>
+                                <td className="text-center p-2">{item.quantity}</td>
+                                <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                                <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                              </tr>
+                            );
+                          })}
                           <tr className="border-t bg-slate-50 font-semibold">
                             <td colSpan={3} className="p-2 text-right">Total:</td>
                             <td className="text-right p-2">${viewingRecord.total_cost?.toFixed(2)}</td>
