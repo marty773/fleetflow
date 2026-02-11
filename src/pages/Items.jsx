@@ -828,12 +828,17 @@ export default function Items() {
               </Button>
               <Link 
                 to={createPageUrl('Bills') + `?edit=${viewingBill.id}`}
-                onClick={() => setViewingBill(null)}
                 className="flex-1"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setViewingBill(null);
+                  setTimeout(() => navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`), 0);
+                }}
               >
                 <Button 
                   type="button"
                   className="w-full bg-amber-600 hover:bg-amber-700"
+                  onClick={(e) => e.preventDefault()}
                 >
                   Edit
                 </Button>
@@ -841,7 +846,8 @@ export default function Items() {
               {viewingBill.photo_url && (
                 <Button 
                   variant="outline"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     window.open(viewingBill.photo_url, '_blank');
                   }}
                   className="flex-1"
