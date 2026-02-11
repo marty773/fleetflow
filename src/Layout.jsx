@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings } from 'lucide-react';
+import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings, Moon, Sun } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
 import CompanySelector from '@/components/CompanySelector';
 import BottomTabs from '@/components/mobile/BottomTabs';
@@ -12,7 +12,21 @@ import { CompanyProvider, useCompany } from '@/components/CompanyContext';
 
 function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    if (saved !== null) return saved === 'true';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const { selectedCompany, setSelectedCompany } = useCompany();
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', darkMode);
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   // Dynamic theming based on company
   const themeColors = selectedCompany === "Pencroft Structures" 
@@ -50,7 +64,7 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex select-none" style={{ overscrollBehavior: 'none' }}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex select-none" style={{ overscrollBehavior: 'none' }}>
       <style>{`
         :root {
           --color-primary: ${themeColors.primary};
@@ -61,35 +75,45 @@ function LayoutContent({ children, currentPageName }) {
         }
       `}</style>
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center h-14 px-4 bg-white border-b border-slate-200">
+      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 hover:bg-slate-200 rounded-lg transition"
+          className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
         >
           {sidebarOpen ? (
-            <X className="w-6 h-6 text-slate-900" />
+            <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
           ) : (
-            <Menu className="w-6 h-6 text-slate-900" />
+            <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100" />
           )}
         </button>
         <div 
-          className="flex-1 text-center text-base font-semibold pr-12"
+          className="flex-1 text-center text-base font-semibold"
           style={{ color: themeColors.primary }}
         >
           {selectedCompany}
         </div>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
+        >
+          {darkMode ? (
+            <Sun className="w-5 h-5 text-slate-900 dark:text-slate-100" />
+          ) : (
+            <Moon className="w-5 h-5 text-slate-900 dark:text-slate-100" />
+          )}
+        </button>
       </div>
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:relative w-64 bg-white border-r border-slate-200 h-screen overflow-y-auto transition-all duration-300 z-30 ${
+        className={`fixed lg:relative w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-screen overflow-y-auto transition-all duration-300 z-30 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4 mt-12 lg:mt-0">
             <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695d462470d43f37f0539478/e0b7746bb_ChatGPTImageFeb2202602_58_12PM.png" alt="FleetFlow" className="w-10 h-10 rounded-lg" />
-            <h1 className="text-xl font-bold text-slate-900">FleetFlow</h1>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white">FleetFlow</h1>
           </div>
 
           <div className="mb-6">
@@ -136,10 +160,20 @@ function LayoutContent({ children, currentPageName }) {
       {/* Main Content */}
       <main className="flex-1 w-full pb-24 lg:pb-0 select-none overflow-x-hidden" style={{ overscrollBehavior: 'none' }}>
         <div 
-          className="mt-14 lg:mt-0 hidden lg:flex items-center justify-center h-14 text-base font-semibold"
+          className="mt-14 lg:mt-0 hidden lg:flex items-center justify-between px-6 h-14 text-base font-semibold"
           style={{ color: themeColors.primary, paddingTop: 'env(safe-area-inset-top)' }}
         >
-          {selectedCompany}
+          <span>{selectedCompany}</span>
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition ml-auto"
+          >
+            {darkMode ? (
+              <Sun className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+            ) : (
+              <Moon className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+            )}
+          </button>
         </div>
         {children}
       </main>
