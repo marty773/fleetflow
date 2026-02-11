@@ -76,12 +76,12 @@ export default function Vendors() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Vendors</h1>
-            <p className="text-slate-600 mt-2">Manage vendor information and contacts</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Vendors</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">Manage vendor information and contacts</p>
           </div>
           <Button
             onClick={() => {
@@ -109,7 +109,7 @@ export default function Vendors() {
         {vendors.length === 0 ? (
           <Card className="border-2 border-dashed">
             <CardContent className="p-12 text-center">
-              <p className="text-slate-600 mb-4">No vendors yet</p>
+              <p className="text-slate-600 dark:text-slate-400 mb-4">No vendors yet</p>
               <Button
                 onClick={() => setShowForm(true)}
                 className="bg-blue-600 hover:bg-blue-700"
@@ -139,63 +139,63 @@ export default function Vendors() {
         {/* View Vendor Dialog */}
         {viewingVendor && (
           <Dialog open={!!viewingVendor} onOpenChange={() => setViewingVendor(null)}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md dark:bg-slate-800 dark:border-slate-700">
               <DialogHeader>
-                <DialogTitle>{viewingVendor.name}</DialogTitle>
+                <DialogTitle className="dark:text-white">{viewingVendor.name}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 {viewingVendor.contact_person && (
                   <div>
-                    <Label className="text-slate-500">Contact Person</Label>
-                    <p className="font-medium">{viewingVendor.contact_person}</p>
-                  </div>
-                )}
-                {viewingVendor.email && (
-                  <div>
-                    <Label className="text-slate-500 flex items-center gap-2">
-                      <Mail className="w-4 h-4" /> Email
-                    </Label>
-                    <a href={`mailto:${viewingVendor.email}`} className="font-medium text-blue-600 hover:underline">
-                      {viewingVendor.email}
-                    </a>
-                  </div>
-                )}
-                {viewingVendor.phone && (
-                  <div>
-                    <Label className="text-slate-500 flex items-center gap-2">
-                      <Phone className="w-4 h-4" /> Phone
-                    </Label>
-                    <a href={`tel:${viewingVendor.phone}`} className="font-medium text-blue-600 hover:underline">
-                      {viewingVendor.phone}
-                    </a>
-                  </div>
-                )}
-                {(viewingVendor.address || viewingVendor.city || viewingVendor.state || viewingVendor.zip) && (
-                  <div>
-                    <Label className="text-slate-500 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" /> Address
-                    </Label>
-                    <p className="font-medium">
-                      {[viewingVendor.address, viewingVendor.city, viewingVendor.state, viewingVendor.zip]
-                        .filter(Boolean)
-                        .join(', ')}
-                    </p>
-                  </div>
-                )}
-                {viewingVendor.category && (
-                  <div>
-                    <Label className="text-slate-500">Category</Label>
-                    <p className="font-medium capitalize">{viewingVendor.category}</p>
-                  </div>
-                )}
-                {viewingVendor.notes && (
-                  <div>
-                    <Label className="text-slate-500">Notes</Label>
+                    <Label className="text-slate-500 dark:text-slate-400">Contact Person</Label>
+                    <p className="font-medium dark:text-white">{viewingVendor.contact_person}</p>
+                    </div>
+                    )}
+                    {viewingVendor.email && (
+                    <div>
+                     <Label className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                       <Mail className="w-4 h-4" /> Email
+                     </Label>
+                     <a href={`mailto:${viewingVendor.email}`} className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                       {viewingVendor.email}
+                     </a>
+                    </div>
+                    )}
+                    {viewingVendor.phone && (
+                    <div>
+                     <Label className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                       <Phone className="w-4 h-4" /> Phone
+                     </Label>
+                     <a href={`tel:${viewingVendor.phone}`} className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                       {viewingVendor.phone}
+                     </a>
+                    </div>
+                    )}
+                    {(viewingVendor.address || viewingVendor.city || viewingVendor.state || viewingVendor.zip) && (
+                    <div>
+                     <Label className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                       <MapPin className="w-4 h-4" /> Address
+                     </Label>
+                     <p className="font-medium dark:text-white">
+                       {[viewingVendor.address, viewingVendor.city, viewingVendor.state, viewingVendor.zip]
+                         .filter(Boolean)
+                         .join(', ')}
+                     </p>
+                    </div>
+                    )}
+                    {viewingVendor.category && (
+                    <div>
+                     <Label className="text-slate-500 dark:text-slate-400">Category</Label>
+                     <p className="font-medium dark:text-white capitalize">{viewingVendor.category}</p>
+                    </div>
+                    )}
+                    {viewingVendor.notes && (
+                    <div>
+                     <Label className="text-slate-500 dark:text-slate-400">Notes</Label>
                     <p className="text-sm mt-1">{viewingVendor.notes}</p>
                   </div>
                 )}
               </div>
-              <div className="flex gap-2 mt-6 pt-4 border-t">
+              <div className="flex gap-2 mt-6 pt-4 border-t dark:border-slate-700">
                 <Button 
                   variant="outline" 
                   onClick={() => setViewingVendor(null)}

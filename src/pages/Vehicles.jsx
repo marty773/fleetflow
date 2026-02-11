@@ -91,12 +91,12 @@ export default function Vehicles() {
   return (
     <PageTransition>
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8">
           <div className="max-w-5xl mx-auto px-4">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Fleet Vehicles</h1>
-            <p className="text-slate-600 mt-2">Manage your trucks and trailers</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Fleet Vehicles</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">Manage your trucks and trailers</p>
           </div>
           <Button
             onClick={() => {
@@ -139,7 +139,7 @@ export default function Vehicles() {
             <div className="lg:col-span-3">
               <Card className="border-2 border-dashed">
                 <CardContent className="p-12 text-center">
-                  <p className="text-slate-600">No vehicles added yet. Create one to get started.</p>
+                  <p className="text-slate-600 dark:text-slate-400">No vehicles added yet. Create one to get started.</p>
                 </CardContent>
               </Card>
             </div>
