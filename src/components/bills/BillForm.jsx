@@ -90,8 +90,12 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
       unit_price: newItem.unit_price,
       total,
       vehicle_id: newItem.vehicle_id || null,
-      item_quantity: newItem.quantity
     };
+    
+    // Only add item_quantity if NO vehicle is assigned (adding to inventory)
+    if (!newItem.vehicle_id) {
+      lineItem.item_quantity = newItem.quantity;
+    }
     
     // Only include item_id if it has a value
     if (newItem.item_id) {
