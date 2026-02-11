@@ -19,6 +19,7 @@ export default function DashboardStats({ stats }) {
       color: 'green',
       bgColor: 'bg-green-50',
       iconColor: 'text-green-600',
+      hideIcon: true,
     },
     {
       label: 'Upcoming Services',
