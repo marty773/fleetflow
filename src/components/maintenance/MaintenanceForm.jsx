@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Plus, Trash2, Edit } from 'lucide-react';
+import { X, Plus, Trash2, Edit, Package } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -272,7 +272,14 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                   <TableBody>
                     {formData.work_items.map((item, idx) => (
                       <TableRow key={idx}>
-                        <TableCell>{item.description}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {item.item_id && (
+                              <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                            )}
+                            <span>{item.description}</span>
+                          </div>
+                        </TableCell>
                         <TableCell>{item.quantity}</TableCell>
                         <TableCell>${item.unit_price.toFixed(2)}</TableCell>
                         <TableCell>${item.total.toFixed(2)}</TableCell>
