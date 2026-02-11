@@ -66,8 +66,27 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-lg">Preferences</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-slate-500 mb-4">Theme settings coming soon</p>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-900 dark:text-white">Dark Mode</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Use system preference or toggle manually</p>
+              </div>
+              <button
+                onClick={() => {
+                  const newValue = localStorage.getItem('darkMode') === 'true' ? 'false' : 'true';
+                  localStorage.setItem('darkMode', newValue);
+                  if (newValue === 'true') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                }}
+                className="w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-600 relative transition-colors"
+              >
+                <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-transform ${localStorage.getItem('darkMode') === 'true' ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
           </CardContent>
         </Card>
 
