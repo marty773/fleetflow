@@ -67,11 +67,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Redirect to calendar page with success message
-    return new Response(null, {
-      status: 302,
-      headers: { 'Location': `${Deno.env.get("BASE_URL")}/Calendar?calendar_connected=true` },
-    });
+    // Close the popup and notify the parent window
+    return new Response(
+      `<html><body><script>window.close(); window.opener.postMessage({type: 'calendar_connected'}, '*');</script><p>Calendar connected! You can close this window.</p></body></html>`,
+      { headers: { 'Content-Type': 'text/html' } }
+    );
   } catch (error) {
     console.error('Callback error:', error);
     return new Response('Authorization failed', { status: 500 });

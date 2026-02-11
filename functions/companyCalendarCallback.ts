@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      `<html><body><script>window.close(); window.opener.postMessage('calendar_connected', '*');</script><p>Calendar connected! You can close this window.</p></body></html>`,
+      `<html><body><script>window.close(); window.opener.postMessage({type: 'calendar_connected'}, '*');</script><p>Calendar connected! You can close this window.</p></body></html>`,
       { headers: { 'Content-Type': 'text/html' } }
     );
   } catch (error) {
