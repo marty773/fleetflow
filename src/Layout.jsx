@@ -41,6 +41,8 @@ function LayoutContent({ children, currentPageName }) {
       { name: 'Reports', path: 'Reports', icon: DollarSign },
     ];
 
+  const mobilePages = ['Dashboard', 'Vehicles', 'Bills', 'Maintenance'];
+
   const [currentUser, setCurrentUser] = React.useState(null);
 
   React.useEffect(() => {
