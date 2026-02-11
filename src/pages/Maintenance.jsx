@@ -179,9 +179,10 @@ export default function Maintenance() {
   const handleSubmitRecord = async (data) => {
     const dataWithCompany = { ...data, company_id: selectedCompany };
     
-    // Group parts by item_id and sum quantities
-    const partQuantityMap = {};
-    if (dataWithCompany.parts_used && dataWithCompany.parts_used.length > 0) {
+    // Only deduct inventory when CREATING a new record, not when editing
+    if (!editingRecord && dataWithCompany.parts_used && dataWithCompany.parts_used.length > 0) {
+      // Group parts by item_id and sum quantities
+      const partQuantityMap = {};
       data.parts_used.forEach(part => {
         if (!partQuantityMap[part.item_id]) {
           partQuantityMap[part.item_id] = 0;
