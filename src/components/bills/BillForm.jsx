@@ -15,32 +15,33 @@ import {
 import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2, Check, ChevronsUpDown, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+   Table,
+   TableBody,
+   TableCell,
+   TableHead,
+   TableHeader,
+   TableRow,
+ } from '@/components/ui/table';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+   Dialog,
+   DialogContent,
+   DialogHeader,
+   DialogTitle,
+ } from '@/components/ui/dialog';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+   Command,
+   CommandEmpty,
+   CommandGroup,
+   CommandInput,
+   CommandItem,
+   CommandList,
+ } from '@/components/ui/command';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+   Popover,
+   PopoverContent,
+   PopoverTrigger,
+ } from '@/components/ui/popover';
+import ResponsiveSelect from '@/components/ResponsiveSelect';
 
 export default function BillForm({ bill, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(bill || {
@@ -241,31 +242,33 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="vendor">Vendor *</Label>
-              {vendors.length > 0 ? (
-                <Select value={formData.vendor} onValueChange={(value) => handleChange('vendor', value)}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select vendor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {vendors.map(v => (
-                      <SelectItem key={v.id} value={v.name}>
-                        {v.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  id="vendor"
-                  placeholder="e.g., Joe's Repair Shop"
-                  value={formData.vendor}
-                  onChange={(e) => handleChange('vendor', e.target.value)}
-                  required
-                  className="mt-2"
-                />
-              )}
-            </div>
+                <Label htmlFor="vendor">Vendor *</Label>
+                {vendors.length > 0 ? (
+                  <div className="mt-2">
+                    <ResponsiveSelect
+                      value={formData.vendor}
+                      onValueChange={(value) => handleChange('vendor', value)}
+                      placeholder="Select vendor"
+                      label="Vendor"
+                    >
+                      {vendors.map(v => (
+                        <SelectItem key={v.id} value={v.name}>
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </ResponsiveSelect>
+                  </div>
+                ) : (
+                  <Input
+                    id="vendor"
+                    placeholder="e.g., Joe's Repair Shop"
+                    value={formData.vendor}
+                    onChange={(e) => handleChange('vendor', e.target.value)}
+                    required
+                    className="mt-2 select-text"
+                  />
+                )}
+              </div>
 
             <div>
               <Label htmlFor="bill_date">Bill Date *</Label>
@@ -275,7 +278,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                 value={formData.bill_date}
                 onChange={(e) => handleChange('bill_date', e.target.value)}
                 required
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
@@ -286,20 +289,19 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                 placeholder="Invoice #"
                 value={formData.bill_number}
                 onChange={(e) => handleChange('bill_number', e.target.value)}
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
             <div>
               <Label htmlFor="category">Category *</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => handleChange('category', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
+              <div className="mt-2">
+                <ResponsiveSelect
+                  value={formData.category}
+                  onValueChange={(value) => handleChange('category', value)}
+                  placeholder="Select category"
+                  label="Category"
+                >
                   <SelectItem value="fuel">Fuel</SelectItem>
                   <SelectItem value="maintenance">Maintenance</SelectItem>
                   <SelectItem value="repairs">Repairs</SelectItem>
@@ -307,8 +309,8 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                   <SelectItem value="registration">Registration</SelectItem>
                   <SelectItem value="tolls">Tolls</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+                </ResponsiveSelect>
+              </div>
             </div>
           </div>
 
@@ -425,6 +427,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                 placeholder="Item description"
                 value={newItem.description}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                className="select-text"
               />
               <div className="grid grid-cols-2 gap-2">
                 <Input
@@ -432,31 +435,33 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                   placeholder="Qty"
                   value={newItem.quantity}
                   onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
+                  className="select-text"
                 />
                 <Input
                   type="number"
                   placeholder="Unit Price"
                   value={newItem.unit_price}
                   onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
+                  className="select-text"
                 />
               </div>
 
               <div className="border-t pt-3 mt-3">
                 <p className="text-sm font-medium text-slate-700 mb-2">Optional: Link to Vehicle or Stock Item</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Select value={newItem.vehicle_id || ''} onValueChange={(value) => setNewItem({ ...newItem, vehicle_id: value === 'none' ? '' : value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vehicle (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {vehicles.map(v => (
-                        <SelectItem key={v.id} value={v.id}>
-                          {v.name} ({v.license_plate})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <ResponsiveSelect
+                    value={newItem.vehicle_id || ''}
+                    onValueChange={(value) => setNewItem({ ...newItem, vehicle_id: value === 'none' ? '' : value })}
+                    placeholder="Vehicle (optional)"
+                    label="Vehicle"
+                  >
+                    <SelectItem value="none">None</SelectItem>
+                    {vehicles.map(v => (
+                      <SelectItem key={v.id} value={v.id}>
+                        {v.name} ({v.license_plate})
+                      </SelectItem>
+                    ))}
+                  </ResponsiveSelect>
                   <div className="flex gap-2">
                     <Popover open={itemSearchOpen} onOpenChange={setItemSearchOpen}>
                       <PopoverTrigger asChild>
@@ -697,13 +702,13 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
               <div className="space-y-2">
                 <Label htmlFor="new_item_name">Item Name *</Label>
                 <Input
-                  id="new_item_name"
-                  value={newItemData.name}
-                  onChange={e => setNewItemData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Enter item name"
-                  required
-                  className="h-11"
-                />
+                    id="new_item_name"
+                    value={newItemData.name}
+                    onChange={e => setNewItemData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter item name"
+                    required
+                    className="h-11 select-text"
+                  />
               </div>
 
               {/* Vendor & Price Row */}
@@ -711,26 +716,26 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                 <div className="space-y-2">
                   <Label htmlFor="new_item_vendor">Vendor</Label>
                   {vendors.length > 0 ? (
-                    <Select value={newItemData.vendor} onValueChange={e => setNewItemData(prev => ({ ...prev, vendor: e }))}>
-                      <SelectTrigger className="h-11">
-                        <SelectValue placeholder="Select vendor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={null}>None</SelectItem>
-                        {vendors.map(v => (
-                          <SelectItem key={v.id} value={v.name}>
-                            {v.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <ResponsiveSelect
+                      value={newItemData.vendor}
+                      onValueChange={e => setNewItemData(prev => ({ ...prev, vendor: e }))}
+                      placeholder="Select vendor"
+                      label="Vendor"
+                    >
+                      <SelectItem value={null}>None</SelectItem>
+                      {vendors.map(v => (
+                        <SelectItem key={v.id} value={v.name}>
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </ResponsiveSelect>
                   ) : (
                     <Input
                       id="new_item_vendor"
                       value={newItemData.vendor}
                       onChange={e => setNewItemData(prev => ({ ...prev, vendor: e.target.value }))}
                       placeholder="Vendor name"
-                      className="h-11"
+                      className="h-11 select-text"
                     />
                   )}
                 </div>
@@ -746,7 +751,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                       value={newItemData.price}
                       onChange={e => setNewItemData(prev => ({ ...prev, price: e.target.value }))}
                       placeholder="0.00"
-                      className="h-11 pl-7"
+                      className="h-11 pl-7 select-text"
                     />
                   </div>
                 </div>
@@ -764,10 +769,10 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                     value={newItemData.quantity_on_hand}
                     onChange={e => setNewItemData(prev => ({ ...prev, quantity_on_hand: e.target.value }))}
                     placeholder="0"
-                    className="h-11"
+                    className="h-11 select-text"
                   />
-                </div>
-                <div className="space-y-2">
+                  </div>
+                  <div className="space-y-2">
                   <Label htmlFor="new_item_low_stock">Low Stock Alert</Label>
                   <Input
                     id="new_item_low_stock"
@@ -777,7 +782,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                     value={newItemData.low_stock_threshold}
                     onChange={e => setNewItemData(prev => ({ ...prev, low_stock_threshold: e.target.value }))}
                     placeholder="2"
-                    className="h-11"
+                    className="h-11 select-text"
                   />
                 </div>
               </div>
@@ -786,12 +791,12 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
               <div className="space-y-2">
                 <Label htmlFor="new_item_number">Item Number / SKU</Label>
                 <Input
-                  id="new_item_number"
-                  value={newItemData.item_number}
-                  onChange={e => setNewItemData(prev => ({ ...prev, item_number: e.target.value }))}
-                  placeholder="e.g. SKU-12345"
-                  className="h-11"
-                />
+                    id="new_item_number"
+                    value={newItemData.item_number}
+                    onChange={e => setNewItemData(prev => ({ ...prev, item_number: e.target.value }))}
+                    placeholder="e.g. SKU-12345"
+                    className="h-11 select-text"
+                  />
               </div>
 
               {/* Description */}

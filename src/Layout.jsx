@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings } from 'lucide-react';
+import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings, ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
@@ -18,6 +18,10 @@ function LayoutContent({ children, currentPageName }) {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
   const { selectedCompany, setSelectedCompany } = useCompany();
+  const location = useLocation();
+
+  const mainTabPaths = ['Dashboard', 'Vehicles', 'Bills', 'Maintenance'];
+  const isSubPage = !mainTabPaths.includes(currentPageName);
 
   useEffect(() => {
     localStorage.setItem('darkMode', darkMode);
@@ -64,7 +68,7 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex select-none" style={{ overscrollBehavior: 'none' }}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex" style={{ overscrollBehavior: 'none', userSelect: 'none' }}>
       <style>{`
         :root {
           --color-primary: ${themeColors.primary};
@@ -89,17 +93,28 @@ function LayoutContent({ children, currentPageName }) {
         }
       `}</style>
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)]">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
-        >
-          {sidebarOpen ? (
-            <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)] select-none">
+        <div className="flex items-center gap-2">
+          {isSubPage ? (
+            <button
+              onClick={() => window.history.back()}
+              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
+            >
+              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+            </button>
           ) : (
-            <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
+            >
+              {sidebarOpen ? (
+                <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+              ) : (
+                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+              )}
+            </button>
           )}
-        </button>
+        </div>
         <div 
           className="flex-1 text-center text-base font-semibold"
           style={{ color: themeColors.primary }}
@@ -163,7 +178,7 @@ function LayoutContent({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full pb-24 lg:pb-0 select-none overflow-x-hidden" style={{ overscrollBehavior: 'none', marginTop: 'env(safe-area-inset-top)' }}>
+      <main className="flex-1 w-full pb-24 lg:pb-0 overflow-x-hidden" style={{ overscrollBehavior: 'none', marginTop: 'env(safe-area-inset-top)', userSelect: 'none' }}>
         <div 
           className="mt-14 lg:mt-0 hidden lg:flex items-center justify-between px-6 h-14 text-base font-semibold"
           style={{ color: themeColors.primary }}

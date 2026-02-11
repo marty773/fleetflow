@@ -13,13 +13,14 @@ import {
 } from '@/components/ui/select';
 import { X, Plus, Trash2, Edit, Package } from 'lucide-react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+   Table,
+   TableBody,
+   TableCell,
+   TableHead,
+   TableHeader,
+   TableRow,
+ } from '@/components/ui/table';
+import ResponsiveSelect from '@/components/ResponsiveSelect';
 
 export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
   // When editing, merge parts_used back into work_items so they show correctly
@@ -170,34 +171,32 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="vehicle_id">Vehicle *</Label>
-              <Select
-                value={formData.vehicle_id}
-                onValueChange={(value) => handleChange('vehicle_id', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select vehicle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vehicles.map(v => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name} ({v.license_plate})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <Label htmlFor="vehicle_id">Vehicle *</Label>
+                <div className="mt-2">
+                  <ResponsiveSelect
+                    value={formData.vehicle_id}
+                    onValueChange={(value) => handleChange('vehicle_id', value)}
+                    placeholder="Select vehicle"
+                    label="Vehicle"
+                  >
+                    {vehicles.map(v => (
+                      <SelectItem key={v.id} value={v.id}>
+                        {v.name} ({v.license_plate})
+                      </SelectItem>
+                    ))}
+                  </ResponsiveSelect>
+                </div>
+              </div>
 
             <div>
               <Label htmlFor="maintenance_type">Type *</Label>
-              <Select
-                value={formData.maintenance_type}
-                onValueChange={(value) => handleChange('maintenance_type', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
+              <div className="mt-2">
+                <ResponsiveSelect
+                  value={formData.maintenance_type}
+                  onValueChange={(value) => handleChange('maintenance_type', value)}
+                  placeholder="Select maintenance type"
+                  label="Type"
+                >
                   <SelectItem value="oil_change">Oil Change</SelectItem>
                   <SelectItem value="filter_change">Filter Change</SelectItem>
                   <SelectItem value="tire_rotation">Tire Rotation</SelectItem>
@@ -205,8 +204,8 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                   <SelectItem value="repair">Repair</SelectItem>
                   <SelectItem value="cleaning">Cleaning</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+                </ResponsiveSelect>
+              </div>
             </div>
 
             <div>
@@ -217,7 +216,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
                 required
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
@@ -229,33 +228,35 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 value={formData.performed_date}
                 onChange={(e) => handleChange('performed_date', e.target.value)}
                 required
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
             <div>
               <Label htmlFor="vendor">Service Provider</Label>
               {vendors.length > 0 ? (
-                <Select value={formData.vendor} onValueChange={(value) => handleChange('vendor', value)}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select service provider" />
-                  </SelectTrigger>
-                  <SelectContent>
+                <div className="mt-2">
+                  <ResponsiveSelect
+                    value={formData.vendor}
+                    onValueChange={(value) => handleChange('vendor', value)}
+                    placeholder="Select service provider"
+                    label="Service Provider"
+                  >
                     <SelectItem value={null}>None</SelectItem>
                     {vendors.map(v => (
                       <SelectItem key={v.id} value={v.name}>
                         {v.name}
                       </SelectItem>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </ResponsiveSelect>
+                </div>
               ) : (
                 <Input
                   id="vendor"
                   placeholder="Shop name"
                   value={formData.vendor}
                   onChange={(e) => handleChange('vendor', e.target.value)}
-                  className="mt-2"
+                  className="mt-2 select-text"
                 />
               )}
             </div>
@@ -268,7 +269,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 placeholder="Miles"
                 value={formData.odometer_reading}
                 onChange={(e) => handleChange('odometer_reading', e.target.value)}
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
           </div>
@@ -281,6 +282,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 placeholder="Work description"
                 value={newItem.description}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                className="select-text"
               />
               <div className="grid grid-cols-2 gap-2">
                 <Input
@@ -288,43 +290,43 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                   placeholder="Qty"
                   value={newItem.quantity}
                   onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
+                  className="select-text"
                 />
                 <Input
                   type="number"
                   placeholder="Price"
                   value={newItem.unit_price}
                   onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
+                  className="select-text"
                 />
               </div>
               <div className="border-t pt-3 mt-3">
                 <p className="text-sm font-medium text-slate-700 mb-2">Optional: Select from Stock Items</p>
-                <Select value={newItem.item_id || 'none'} onValueChange={(value) => {
-                  if (value === 'none') {
-                    setNewItem({ ...newItem, item_id: '' });
-                  } else {
-                    const selectedItem = items.find(i => i.id === value);
-                    setNewItem({ 
-                      ...newItem, 
-                      item_id: value,
-                      description: selectedItem?.name || newItem.description,
-                      unit_price: selectedItem?.price || newItem.unit_price
-                    });
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Stock Item (optional)">
-                      {newItem.item_id ? items.find(i => i.id === newItem.item_id)?.name || 'Stock Item (optional)' : 'Stock Item (optional)'}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {items.map(item => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.name} - ${item.price?.toFixed(2) || '0.00'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ResponsiveSelect
+                  value={newItem.item_id || 'none'}
+                  onValueChange={(value) => {
+                    if (value === 'none') {
+                      setNewItem({ ...newItem, item_id: '' });
+                    } else {
+                      const selectedItem = items.find(i => i.id === value);
+                      setNewItem({ 
+                        ...newItem, 
+                        item_id: value,
+                        description: selectedItem?.name || newItem.description,
+                        unit_price: selectedItem?.price || newItem.unit_price
+                      });
+                    }
+                  }}
+                  placeholder="Stock Item (optional)"
+                  label="Stock Item"
+                >
+                  <SelectItem value="none">None</SelectItem>
+                  {items.map(item => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name} - ${item.price?.toFixed(2) || '0.00'}
+                    </SelectItem>
+                  ))}
+                </ResponsiveSelect>
               </div>
               <Button type="button" onClick={handleAddItem} variant="outline" size="sm" className="w-full">
                 <Plus className="w-4 h-4 mr-2" /> Add Item
@@ -395,7 +397,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               placeholder="Additional notes..."
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
-              className="mt-2 h-20"
+              className="mt-2 h-20 select-text"
             />
           </div>
 

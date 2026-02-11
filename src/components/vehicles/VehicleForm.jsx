@@ -4,14 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
+ } from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import ResponsiveSelect from '@/components/ResponsiveSelect';
 
 export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(vehicle || {
@@ -63,21 +64,23 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 required
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
             <div>
               <Label htmlFor="type">Type *</Label>
-              <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
+              <div className="mt-2">
+                <ResponsiveSelect
+                  value={formData.type}
+                  onValueChange={(value) => handleChange('type', value)}
+                  placeholder="Select type"
+                  label="Type"
+                >
                   <SelectItem value="truck">Truck</SelectItem>
                   <SelectItem value="trailer">Trailer</SelectItem>
-                </SelectContent>
-              </Select>
+                </ResponsiveSelect>
+              </div>
             </div>
 
             <div>
