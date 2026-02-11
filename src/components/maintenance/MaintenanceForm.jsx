@@ -263,7 +263,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               </div>
               <div className="border-t pt-3 mt-3">
                 <p className="text-sm font-medium text-slate-700 mb-2">Optional: Select from Stock Items</p>
-                <Select value={newItem.item_id || ''} onValueChange={(value) => {
+                <Select value={newItem.item_id || 'none'} onValueChange={(value) => {
                   if (value === 'none') {
                     setNewItem({ ...newItem, item_id: '' });
                   } else {
@@ -277,7 +277,9 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                   }
                 }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Stock Item (optional)" />
+                    <SelectValue placeholder="Stock Item (optional)">
+                      {newItem.item_id ? items.find(i => i.id === newItem.item_id)?.name || 'Stock Item (optional)' : 'Stock Item (optional)'}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
