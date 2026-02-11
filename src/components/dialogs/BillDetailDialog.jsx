@@ -49,10 +49,10 @@ export default function BillDetailDialog({ bill, vehicles = [], onClose, onEdit,
                     />
                   </div>
                 ) : bill.photo_url.includes('.pdf') || bill.photo_url.toLowerCase().endsWith('.pdf') ? (
-                   <div className="w-full border border-slate-700 rounded-lg p-6 bg-slate-900 dark:bg-slate-800 flex flex-col items-center justify-center gap-3">
-                     <Package className="w-8 h-8 text-slate-500" />
-                     <p className="text-sm text-slate-400">PDF uploaded</p>
-                   </div>
+                  <div className="w-full border rounded-lg p-6 bg-slate-50 flex flex-col items-center justify-center gap-3">
+                    <Package className="w-8 h-8 text-slate-400" />
+                    <p className="text-sm text-slate-600">PDF uploaded</p>
+                  </div>
                 ) : (
                   <img
                     src={bill.photo_url}
@@ -85,38 +85,38 @@ export default function BillDetailDialog({ bill, vehicles = [], onClose, onEdit,
           {bill.line_items && bill.line_items.length > 0 && (
             <div>
               <Label className="text-slate-500 mb-2 block">Line Items</Label>
-              <div className="border border-slate-700 rounded-lg overflow-hidden bg-slate-900 dark:bg-slate-800">
+              <div className="border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-800 dark:bg-slate-700">
+                  <thead className="bg-slate-50">
                     <tr>
-                      <th className="text-left p-2 text-slate-300">Description</th>
-                      <th className="text-left p-2 text-slate-300">Vehicle</th>
-                      <th className="text-center p-2 text-slate-300">Qty</th>
-                      <th className="text-right p-2 text-slate-300">Price</th>
-                      <th className="text-right p-2 text-slate-300">Total</th>
+                      <th className="text-left p-2">Description</th>
+                      <th className="text-left p-2">Vehicle</th>
+                      <th className="text-center p-2">Qty</th>
+                      <th className="text-right p-2">Price</th>
+                      <th className="text-right p-2">Total</th>
                     </tr>
                   </thead>
                   <tbody>
                     {bill.line_items.map((item, idx) => {
                       const vehicle = vehicles.find(v => v.id === item.vehicle_id);
                       return (
-                        <tr key={idx} className="border-t border-slate-700">
-                          <td className="p-2 text-slate-100">
+                        <tr key={idx} className="border-t">
+                          <td className="p-2">
                             <div className="flex items-center gap-1">
                               {item.item_id && <Package className="w-3 h-3 text-slate-400" />}
                               <span>{item.description}</span>
                             </div>
                           </td>
-                          <td className="p-2 text-slate-400">{vehicle ? vehicle.name : '-'}</td>
-                          <td className="text-center p-2 text-slate-100">{item.quantity}</td>
-                          <td className="text-right p-2 text-slate-100">${item.unit_price?.toFixed(2)}</td>
-                          <td className="text-right p-2 text-slate-100">${item.total?.toFixed(2)}</td>
+                          <td className="p-2 text-slate-600">{vehicle ? vehicle.name : '-'}</td>
+                          <td className="text-center p-2">{item.quantity}</td>
+                          <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
+                          <td className="text-right p-2">${item.total?.toFixed(2)}</td>
                         </tr>
                       );
                     })}
-                    <tr className="border-t border-slate-700 bg-slate-800 dark:bg-slate-700 font-semibold">
-                      <td colSpan={4} className="p-2 text-right text-slate-300">Total:</td>
-                      <td className="text-right p-2 text-slate-100">${bill.total_amount?.toFixed(2)}</td>
+                    <tr className="border-t bg-slate-50 font-semibold">
+                      <td colSpan={4} className="p-2 text-right">Total:</td>
+                      <td className="text-right p-2">${bill.total_amount?.toFixed(2)}</td>
                     </tr>
                   </tbody>
                 </table>
