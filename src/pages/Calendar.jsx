@@ -665,6 +665,20 @@ export default function Calendar() {
                 )}
               </div>
               <div className="flex gap-2 mt-6 pt-4 border-t">
+                <Button
+                  onClick={() => {
+                    setEditingAppointment(null);
+                    setShowAppointmentForm(true);
+                    setSelectedDay(null);
+                  }}
+                  className="flex-1"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Appointment
+                </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setSelectedDay(null)}
