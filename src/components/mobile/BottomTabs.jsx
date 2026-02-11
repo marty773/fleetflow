@@ -21,7 +21,7 @@ export default function BottomTabs({ currentPageName }) {
             <Link
               key={tab.name}
               to={createPageUrl(tab.path)}
-              className={`flex flex-col items-center justify-center py-3 px-4 flex-1 transition-colors ${
+              className={`flex flex-col items-center justify-center px-4 flex-1 transition-colors ${
                 isActive
                   ? 'text-amber-600 border-t-2 border-amber-600'
                   : 'text-slate-600 hover:text-slate-900'
