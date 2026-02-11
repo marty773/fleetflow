@@ -277,14 +277,14 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8 pt-14 lg:pt-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance Calendar</h1>
-              <p className="text-slate-600 mt-2">Schedule and track upcoming maintenance</p>
-            </div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Maintenance Calendar</h1>
+                <p className="text-slate-600 dark:text-slate-400 mt-2">Schedule and track upcoming maintenance</p>
+              </div>
             <Button
               onClick={() => {
                 setEditingAppointment(null);
@@ -342,7 +342,7 @@ export default function Calendar() {
 
             {/* Vehicle filter below buttons */}
             <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-              <SelectTrigger className="w-full sm:w-64">
+              <SelectTrigger className="w-full sm:w-64 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -374,22 +374,22 @@ export default function Calendar() {
           {/* Calendar */}
           <div className="lg:col-span-2">
             <Card className="border-0 shadow-sm">
-              <CardHeader className="border-b flex flex-row items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Button variant="outline" size="sm" onClick={prevMonth}>
-                    <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                  <CardTitle>{format(currentDate, 'MMMM yyyy')}</CardTitle>
-                  <Button variant="outline" size="sm" onClick={nextMonth}>
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardHeader>
+               <CardHeader className="border-b dark:border-slate-700 flex flex-row items-center justify-between">
+                 <div className="flex items-center gap-4">
+                   <Button variant="outline" size="sm" onClick={prevMonth}>
+                     <ChevronLeft className="w-4 h-4" />
+                   </Button>
+                   <CardTitle className="dark:text-white">{format(currentDate, 'MMMM yyyy')}</CardTitle>
+                   <Button variant="outline" size="sm" onClick={nextMonth}>
+                     <ChevronRight className="w-4 h-4" />
+                   </Button>
+                 </div>
+               </CardHeader>
               <CardContent className="p-6">
                 {/* Day labels */}
                 <div className="grid grid-cols-7 gap-2 mb-4">
                   {dayLabels.map(day => (
-                    <div key={day} className="text-center font-semibold text-slate-700 text-sm py-2">
+                    <div key={day} className="text-center font-semibold text-slate-700 dark:text-slate-400 text-sm py-2">
                       {day}
                     </div>
                   ))}
@@ -404,15 +404,15 @@ export default function Calendar() {
 
                     return (
                       <div
-                        key={day.toISOString()}
-                        onClick={() => setSelectedDay(day)}
-                        className={`min-h-24 p-2 border rounded-lg cursor-pointer transition-all ${
-                          isCurrentMonth ? 'bg-white hover:bg-slate-50' : 'bg-slate-50'
-                        } ${isToday ? 'border-blue-500 border-2' : 'border-slate-200'}`}
-                      >
+                         key={day.toISOString()}
+                         onClick={() => setSelectedDay(day)}
+                         className={`min-h-24 p-2 border rounded-lg cursor-pointer transition-all ${
+                           isCurrentMonth ? 'bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600' : 'bg-slate-50 dark:bg-slate-800'
+                         } ${isToday ? 'border-blue-500 border-2' : 'border-slate-200 dark:border-slate-600'}`}
+                       >
                         <p className={`text-sm font-semibold mb-1 ${
-                          isCurrentMonth ? 'text-slate-900' : 'text-slate-400'
-                        }`}>
+                           isCurrentMonth ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'
+                         }`}>
                           {format(day, 'd')}
                         </p>
                         <div className="space-y-1">
@@ -459,8 +459,8 @@ export default function Calendar() {
           {/* Upcoming Events Sidebar */}
           <div>
             <Card className="border-0 shadow-sm">
-              <CardHeader className="border-b">
-                <CardTitle className="text-lg">Upcoming Services</CardTitle>
+              <CardHeader className="border-b dark:border-slate-700">
+                <CardTitle className="text-lg dark:text-white">Upcoming Services</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-3 max-h-96 overflow-y-auto">
                 {(filteredIntervals.filter(i => i.next_due_date).length > 0 || filteredAppointments.length > 0) ? (

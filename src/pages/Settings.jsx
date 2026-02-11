@@ -33,39 +33,39 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 pb-32 lg:pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-32 lg:pb-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Settings className="w-6 h-6 text-amber-600" />
-          <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
         </div>
 
         {user && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="text-lg">Account Information</CardTitle>
+              <CardTitle className="text-lg dark:text-white">Account Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-slate-500">Name</p>
-                <p className="font-medium text-slate-900">{user.full_name}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Name</p>
+                <p className="font-medium text-slate-900 dark:text-white">{user.full_name}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500">Email</p>
-                <p className="font-medium text-slate-900">{user.email}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Email</p>
+                <p className="font-medium text-slate-900 dark:text-white">{user.email}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500">Role</p>
-                <p className="font-medium capitalize text-slate-900">{user.role}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Role</p>
+                <p className="font-medium capitalize text-slate-900 dark:text-white">{user.role}</p>
               </div>
             </CardContent>
           </Card>
         )}
 
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Preferences</CardTitle>
-          </CardHeader>
+           <CardHeader>
+             <CardTitle className="text-lg dark:text-white">Preferences</CardTitle>
+           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -92,13 +92,13 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Danger Zone</CardTitle>
+            <CardTitle className="text-lg dark:text-white">Danger Zone</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button
               variant="outline"
               onClick={handleLogout}
-              className="w-full justify-start gap-2 text-slate-700 hover:bg-slate-100"
+              className="w-full justify-start gap-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               <LogOut className="w-4 h-4" />
               Logout
@@ -106,7 +106,7 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(true)}
-              className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="w-full justify-start gap-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
             >
               <Trash2 className="w-4 h-4" />
               Delete Account

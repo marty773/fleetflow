@@ -335,17 +335,17 @@ export default function Maintenance() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8 pt-14 lg:pt-0">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Maintenance</h1>
-            <p className="text-slate-600 mt-2">Track maintenance records and scheduled intervals</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Maintenance</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">Track maintenance records and scheduled intervals</p>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white border-b rounded-none">
+          <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
             <TabsTrigger value="records">Maintenance Records</TabsTrigger>
             <TabsTrigger value="intervals">Scheduled Intervals</TabsTrigger>
           </TabsList>

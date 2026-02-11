@@ -12,25 +12,25 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
   }, {});
 
   const maintenanceColors = {
-    oil_change: 'bg-blue-100 text-blue-800',
-    filter_change: 'bg-yellow-100 text-yellow-800',
-    tire_rotation: 'bg-purple-100 text-purple-800',
-    inspection: 'bg-indigo-100 text-indigo-800',
-    repair: 'bg-red-100 text-red-800',
-    cleaning: 'bg-green-100 text-green-800',
-    other: 'bg-slate-100 text-slate-800',
-  };
+     oil_change: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+     filter_change: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+     tire_rotation: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
+     inspection: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300',
+     repair: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+     cleaning: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+     other: 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300',
+   };
 
   if (records.length === 0) {
-    return (
-      <Card className="border-2 border-dashed">
-        <CardContent className="p-12 text-center">
-          <Wrench className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-          <p className="text-slate-600">No maintenance records yet</p>
-        </CardContent>
-      </Card>
-    );
-  }
+     return (
+       <Card className="border-2 border-dashed dark:border-slate-700">
+         <CardContent className="p-12 text-center">
+           <Wrench className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+           <p className="text-slate-600 dark:text-slate-400">No maintenance records yet</p>
+         </CardContent>
+       </Card>
+     );
+   }
 
   const sortedRecords = [...records].sort(
     (a, b) => new Date(b.performed_date) - new Date(a.performed_date)
@@ -45,45 +45,45 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
           onClick={() => onView(record)}
         >
           <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-semibold text-slate-900">{record.title}</h3>
-                  <Badge className={maintenanceColors[record.maintenance_type]}>
-                    {record.maintenance_type?.replace('_', ' ')}
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
-                  <div>
-                    <p className="text-slate-600">Vehicle</p>
-                    <p className="font-semibold text-slate-900">
-                      {vehicleMap[record.vehicle_id]?.name}
+             <div className="flex items-start justify-between">
+               <div className="flex-1">
+                 <div className="flex items-center gap-3 mb-2">
+                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{record.title}</h3>
+                   <Badge className={maintenanceColors[record.maintenance_type]}>
+                     {record.maintenance_type?.replace('_', ' ')}
+                   </Badge>
+                 </div>
+                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                   <div>
+                     <p className="text-slate-600 dark:text-slate-400">Vehicle</p>
+                     <p className="font-semibold text-slate-900 dark:text-white">
+                       {vehicleMap[record.vehicle_id]?.name}
+                     </p>
+                   </div>
+                   <div>
+                     <p className="text-slate-600 dark:text-slate-400">Date</p>
+                     <p className="font-semibold text-slate-900 dark:text-white">
+                       {format(new Date(record.performed_date), 'MMM dd, yyyy')}
+                     </p>
+                   </div>
+                   {record.vendor && (
+                     <div>
+                       <p className="text-slate-600 dark:text-slate-400">Provider</p>
+                       <p className="font-semibold text-slate-900 dark:text-white">{record.vendor}</p>
+                     </div>
+                   )}
+                   <div>
+                     <p className="text-slate-600 dark:text-slate-400">Cost</p>
+                     <p className="font-semibold text-slate-900 dark:text-white">
+                       ${record.total_cost?.toFixed(2) || '0.00'}
+                     </p>
+                   </div>
+                 </div>
+                 {record.odometer_reading && (
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-3">
+                      Odometer: {record.odometer_reading} miles
                     </p>
-                  </div>
-                  <div>
-                    <p className="text-slate-600">Date</p>
-                    <p className="font-semibold text-slate-900">
-                      {format(new Date(record.performed_date), 'MMM dd, yyyy')}
-                    </p>
-                  </div>
-                  {record.vendor && (
-                    <div>
-                      <p className="text-slate-600">Provider</p>
-                      <p className="font-semibold text-slate-900">{record.vendor}</p>
-                    </div>
                   )}
-                  <div>
-                    <p className="text-slate-600">Cost</p>
-                    <p className="font-semibold text-slate-900">
-                      ${record.total_cost?.toFixed(2) || '0.00'}
-                    </p>
-                  </div>
-                </div>
-                {record.odometer_reading && (
-                   <p className="text-sm text-slate-500 mt-3">
-                     Odometer: {record.odometer_reading} miles
-                   </p>
-                 )}
               </div>
             </div>
           </CardContent>
