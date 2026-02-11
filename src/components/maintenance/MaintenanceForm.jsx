@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/table';
 
 export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
-  // When editing, ensure work_items have item_id properly set from parts_used
+  // When editing, merge parts_used back into work_items so they show correctly
   const initializeFormData = () => {
     if (!record) {
       return {
@@ -39,14 +39,35 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
       };
     }
     
-    // If editing, ensure work_items maintain their item_id from the database
-    const workItems = (record.work_items || []).map(item => ({
-      description: item.description,
-      quantity: item.quantity,
-      unit_price: item.unit_price,
-      total: item.total,
-      ...(item.item_id && { item_id: item.item_id })
-    }));
+    // Build a map of item_id -> quantity from parts_used
+    const partsUsedMap = {};
+    if (record.parts_used) {
+      record.parts_used.forEach(part => {
+        partsUsedMap[part.item_id] = part.quantity_used;
+      });
+    }
+    
+    // Reconstruct work_items with item_id from parts_used
+    const workItems = (record.work_items || []).map(item => {
+      const workItem = {
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total: item.total
+      };
+      
+      // Check if this work item corresponds to a part in parts_used
+      // Match by quantity and see if we can find a corresponding item
+      for (const [itemId, qty] of Object.entries(partsUsedMap)) {
+        if (qty === item.quantity) {
+          workItem.item_id = itemId;
+          delete partsUsedMap[itemId]; // Remove so we don't match it twice
+          break;
+        }
+      }
+      
+      return workItem;
+    });
     
     return {
       ...record,
