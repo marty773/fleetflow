@@ -12,6 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import MaintenanceForm from '../components/maintenance/MaintenanceForm';
 import MaintenanceList from '../components/maintenance/MaintenanceList';
@@ -30,6 +40,7 @@ export default function Maintenance() {
   const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('records');
   const [calendarConnected, setCalendarConnected] = useState(false);
+  const [deletingRecord, setDeletingRecord] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
@@ -522,6 +533,15 @@ export default function Maintenance() {
                   Close
                 </Button>
                 <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setDeletingRecord(viewingRecord);
+                  }}
+                  className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  Delete
+                </Button>
+                <Button 
                   onClick={() => {
                     setEditingRecord(viewingRecord);
                     setViewingRecord(null);
@@ -535,6 +555,31 @@ export default function Maintenance() {
             </DialogContent>
           </Dialog>
           )}
+
+          {/* Delete Confirmation Dialog */}
+          <AlertDialog open={!!deletingRecord} onOpenChange={() => setDeletingRecord(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Maintenance Record</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this maintenance record? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    deleteRecordMutation.mutate(deletingRecord.id);
+                    setDeletingRecord(null);
+                    setViewingRecord(null);
+                  }}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           </div>
           </div>
           );
