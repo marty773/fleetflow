@@ -3,15 +3,9 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Wrench, Calendar as CalendarIcon, Package } from 'lucide-react';
+import { Plus, Wrench, Calendar as CalendarIcon, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,14 +16,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Label } from '@/components/ui/label';
 import MaintenanceForm from '../components/maintenance/MaintenanceForm';
 import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalForm from '../components/maintenance/IntervalForm';
 import IntervalList from '../components/maintenance/IntervalList';
+import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
 import { format } from 'date-fns';
 import { useCompany } from '../components/CompanyContext';
-import { Download } from 'lucide-react';
 
 export default function Maintenance() {
   const { selectedCompany } = useCompany();
