@@ -48,15 +48,15 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
           </div>
           {record.work_items && record.work_items.length > 0 && (
             <div>
-              <Label className="text-slate-500">Work Performed</Label>
-              <div className="border rounded-lg overflow-hidden mt-2">
+              <Label className="text-slate-500 dark:text-slate-400">Work Performed</Label>
+              <div className="border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden mt-2">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50">
+                  <thead className="bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-700">
                     <tr>
-                      <th className="text-left p-2">Description</th>
-                      <th className="text-center p-2">Qty</th>
-                      <th className="text-right p-2">Price</th>
-                      <th className="text-right p-2">Total</th>
+                      <th className="text-left p-2 text-slate-900 dark:text-slate-100">Description</th>
+                      <th className="text-center p-2 text-slate-900 dark:text-slate-100">Qty</th>
+                      <th className="text-right p-2 text-slate-900 dark:text-slate-100">Price</th>
+                      <th className="text-right p-2 text-slate-900 dark:text-slate-100">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -96,23 +96,23 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
                         }
 
                         return (
-                          <tr key={idx} className="border-t">
-                            <td className="p-2">
+                          <tr key={idx} className="border-t border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                            <td className="p-2 text-slate-900 dark:text-slate-100">
                               <div className="flex items-center gap-1">
-                                {itemId && <Package className="w-3 h-3 text-slate-400 flex-shrink-0" />}
+                                {itemId && <Package className="w-3 h-3 text-slate-400 dark:text-slate-500 flex-shrink-0" />}
                                 <span>{item.description}</span>
                               </div>
                             </td>
-                            <td className="text-center p-2">{item.quantity}</td>
-                            <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                            <td className="text-right p-2">${item.total?.toFixed(2)}</td>
+                            <td className="text-center p-2 text-slate-900 dark:text-slate-100">{item.quantity}</td>
+                            <td className="text-right p-2 text-slate-900 dark:text-slate-100">${item.unit_price?.toFixed(2)}</td>
+                            <td className="text-right p-2 text-slate-900 dark:text-slate-100">${item.total?.toFixed(2)}</td>
                           </tr>
                         );
                       });
                     })()}
-                    <tr className="border-t bg-slate-50 font-semibold">
-                      <td colSpan={3} className="p-2 text-right">Total:</td>
-                      <td className="text-right p-2">${record.total_cost?.toFixed(2)}</td>
+                    <tr className="border-t border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 font-semibold">
+                      <td colSpan={3} className="p-2 text-right text-slate-900 dark:text-slate-100">Total:</td>
+                      <td className="text-right p-2 text-slate-900 dark:text-slate-100">${record.total_cost?.toFixed(2)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -126,7 +126,7 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
             </div>
           )}
         </div>
-        <div className="flex gap-2 mt-6 pt-4 border-t">
+        <div className="flex gap-2 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
           <Button variant="outline" onClick={onClose} className="flex-1">
             Close
           </Button>

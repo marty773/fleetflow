@@ -49,13 +49,13 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
             </div>
           )}
           {transactions.length > 0 && (
-            <div className="border-t pt-4">
-              <Label className="text-slate-500 block mb-3">Transaction History</Label>
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+              <Label className="text-slate-500 dark:text-slate-400 block mb-3">Transaction History</Label>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {transactions.map((txn, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 bg-slate-900 dark:bg-slate-800 rounded-lg text-sm hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer border border-slate-700 dark:border-slate-600"
+                    className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer border border-slate-300 dark:border-slate-700"
                     onClick={() => {
                       onClose();
                       setTimeout(() => {
@@ -74,8 +74,8 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
                         <TrendingDown className="h-4 w-4 text-red-500" />
                       )}
                       <div>
-                        <p className="font-medium text-slate-100">{new Date(txn.date).toLocaleDateString()}</p>
-                        <p className="text-xs text-slate-400">
+                        <p className="font-medium text-slate-900 dark:text-slate-100">{new Date(txn.date).toLocaleDateString()}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
                           {txn.type === 'purchase' ? `Purchased from ${txn.vendor}` : `Used on ${txn.vehicle}`}
                         </p>
                       </div>
@@ -91,7 +91,7 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           )}
           </div>
           </div>
-          <div className="sticky bottom-0 flex gap-2 p-6 bg-slate-950 dark:bg-slate-900 border-t border-slate-700 dark:border-slate-700 flex-wrap sm:flex-nowrap">
+          <div className="sticky bottom-0 flex gap-2 p-6 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 flex-wrap sm:flex-nowrap">
           <Button variant="outline" onClick={onClose} className="flex-1">
            Close
           </Button>
