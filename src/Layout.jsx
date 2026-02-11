@@ -73,9 +73,23 @@ function LayoutContent({ children, currentPageName }) {
           --color-accent: ${themeColors.accent};
           --color-icon-bg: ${themeColors.iconBg};
         }
+        .dark {
+          color-scheme: dark;
+        }
+        .dark * {
+          border-color: rgba(148, 163, 184, 0.2);
+        }
+        .dark input, .dark textarea, .dark select {
+          background-color: rgb(30, 41, 59);
+          color: rgb(241, 245, 249);
+          border-color: rgb(51, 65, 85);
+        }
+        .dark input::placeholder, .dark textarea::placeholder {
+          color: rgb(148, 163, 184);
+        }
       `}</style>
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-[env(safe-area-inset-top)]">
+      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)]">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
@@ -106,7 +120,7 @@ function LayoutContent({ children, currentPageName }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:relative w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-screen overflow-y-auto transition-all duration-300 z-30 ${
+        className={`fixed lg:relative w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 h-screen overflow-y-auto transition-all duration-300 z-30 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -132,7 +146,7 @@ function LayoutContent({ children, currentPageName }) {
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     isActive
                       ? 'border-l-4'
-                      : 'text-slate-600 hover:bg-slate-50'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                   style={isActive ? {
                     backgroundColor: themeColors.primaryLight,
