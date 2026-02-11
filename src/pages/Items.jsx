@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Search, Package, Grid3X3, List, Loader2 } from 'lucide-react';
+import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw } from 'lucide-react';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
 import ItemDetailDialog from '@/components/dialogs/ItemDetailDialog';
