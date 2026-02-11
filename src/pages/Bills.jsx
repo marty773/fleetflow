@@ -247,29 +247,23 @@ export default function Bills() {
                         variant="outline"
                         size="sm"
                         onClick={async () => {
-                          if (viewingBill.photo_url.includes('drive.google.com')) {
-                            // For Google Drive PDFs, open in new tab
-                            window.open(viewingBill.photo_url, '_blank');
-                          } else {
-                            // For images, force download
-                            try {
-                              const response = await fetch(viewingBill.photo_url);
-                              const blob = await response.blob();
-                              const url = window.URL.createObjectURL(blob);
-                              const link = document.createElement('a');
-                              link.href = url;
-                              link.download = `bill_${viewingBill.bill_number || viewingBill.id}.${blob.type.includes('pdf') ? 'pdf' : 'jpg'}`;
-                              document.body.appendChild(link);
-                              link.click();
-                              window.URL.revokeObjectURL(url);
-                              link.remove();
-                            } catch (error) {
-                              console.error('Download failed:', error);
-                            }
+                          try {
+                            const response = await fetch(viewingBill.photo_url);
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `bill_${viewingBill.bill_number || viewingBill.id}.${blob.type.includes('pdf') ? 'pdf' : 'jpg'}`;
+                            document.body.appendChild(link);
+                            link.click();
+                            window.URL.revokeObjectURL(url);
+                            link.remove();
+                          } catch (error) {
+                            console.error('Download failed:', error);
                           }
                         }}
                       >
-                        Download
+                        Download Photo
                       </Button>
                     </div>
                     <div className="flex justify-center">
