@@ -110,11 +110,11 @@ export default function Dashboard() {
         {vehicles.length === 0 && (
           <Card className="mt-8 border-2 border-dashed">
             <CardContent className="p-12 text-center">
-              <Wrench className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">No vehicles yet</h3>
-              <p className="text-slate-600 mb-6">Add your first truck or trailer to get started</p>
+              <Wrench className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No vehicles yet</h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6">Add your first truck or trailer to get started</p>
               <Link to={createPageUrl('Vehicles')}>
-                <Button className="bg-slate-900 hover:bg-slate-800">Add Vehicle</Button>
+                <Button className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600">Add Vehicle</Button>
               </Link>
             </CardContent>
           </Card>

@@ -17,16 +17,16 @@ export default function UpcomingMaintenance({ intervals, vehicles }) {
 
   const getUrgency = (dueDate) => {
     const days = (new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24);
-    if (days < 0) return { label: 'Overdue', color: 'bg-red-100 text-red-800' };
-    if (days <= 7) return { label: 'Urgent', color: 'bg-orange-100 text-orange-800' };
-    if (days <= 30) return { label: 'Due Soon', color: 'bg-yellow-100 text-yellow-800' };
-    return { label: 'Scheduled', color: 'bg-blue-100 text-blue-800' };
+    if (days < 0) return { label: 'Overdue', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' };
+    if (days <= 7) return { label: 'Urgent', color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300' };
+    if (days <= 30) return { label: 'Due Soon', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' };
+    return { label: 'Scheduled', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' };
   };
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardHeader className="border-b">
-        <CardTitle>Maintenance Due</CardTitle>
+      <CardHeader className="border-b border-slate-200 dark:border-slate-700">
+        <CardTitle className="text-slate-900 dark:text-white">Maintenance Due</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
         {sortedIntervals.length > 0 ? (
@@ -35,26 +35,26 @@ export default function UpcomingMaintenance({ intervals, vehicles }) {
               const urgency = getUrgency(interval.next_due_date);
               const vehicle = vehicleMap[interval.vehicle_id];
               return (
-                <div key={interval.id} className="p-3 border rounded-lg hover:bg-slate-50 transition cursor-pointer">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-slate-900">{interval.name}</p>
-                      <p className="text-sm text-slate-500">{vehicle?.name}</p>
-                    </div>
-                    <Badge className={urgency.color}>{urgency.label}</Badge>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm text-slate-600">
-                    <Calendar className="w-3 h-3" />
-                    {format(new Date(interval.next_due_date), 'MMM dd, yyyy')}
-                  </div>
-                </div>
+                <div key={interval.id} className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition cursor-pointer">
+                   <div className="flex items-start justify-between mb-2">
+                     <div className="flex-1">
+                       <p className="font-medium text-sm text-slate-900 dark:text-white">{interval.name}</p>
+                       <p className="text-sm text-slate-600 dark:text-slate-400">{vehicle?.name}</p>
+                     </div>
+                     <Badge className={urgency.color}>{urgency.label}</Badge>
+                   </div>
+                   <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                     <Calendar className="w-3 h-3" />
+                     {format(new Date(interval.next_due_date), 'MMM dd, yyyy')}
+                   </div>
+                 </div>
               );
             })}
           </div>
         ) : (
           <div className="text-center py-8">
-            <Calendar className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-            <p className="text-sm text-slate-500">No scheduled maintenance</p>
+            <Calendar className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+            <p className="text-sm text-slate-500 dark:text-slate-400">No scheduled maintenance</p>
           </div>
         )}
       </CardContent>

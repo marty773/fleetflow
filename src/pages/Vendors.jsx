@@ -139,9 +139,9 @@ export default function Vendors() {
         {/* View Vendor Dialog */}
         {viewingVendor && (
           <Dialog open={!!viewingVendor} onOpenChange={() => setViewingVendor(null)}>
-            <DialogContent className="max-w-md dark:bg-slate-800 dark:border-slate-700">
+            <DialogContent className="max-w-md bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
               <DialogHeader>
-                <DialogTitle className="dark:text-white">{viewingVendor.name}</DialogTitle>
+                <DialogTitle className="text-slate-900 dark:text-white">{viewingVendor.name}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 {viewingVendor.contact_person && (
@@ -195,7 +195,7 @@ export default function Vendors() {
                   </div>
                 )}
               </div>
-              <div className="flex gap-2 mt-6 pt-4 border-t dark:border-slate-700">
+              <div className="flex gap-2 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <Button 
                   variant="outline" 
                   onClick={() => setViewingVendor(null)}

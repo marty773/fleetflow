@@ -12,9 +12,9 @@ export default function CompanySelector({ value, onChange }) {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm">
-        <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-        <span className="text-sm text-slate-500 dark:text-slate-400">Loading...</span>
+      <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm">
+        <Building2 className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+        <span className="text-sm text-slate-600 dark:text-slate-400">Loading...</span>
       </div>
     );
   }
@@ -22,9 +22,9 @@ export default function CompanySelector({ value, onChange }) {
   // If user only has access to one company, show it as static text
   if (allowedCompanies.length === 1) {
     return (
-      <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm">
-        <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-        <span className="font-medium dark:text-white">{allowedCompanies[0]}</span>
+      <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm">
+        <Building2 className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+        <span className="font-medium text-slate-900 dark:text-white">{allowedCompanies[0]}</span>
       </div>
     );
   }
@@ -35,10 +35,10 @@ export default function CompanySelector({ value, onChange }) {
       <>
         <button
           onClick={() => setDrawerOpen(true)}
-          className="flex items-center gap-2 w-full bg-white dark:bg-slate-950 border dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 transition"
+          className="flex items-center gap-2 w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 transition"
         >
-          <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-          <span className="font-medium dark:text-white flex-1 text-left text-sm">{value}</span>
+          <Building2 className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+          <span className="font-medium text-slate-900 dark:text-white flex-1 text-left text-sm">{value}</span>
         </button>
         <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
           <DrawerContent>
@@ -71,15 +71,15 @@ export default function CompanySelector({ value, onChange }) {
 
   // Desktop select
   return (
-    <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm">
-      <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+    <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm">
+      <Building2 className="w-4 h-4 text-slate-400 dark:text-slate-500" />
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="border-0 shadow-none focus:ring-0 h-auto p-0 font-medium dark:bg-slate-950 dark:text-white">
+        <SelectTrigger className="border-0 shadow-none focus:ring-0 h-auto p-0 font-medium text-slate-900 dark:bg-slate-950 dark:text-white">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="dark:bg-slate-950 dark:border-slate-800">
+        <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
           {allowedCompanies.map(company => (
-            <SelectItem key={company} value={company} className="dark:text-white dark:hover:bg-slate-900">{company}</SelectItem>
+            <SelectItem key={company} value={company} className="text-slate-900 dark:text-white dark:hover:bg-slate-900">{company}</SelectItem>
           ))}
         </SelectContent>
       </Select>
