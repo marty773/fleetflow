@@ -252,27 +252,27 @@ export default function Items() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 pb-24 lg:pb-0">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 md:p-8 pb-24 lg:pb-0">
       {/* Header */}
       <div className="mb-8 pt-14 lg:pt-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Item Gallery</h1>
-        <p className="text-slate-600">Manage your inventory items for bills and maintenance records</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">Item Gallery</h1>
+        <p className="text-slate-600 dark:text-slate-400">Manage your inventory items for bills and maintenance records</p>
       </div>
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500" />
           <Input
             placeholder="Search items..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10 h-11 bg-white border-slate-200"
+            className="pl-10"
           />
         </div>
 
         <div className="flex gap-2">
-          <div className="flex bg-white border border-slate-200 rounded-lg p-1">
+          <div className="flex bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-1">
             <Button
               variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
               size="icon"
@@ -368,14 +368,14 @@ export default function Items() {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
-          {filteredItems.map(item => (
-            <div
-              key={item.id}
-              className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors cursor-pointer"
-              onClick={() => handleEdit(item)}
-            >
-              <div className="w-16 h-16 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0">
+        <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+           {filteredItems.map(item => (
+             <div
+               key={item.id}
+               className="flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
+               onClick={() => handleEdit(item)}
+             >
+               <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 overflow-hidden flex-shrink-0">
                 {item.photo_url ? (
                   <img
                     src={item.photo_url}
@@ -389,8 +389,8 @@ export default function Items() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-slate-900 truncate">{item.name}</h3>
-                <div className="flex items-center gap-3 text-sm text-slate-500">
+                <h3 className="font-semibold text-slate-900 dark:text-white truncate">{item.name}</h3>
+                <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
                   {item.item_number && <span className="font-mono">#{item.item_number}</span>}
                   {item.vendor && <span>{item.vendor}</span>}
                 </div>
