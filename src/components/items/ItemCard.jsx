@@ -26,7 +26,7 @@ export default function ItemCard({ item, onView, onEdit, onDelete }) {
           <Button
             size="icon"
             variant="secondary"
-            className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
+            className="h-11 w-11 rounded-full bg-white/90 hover:bg-white shadow-lg md:h-10 md:w-10"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(item);
@@ -37,7 +37,7 @@ export default function ItemCard({ item, onView, onEdit, onDelete }) {
           <Button
             size="icon"
             variant="secondary"
-            className="h-10 w-10 rounded-full bg-white/90 hover:bg-red-50 shadow-lg"
+            className="h-11 w-11 rounded-full bg-white/90 hover:bg-red-50 shadow-lg md:h-10 md:w-10"
             onClick={(e) => {
               e.stopPropagation();
               onDelete(item);
@@ -63,8 +63,8 @@ export default function ItemCard({ item, onView, onEdit, onDelete }) {
         <h3 className="font-semibold text-slate-900 truncate">{item.name}</h3>
         
         {item.item_number && (
-          <p className="text-xs text-slate-500 font-mono">#{item.item_number}</p>
-        )}
+           <p className="text-sm text-slate-500 font-mono">#{item.item_number}</p>
+         )}
 
         {item.vendor && (
           <div className="flex items-center gap-1.5 text-sm text-slate-600">

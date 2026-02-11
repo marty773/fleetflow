@@ -80,10 +80,10 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
                   </div>
                 </div>
                 {record.odometer_reading && (
-                  <p className="text-xs text-slate-500 mt-3">
-                    Odometer: {record.odometer_reading} miles
-                  </p>
-                )}
+                   <p className="text-sm text-slate-500 mt-3">
+                     Odometer: {record.odometer_reading} miles
+                   </p>
+                 )}
               </div>
             </div>
           </CardContent>
