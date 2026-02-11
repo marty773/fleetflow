@@ -84,9 +84,25 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
   const handleAddItem = () => {
     if (!newItem.description || newItem.unit_price === 0) return;
     const total = newItem.quantity * newItem.unit_price;
+    const lineItem = {
+      description: newItem.description,
+      quantity: newItem.quantity,
+      unit_price: newItem.unit_price,
+      total,
+      item_quantity: newItem.quantity
+    };
+    
+    // Only include vehicle_id and item_id if they have values
+    if (newItem.vehicle_id) {
+      lineItem.vehicle_id = newItem.vehicle_id;
+    }
+    if (newItem.item_id) {
+      lineItem.item_id = newItem.item_id;
+    }
+    
     setFormData(prev => ({
       ...prev,
-      line_items: [...prev.line_items, { ...newItem, total, item_quantity: newItem.quantity }],
+      line_items: [...prev.line_items, lineItem],
     }));
     setNewItem({ description: '', quantity: 1, unit_price: 0, vehicle_id: '', item_id: '' });
   };
