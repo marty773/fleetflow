@@ -50,15 +50,17 @@ export default function DashboardStats({ stats }) {
                   <p className="text-sm font-medium text-slate-600 mb-2">{stat.label}</p>
                   <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
                 </div>
-                <div 
-                  className={stat.useDynamic ? 'p-3 rounded-lg' : `${stat.bgColor} p-3 rounded-lg`}
-                  style={stat.useDynamic ? { backgroundColor: 'var(--color-primary-light)' } : {}}
-                >
-                  <Icon 
-                    className={stat.useDynamic ? 'w-6 h-6' : `w-6 h-6 ${stat.iconColor}`}
-                    style={stat.useDynamic ? { color: 'var(--color-icon-bg)' } : {}}
-                  />
-                </div>
+                {!stat.hideIcon && (
+                  <div 
+                    className={stat.useDynamic ? 'p-3 rounded-lg' : `${stat.bgColor} p-3 rounded-lg`}
+                    style={stat.useDynamic ? { backgroundColor: 'var(--color-primary-light)' } : {}}
+                  >
+                    <Icon 
+                      className={stat.useDynamic ? 'w-6 h-6' : `w-6 h-6 ${stat.iconColor}`}
+                      style={stat.useDynamic ? { color: 'var(--color-icon-bg)' } : {}}
+                    />
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
