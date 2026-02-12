@@ -2,16 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { Camera } from 'lucide-react';
+import BillDetailDialog from '../dialogs/BillDetailDialog';
 
 export default function RecentExpenses({ bills, vehicles }) {
   const [viewingBill, setViewingBill] = useState(null);
@@ -81,85 +74,12 @@ export default function RecentExpenses({ bills, vehicles }) {
          </div>
        </CardContent>
 
-      {/* View Bill Dialog */}
-      {viewingBill && (
-        <Dialog open={!!viewingBill} onOpenChange={() => setViewingBill(null)}>
-           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
-             <DialogHeader>
-               <DialogTitle className="text-slate-900 dark:text-white">Bill Details</DialogTitle>
-             </DialogHeader>
-            <div className="space-y-4">
-              {viewingBill.photo_url && (
-                <div className="flex justify-center">
-                  <img
-                    src={viewingBill.photo_url}
-                    alt="Bill"
-                    className="max-h-64 rounded-lg object-cover"
-                  />
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-slate-500 dark:text-slate-400">Vendor</Label>
-                  <p className="font-medium dark:text-white">{viewingBill.vendor}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500 dark:text-slate-400">Date</Label>
-                  <p className="font-medium dark:text-white">{format(new Date(viewingBill.bill_date), 'MMM dd, yyyy')}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500 dark:text-slate-400">Bill Number</Label>
-                  <p className="font-medium dark:text-white">{viewingBill.bill_number || '-'}</p>
-                </div>
-                <div>
-                  <Label className="text-slate-500 dark:text-slate-400">Category</Label>
-                  <p className="font-medium dark:text-white capitalize">{viewingBill.category?.replace('_', ' ')}</p>
-                </div>
-              </div>
-              {viewingBill.line_items && viewingBill.line_items.length > 0 && (
-                <div>
-                  <Label className="text-slate-500 dark:text-slate-400 mb-2 block">Line Items</Label>
-                  <div className="border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-700">
-                        <tr>
-                          <th className="text-left p-2 text-slate-900 dark:text-slate-100">Description</th>
-                          <th className="text-center p-2 text-slate-900 dark:text-slate-100">Qty</th>
-                          <th className="text-right p-2 text-slate-900 dark:text-slate-100">Price</th>
-                          <th className="text-right p-2 text-slate-900 dark:text-slate-100">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {viewingBill.line_items.map((item, idx) => (
-                          <tr key={idx} className="border-t border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-900 dark:text-slate-100">
-                            <td className="p-2">{item.description}</td>
-                            <td className="text-center p-2">{item.quantity}</td>
-                            <td className="text-right p-2">${item.unit_price?.toFixed(2)}</td>
-                            <td className="text-right p-2">${item.total?.toFixed(2)}</td>
-                          </tr>
-                        ))}
-                        <tr className="border-t border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 font-semibold text-slate-900 dark:text-slate-100">
-                          <td colSpan={3} className="p-2 text-right">Total:</td>
-                          <td className="text-right p-2">${viewingBill.total_amount?.toFixed(2)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-              {viewingBill.notes && (
-                <div>
-                  <Label className="text-slate-500 dark:text-slate-400">Notes</Label>
-                  <p className="mt-1 dark:text-slate-300">{viewingBill.notes}</p>
-                </div>
-              )}
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button variant="outline" onClick={() => setViewingBill(null)}>Close</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <BillDetailDialog
+        bill={viewingBill}
+        vehicles={vehicles}
+        onClose={() => setViewingBill(null)}
+        onEdit={() => setViewingBill(null)}
+      />
     </Card>
   );
 }
