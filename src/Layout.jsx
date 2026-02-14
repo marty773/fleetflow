@@ -93,19 +93,19 @@ function LayoutContent({ children, currentPageName }) {
         }
       `}</style>
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)] select-none">
+      <div className="fixed top-0 left-0 right-0 z-50 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)]">
         <div className="flex items-center gap-2">
           {isSubPage ? (
             <button
               onClick={() => window.history.back()}
-              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
+              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation relative z-10"
             >
               <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
             </button>
           ) : (
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
+              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation relative z-10"
             >
               {sidebarOpen ? (
                 <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
