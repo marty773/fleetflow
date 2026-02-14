@@ -106,27 +106,25 @@ function LayoutContent({ children, currentPageName }) {
       `}</style>
       {/* Mobile header */}
       <div className="fixed top-0 left-0 right-0 z-[60] lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)]">
-        <div className="flex items-center gap-2 relative z-[60]">
+        <div className="flex items-center gap-2">
           {isSubPage ? (
             <button
               type="button"
               onClick={handleGoBack}
-              className="p-3 -m-1 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation', userSelect: 'none' }}
+              className="p-2 rounded-lg active:bg-slate-200 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
+              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
             </button>
           ) : (
             <button
               type="button"
               onClick={handleToggleSidebar}
-              className="p-3 -m-1 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation', userSelect: 'none' }}
+              className="p-2 rounded-lg active:bg-slate-200 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {sidebarOpen ? (
-                <X className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
+                <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
               ) : (
-                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
+                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100" />
               )}
             </button>
           )}
