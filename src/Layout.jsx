@@ -162,8 +162,8 @@ function LayoutContent({ children, currentPageName }) {
                 <Link
                   key={item.name}
                   to={createPageUrl(item.path)}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  onClick={handleCloseSidebar}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     isActive
                       ? 'border-l-4'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
