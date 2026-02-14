@@ -109,22 +109,24 @@ function LayoutContent({ children, currentPageName }) {
         <div className="flex items-center gap-2 relative z-[60]">
           {isSubPage ? (
             <button
+              type="button"
               onClick={handleGoBack}
-              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
-              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
+              className="p-3 -m-1 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation', userSelect: 'none' }}
             >
-              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
             </button>
           ) : (
             <button
+              type="button"
               onClick={handleToggleSidebar}
-              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
-              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
+              className="p-3 -m-1 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation', userSelect: 'none' }}
             >
               {sidebarOpen ? (
-                <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+                <X className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
               ) : (
-                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
               )}
             </button>
           )}
