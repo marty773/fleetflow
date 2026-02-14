@@ -12,6 +12,7 @@ import { CompanyProvider, useCompany } from '@/components/CompanyContext';
 
 function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [navigationDisabled, setNavigationDisabled] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     if (saved !== null) return saved === 'true';
