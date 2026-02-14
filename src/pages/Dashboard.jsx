@@ -68,13 +68,13 @@ export default function Dashboard() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-14 lg:pt-0">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">Fleet Dashboard</h1>
-            <p className="text-slate-600 dark:text-slate-400">Manage your truck and trailer fleet</p>
-          </div>
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">Fleet Dashboard</h1>
+          <p className="text-slate-600 dark:text-slate-400">Manage your truck and trailer fleet</p>
         </div>
-        
-        <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
+      </div>
+      
+      <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
             <Link to={createPageUrl('Bills')} className="flex-1 sm:flex-none">
               <Button className="w-full sm:w-auto" style={{ backgroundColor: 'var(--color-primary)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}>
                 <Plus className="w-4 h-4 mr-2" /> New Bill
