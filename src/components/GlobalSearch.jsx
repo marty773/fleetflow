@@ -240,9 +240,9 @@ export default function GlobalSearch() {
               </div>
               <button
                 onClick={() => setDialogOpen(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-slate-600" />
+                <X className="w-5 h-5 text-slate-600 dark:text-slate-300" />
               </button>
             </div>
           </div>
