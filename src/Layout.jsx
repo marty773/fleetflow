@@ -188,7 +188,6 @@ function LayoutContent({ children, currentPageName }) {
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={handleCloseSidebar}
-          style={{ touchAction: 'none' }}
         />
       )}
 
