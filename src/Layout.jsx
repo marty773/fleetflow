@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings, ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
 import CompanySelector from '@/components/CompanySelector';
 import BottomTabs from '@/components/mobile/BottomTabs';
@@ -19,6 +19,18 @@ function LayoutContent({ children, currentPageName }) {
   });
   const { selectedCompany, setSelectedCompany } = useCompany();
   const location = useLocation();
+
+  const handleToggleSidebar = useCallback(() => {
+    setSidebarOpen(prev => !prev);
+  }, []);
+
+  const handleCloseSidebar = useCallback(() => {
+    setSidebarOpen(false);
+  }, []);
+
+  const handleGoBack = useCallback(() => {
+    window.history.back();
+  }, []);
 
   const mainTabPaths = ['Dashboard', 'Vehicles', 'Bills', 'Maintenance'];
   const isSubPage = !mainTabPaths.includes(currentPageName);
