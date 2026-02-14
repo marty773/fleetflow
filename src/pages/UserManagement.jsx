@@ -102,17 +102,17 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8 pt-14 lg:pt-0">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">User Management</h1>
-          <p className="text-slate-600">Manage user access and permissions</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">User Management</h1>
+          <p className="text-slate-600 dark:text-slate-400">Manage user access and permissions</p>
         </div>
 
         {/* Invite New User */}
         <Card className="mb-6 border-0 shadow-sm">
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2">
+          <CardHeader className="border-b border-slate-200 dark:border-slate-700">
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
               <UserPlus className="w-5 h-5" />
               Invite New User
             </CardTitle>
@@ -121,7 +121,7 @@ export default function UserManagement() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">Email Address</Label>
                   <Input
                     id="email"
                     type="email"
@@ -132,7 +132,7 @@ export default function UserManagement() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="role" className="text-slate-700 dark:text-slate-300">Role</Label>
                   <Select value={inviteRole} onValueChange={setInviteRole}>
                     <SelectTrigger className="mt-2">
                       <SelectValue />
@@ -146,7 +146,7 @@ export default function UserManagement() {
               </div>
 
               <div>
-                <Label className="mb-3 block">Company Access</Label>
+                <Label className="mb-3 block text-slate-700 dark:text-slate-300">Company Access</Label>
                 <div className="space-y-2">
                   {companies.map(company => (
                     <div key={company} className="flex items-center space-x-2">
@@ -157,7 +157,7 @@ export default function UserManagement() {
                       />
                       <label
                         htmlFor={`invite-${company}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-900 dark:text-slate-100"
                       >
                         {company}
                       </label>
@@ -180,8 +180,8 @@ export default function UserManagement() {
 
         {/* Existing Users */}
         <Card className="border-0 shadow-sm">
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2">
+          <CardHeader className="border-b border-slate-200 dark:border-slate-700">
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
               <Users className="w-5 h-5" />
               Existing Users
             </CardTitle>
@@ -191,18 +191,18 @@ export default function UserManagement() {
               {users.map(user => {
                 const userCompanies = getUserCompanies(user.email);
                 return (
-                  <div key={user.id} className="p-4 bg-slate-50 rounded-lg">
+                  <div key={user.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="font-semibold text-slate-900">{user.full_name}</p>
-                        <p className="text-sm text-slate-600">{user.email}</p>
+                        <p className="font-semibold text-slate-900 dark:text-white">{user.full_name}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{user.email}</p>
                       </div>
                       <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                         {user.role}
                       </Badge>
                     </div>
                     <div>
-                      <Label className="text-xs text-slate-600 mb-2 block">Company Access:</Label>
+                      <Label className="text-xs text-slate-600 dark:text-slate-400 mb-2 block">Company Access:</Label>
                       <div className="flex flex-wrap gap-2">
                         {companies.map(company => {
                           const hasAccess = userCompanies.includes(company);
@@ -221,7 +221,7 @@ export default function UserManagement() {
                               />
                               <label
                                 htmlFor={`${user.email}-${company}`}
-                                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-900 dark:text-slate-100"
                               >
                                 {company}
                               </label>
