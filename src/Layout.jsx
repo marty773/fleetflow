@@ -97,33 +97,17 @@ function LayoutContent({ children, currentPageName }) {
         <div className="flex items-center gap-2 relative z-[60]">
           {isSubPage ? (
             <button
-              onTouchStart={(e) => {
-                e.preventDefault();
-                window.history.back();
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                window.history.back();
-              }}
-              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
+              onClick={() => window.history.back()}
+              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
+              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
             >
               <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
             </button>
           ) : (
             <button
-              onTouchStart={(e) => {
-                e.preventDefault();
-                setSidebarOpen(!sidebarOpen);
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setSidebarOpen(!sidebarOpen);
-              }}
-              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
+              style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
             >
               {sidebarOpen ? (
                 <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
