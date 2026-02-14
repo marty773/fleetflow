@@ -225,9 +225,9 @@ export default function GlobalSearch() {
                       setSearchTriggered(false);
                       setShowResults(false);
                     }}
-                    className="absolute right-16 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 rounded-full transition-colors"
+                    className="absolute right-16 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
                   >
-                    <X className="w-4 h-4 text-slate-400" />
+                    <X className="w-4 h-4 text-slate-400 dark:text-slate-300" />
                   </button>
                 )}
                 <button
