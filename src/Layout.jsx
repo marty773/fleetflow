@@ -68,7 +68,7 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex" style={{ overscrollBehavior: 'none', userSelect: 'none' }}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex">
       <style>{`
         :root {
           --color-primary: ${themeColors.primary};
@@ -178,7 +178,7 @@ function LayoutContent({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full pb-24 lg:pb-0 overflow-x-hidden" style={{ overscrollBehavior: 'none', marginTop: 'env(safe-area-inset-top)', userSelect: 'none' }}>
+      <main className="flex-1 w-full pb-24 lg:pb-0 overflow-x-hidden overflow-y-auto" style={{ marginTop: 'env(safe-area-inset-top)' }}>
         <div 
           className="mt-14 lg:mt-0 hidden lg:flex items-center justify-between px-6 h-14 text-base font-semibold"
           style={{ color: themeColors.primary }}
