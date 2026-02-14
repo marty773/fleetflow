@@ -12,7 +12,6 @@ import { CompanyProvider, useCompany } from '@/components/CompanyContext';
 
 function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [navigationDisabled, setNavigationDisabled] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     if (saved !== null) return saved === 'true';
@@ -98,14 +97,8 @@ function LayoutContent({ children, currentPageName }) {
         <div className="flex items-center gap-2 relative z-[60]">
           {isSubPage ? (
             <button
-              onClick={() => {
-                if (navigationDisabled) return;
-                setNavigationDisabled(true);
-                window.history.back();
-                setTimeout(() => setNavigationDisabled(false), 800);
-              }}
-              disabled={navigationDisabled}
-              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => window.history.back()}
+              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg active:bg-slate-300 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
               style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
             >
               <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
