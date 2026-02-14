@@ -214,7 +214,7 @@ export default function GlobalSearch() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Search vehicles, bills, maintenance, items, vendors..."
-                  className="pl-10 pr-20 py-6 text-base border-2 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="pl-10 pr-20 py-6 text-base border-2 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
                   style={{ borderColor: 'var(--color-primary)' }}
                   autoFocus
                 />
