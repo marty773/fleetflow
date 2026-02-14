@@ -94,29 +94,37 @@ function LayoutContent({ children, currentPageName }) {
       `}</style>
       {/* Mobile header */}
       <div className="fixed top-0 left-0 right-0 z-50 lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)]">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative z-50">
           {isSubPage ? (
             <button
-              onClick={() => window.history.back()}
-              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation relative z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.history.back();
+              }}
+              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation active:scale-95"
+              style={{ pointerEvents: 'auto' }}
             >
-              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
             </button>
           ) : (
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation relative z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSidebarOpen(!sidebarOpen);
+              }}
+              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation active:scale-95"
+              style={{ pointerEvents: 'auto' }}
             >
               {sidebarOpen ? (
-                <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+                <X className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
               ) : (
-                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100" />
+                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
               )}
             </button>
           )}
         </div>
         <div 
-          className="flex-1 text-center text-base font-semibold"
+          className="flex-1 text-center text-base font-semibold pointer-events-none"
           style={{ color: themeColors.primary }}
         >
           {selectedCompany}
