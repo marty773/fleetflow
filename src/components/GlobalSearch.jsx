@@ -205,7 +205,7 @@ export default function GlobalSearch() {
           </button>
         </DialogTrigger>
         <DialogContent className="max-w-2xl p-0 max-h-[85vh]">
-          <div className="p-4 border-b sticky top-0 bg-white z-10">
+          <div className="p-4 border-b sticky top-0 bg-white dark:bg-slate-900 z-10">
             <div className="flex items-center gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
