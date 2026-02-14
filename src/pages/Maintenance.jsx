@@ -351,7 +351,8 @@ export default function Maintenance() {
           </TabsList>
 
           <TabsContent value="records" className="mt-6">
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Records</h2>
               <Button
                 onClick={() => {
                   setEditingRecord(null);
