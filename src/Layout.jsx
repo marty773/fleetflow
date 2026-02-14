@@ -98,27 +98,27 @@ function LayoutContent({ children, currentPageName }) {
           {isSubPage ? (
             <button
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 window.history.back();
               }}
-              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation active:scale-95"
-              style={{ pointerEvents: 'auto' }}
+              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition active:scale-95 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
+              <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
             </button>
           ) : (
             <button
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 setSidebarOpen(!sidebarOpen);
               }}
-              className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition touch-manipulation active:scale-95"
-              style={{ pointerEvents: 'auto' }}
+              className="p-3 -m-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition active:scale-95 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {sidebarOpen ? (
-                <X className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
+                <X className="w-6 h-6 text-slate-900 dark:text-slate-100" />
               ) : (
-                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100 pointer-events-none" />
+                <Menu className="w-6 h-6 text-slate-900 dark:text-slate-100" />
               )}
             </button>
           )}
