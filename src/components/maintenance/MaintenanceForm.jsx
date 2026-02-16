@@ -277,7 +277,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
           {/* Work Items */}
           <div>
             <Label className="mb-3 block">Work Performed</Label>
-            <div className="space-y-3 mb-4 p-4 bg-slate-50 rounded-lg">
+            <div className="space-y-3 mb-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
               <Input
                 placeholder="Work description"
                 value={newItem.description}
@@ -300,8 +300,8 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                   className="select-text"
                 />
               </div>
-              <div className="border-t pt-3 mt-3">
-                <p className="text-sm font-medium text-slate-700 mb-2">Optional: Select from Stock Items</p>
+              <div className="border-t dark:border-slate-700 pt-3 mt-3">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Optional: Select from Stock Items</p>
                 <ResponsiveSelect
                   value={newItem.item_id || 'none'}
                   onValueChange={(value) => {
@@ -334,10 +334,10 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
             </div>
 
             {formData.work_items.length > 0 && (
-              <div className="border rounded-lg overflow-hidden mb-6">
+              <div className="border dark:border-slate-700 rounded-lg overflow-hidden mb-6">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-slate-50">
+                    <TableRow className="bg-slate-50 dark:bg-slate-800">
                       <TableHead>Description</TableHead>
                       <TableHead>Qty</TableHead>
                       <TableHead>Price</TableHead>
@@ -379,7 +379,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                         </TableCell>
                       </TableRow>
                     ))}
-                    <TableRow className="bg-slate-50 font-semibold">
+                    <TableRow className="bg-slate-50 dark:bg-slate-800 font-semibold">
                       <TableCell colSpan={3}>Total:</TableCell>
                       <TableCell>${calculateTotal().toFixed(2)}</TableCell>
                       <TableCell></TableCell>

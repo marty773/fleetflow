@@ -341,9 +341,9 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                      </button>
                    </div>
                  ) : photoPreview.toLowerCase().endsWith('.pdf') ? (
-                   <div className="relative w-full border rounded-lg p-6 bg-slate-50 flex flex-col items-center justify-center gap-3">
-                     <ImageIcon className="w-8 h-8 text-slate-400" />
-                     <p className="text-sm text-slate-600">PDF uploaded</p>
+                   <div className="relative w-full border dark:border-slate-700 rounded-lg p-6 bg-slate-50 dark:bg-slate-800 flex flex-col items-center justify-center gap-3">
+                     <ImageIcon className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                     <p className="text-sm text-slate-600 dark:text-slate-400">PDF uploaded</p>
                      <div className="flex gap-2">
                        <Button 
                          type="button"
@@ -402,11 +402,11 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                  )}
                </div>
               ) : (
-                <label className="flex items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-slate-50">
-                  <div className="text-center">
-                    <Upload className="w-6 h-6 mx-auto text-slate-400 mb-2" />
-                    <span className="text-sm text-slate-600">Click to upload bill photo or PDF</span>
-                  </div>
+               <label className="flex items-center justify-center border-2 border-dashed dark:border-slate-700 rounded-lg p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                 <div className="text-center">
+                   <Upload className="w-6 h-6 mx-auto text-slate-400 dark:text-slate-500 mb-2" />
+                   <span className="text-sm text-slate-600 dark:text-slate-400">Click to upload bill photo or PDF</span>
+                 </div>
                   <input
                     type="file"
                     accept="image/*,.pdf,application/pdf"
@@ -422,7 +422,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
           {/* Line Items */}
           <div>
             <Label className="mb-3 block">Line Items</Label>
-            <div className="space-y-3 mb-4 p-4 bg-slate-50 rounded-lg">
+            <div className="space-y-3 mb-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
               <Input
                 placeholder="Item description"
                 value={newItem.description}
@@ -446,8 +446,8 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                 />
               </div>
 
-              <div className="border-t pt-3 mt-3">
-                <p className="text-sm font-medium text-slate-700 mb-2">Optional: Link to Vehicle or Stock Item</p>
+              <div className="border-t dark:border-slate-700 pt-3 mt-3">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Optional: Link to Vehicle or Stock Item</p>
                 <div className="grid grid-cols-2 gap-2">
                   <ResponsiveSelect
                     value={newItem.vehicle_id || ''}
@@ -556,10 +556,10 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
             </div>
 
             {formData.line_items.length > 0 && (
-              <div className="border rounded-lg overflow-x-auto">
+              <div className="border dark:border-slate-700 rounded-lg overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-slate-50">
+                    <TableRow className="bg-slate-50 dark:bg-slate-800">
                       <TableHead>Description</TableHead>
                       <TableHead>Qty</TableHead>
                       <TableHead>Price</TableHead>
@@ -609,7 +609,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                         </TableRow>
                       );
                     })}
-                    <TableRow className="bg-slate-50 font-semibold">
+                    <TableRow className="bg-slate-50 dark:bg-slate-800 font-semibold">
                       <TableCell colSpan={3}>Total:</TableCell>
                       <TableCell>${calculateTotal().toFixed(2)}</TableCell>
                       <TableCell colSpan={3}></TableCell>
@@ -676,14 +676,14 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                       </Button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors">
+                    <label className="flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors">
                       {photoUploading ? (
-                        <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+                        <Loader2 className="h-8 w-8 text-slate-400 dark:text-slate-500 animate-spin" />
                       ) : (
                         <>
-                          <ImageIcon className="h-10 w-10 text-slate-400 mb-2" />
-                          <span className="text-sm text-slate-600">Click to upload photo</span>
-                          <span className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</span>
+                          <ImageIcon className="h-10 w-10 text-slate-400 dark:text-slate-500 mb-2" />
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Click to upload photo</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 mt-1">PNG, JPG up to 10MB</span>
                         </>
                       )}
                       <input
