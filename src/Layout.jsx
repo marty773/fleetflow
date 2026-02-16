@@ -103,6 +103,12 @@ function LayoutContent({ children, currentPageName }) {
         .dark input::placeholder, .dark textarea::placeholder {
           color: rgb(148, 163, 184);
         }
+        /* Prevent text selection on interactive elements for better mobile UX */
+        button, a, [role="tab"], [role="button"], h1, h2, h3, h4, h5, h6, svg {
+          user-select: none;
+          -webkit-user-select: none;
+          -webkit-touch-callout: none;
+        }
       `}</style>
       {/* Mobile header */}
       <div className="fixed top-0 left-0 right-0 z-[60] lg:hidden flex items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 pt-[env(safe-area-inset-top)]">
@@ -111,6 +117,7 @@ function LayoutContent({ children, currentPageName }) {
             <button
               type="button"
               onClick={handleGoBack}
+              aria-label="Go back"
               className="p-2 rounded-lg active:bg-slate-200 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-slate-100" />
@@ -119,6 +126,7 @@ function LayoutContent({ children, currentPageName }) {
             <button
               type="button"
               onClick={handleToggleSidebar}
+              aria-label={sidebarOpen ? "Close menu" : "Open menu"}
               className="p-2 rounded-lg active:bg-slate-200 dark:active:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {sidebarOpen ? (

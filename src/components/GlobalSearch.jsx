@@ -198,6 +198,7 @@ export default function GlobalSearch() {
       }}>
         <DialogTrigger asChild>
           <button 
+            aria-label="Open search"
             className="fixed bottom-24 right-6 lg:bottom-6 lg:right-6 z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation"
             style={{ backgroundColor: 'var(--color-primary)' }}
           >
@@ -225,6 +226,7 @@ export default function GlobalSearch() {
                       setSearchTriggered(false);
                       setShowResults(false);
                     }}
+                    aria-label="Clear search"
                     className="absolute right-16 top-1/2 transform -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
                   >
                     <X className="w-4 h-4 text-slate-400 dark:text-slate-300" />
@@ -240,6 +242,7 @@ export default function GlobalSearch() {
               </div>
               <button
                 onClick={() => setDialogOpen(false)}
+                aria-label="Close search dialog"
                 className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
                 <X className="w-5 h-5 text-slate-600 dark:text-slate-300" />

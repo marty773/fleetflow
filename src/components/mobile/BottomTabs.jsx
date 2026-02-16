@@ -1,10 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Wrench, Truck, FileText, Home } from 'lucide-react';
 
 export default function BottomTabs({ currentPageName }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const scrollPositions = useRef({});
+
   const tabs = [
     { name: 'Dashboard', path: 'Dashboard', icon: Home },
     { name: 'Vehicles', path: 'Vehicles', icon: Truck },
@@ -12,13 +15,34 @@ export default function BottomTabs({ currentPageName }) {
     { name: 'Maintenance', path: 'Maintenance', icon: Wrench },
   ];
 
+  // Save scroll position when leaving a tab
+  useEffect(() => {
+    const saveScrollPosition = () => {
+      scrollPositions.current[currentPageName] = window.scrollY;
+    };
+
+    window.addEventListener('scroll', saveScrollPosition);
+    return () => window.removeEventListener('scroll', saveScrollPosition);
+  }, [currentPageName]);
+
+  // Restore scroll position when returning to a tab
+  useEffect(() => {
+    const savedPosition = scrollPositions.current[currentPageName];
+    if (savedPosition !== undefined) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, savedPosition);
+      });
+    }
+  }, [location.pathname, currentPageName]);
+
   const handleTabClick = (tab) => {
     const isActive = currentPageName === tab.name;
     if (isActive) {
       // Reset navigation to root view by navigating to the page without params
       navigate(createPageUrl(tab.path), { replace: true });
-      // Scroll to top
+      // Scroll to top and clear saved position
       window.scrollTo(0, 0);
+      scrollPositions.current[tab.name] = 0;
     } else {
       navigate(createPageUrl(tab.path));
     }
@@ -34,6 +58,8 @@ export default function BottomTabs({ currentPageName }) {
             <button
               key={tab.name}
               onClick={() => handleTabClick(tab)}
+              aria-label={`Navigate to ${tab.name}`}
+              aria-current={isActive ? 'page' : undefined}
               className={`flex flex-col items-center justify-center px-4 flex-1 transition-colors ${
                  isActive
                    ? 'text-amber-600 border-t-2 border-amber-600'
