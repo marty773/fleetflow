@@ -261,7 +261,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                 )}
               </div>
 
-            <div className="w-full min-w-0">
+            <div className="w-full overflow-hidden">
               <Label htmlFor="bill_date">Bill Date *</Label>
               <Input
                 id="bill_date"
@@ -269,8 +269,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                 value={formData.bill_date}
                 onChange={(e) => handleChange('bill_date', e.target.value)}
                 required
-                className="mt-2 select-text"
-                style={{ minWidth: 0 }}
+                className="mt-2 select-text max-w-full"
               />
             </div>
 

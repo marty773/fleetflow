@@ -220,7 +220,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               />
             </div>
 
-            <div className="w-full min-w-0">
+            <div className="w-full overflow-hidden">
               <Label htmlFor="performed_date">Date Performed *</Label>
               <Input
                 id="performed_date"
@@ -228,8 +228,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 value={formData.performed_date}
                 onChange={(e) => handleChange('performed_date', e.target.value)}
                 required
-                className="mt-2 select-text"
-                style={{ minWidth: 0 }}
+                className="mt-2 select-text max-w-full"
               />
             </div>
 
