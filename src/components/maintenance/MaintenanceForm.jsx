@@ -85,6 +85,26 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
     item_id: '',
   });
 
+  // Update form data when record prop changes (important for editing)
+  React.useEffect(() => {
+    if (record) {
+      setFormData(initializeFormData());
+    } else {
+      setFormData({
+        vehicle_id: '',
+        maintenance_type: 'oil_change',
+        title: '',
+        performed_date: new Date().toISOString().split('T')[0],
+        vendor: '',
+        work_items: [],
+        parts_used: [],
+        total_cost: 0,
+        odometer_reading: '',
+        notes: '',
+      });
+    }
+  }, [record]);
+
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };

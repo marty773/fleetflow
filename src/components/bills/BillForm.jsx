@@ -56,6 +56,26 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
   });
 
   const [photoPreview, setPhotoPreview] = useState(bill?.photo_url || '');
+
+  // Update form data when bill prop changes (important for editing)
+  React.useEffect(() => {
+    if (bill) {
+      setFormData(bill);
+      setPhotoPreview(bill.photo_url || '');
+    } else {
+      setFormData({
+        vendor: '',
+        bill_date: new Date().toISOString().split('T')[0],
+        bill_number: '',
+        category: 'maintenance',
+        line_items: [],
+        total_amount: 0,
+        photo_url: '',
+        notes: '',
+      });
+      setPhotoPreview('');
+    }
+  }, [bill]);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [newItem, setNewItem] = useState({
     description: '',
