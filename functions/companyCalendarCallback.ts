@@ -18,6 +18,8 @@ Deno.serve(async (req) => {
 
     const { company_id, user_email } = JSON.parse(state);
 
+    console.log('Using redirect_uri:', REDIRECT_URI);
+    
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -30,10 +32,11 @@ Deno.serve(async (req) => {
       }),
     });
 
+    console.log('Token response status:', tokenResponse.status);
     const tokens = await tokenResponse.json();
+    console.log('Token response:', JSON.stringify(tokens, null, 2));
 
     if (!tokens.access_token) {
-      console.error('Google token error:', JSON.stringify(tokens, null, 2));
       throw new Error(`Failed to get access token: ${tokens.error || 'Unknown error'} - ${tokens.error_description || ''}`);
     }
 
