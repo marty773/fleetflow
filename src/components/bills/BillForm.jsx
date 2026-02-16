@@ -135,11 +135,9 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
 
     setPhotoUploading(true);
     try {
-      // Upload original file first
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
       if (file.type === 'application/pdf') {
-        // PDF files go to Google Drive
         const response = await base44.functions.invoke('uploadToGoogleDrive', {
           fileUrl: file_url,
           fileName: file.name
@@ -147,31 +145,16 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
         handleChange('photo_url', response.data.preview_url);
         setPhotoPreview(response.data.preview_url);
       } else {
-        // Images: Use AI to scan, crop, remove background, correct orientation, and convert to PDF
-        const result = await base44.integrations.Core.InvokeLLM({
-          prompt: `Analyze this document/receipt image and:
-1. Detect if it needs rotation (check text orientation) and rotate to correct upright position
-2. Extract and crop only the document/receipt, removing all background
-3. Output a clean, high-contrast scan with white/transparent background removed
-4. Preserve all text clarity and readability
-
-Return a perfectly cropped, oriented document scan.`,
-          file_urls: [file_url],
-          add_context_from_internet: false
-        });
-        
-        // Generate cleaned/cropped version
         const { url: processedUrl } = await base44.integrations.Core.GenerateImage({
-          prompt: "Create a clean document scan: remove background completely, ensure text is straight and readable, correct orientation if needed, crop to document edges only. Output should look like a professional scanner output with no background.",
+          prompt: "Scan and clean this document: crop to document edges only, remove all background, correct orientation if text is sideways or upside down, straighten if tilted, enhance contrast for readability. Output a clean professional scan.",
           existing_image_urls: [file_url]
         });
-        
         handleChange('photo_url', processedUrl);
         setPhotoPreview(processedUrl);
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Failed to process file. Please try again.');
+      alert('Failed to upload file. Please try again.');
     } finally {
       setPhotoUploading(false);
     }
@@ -271,10 +254,10 @@ Return a perfectly cropped, oriented document scan.`,
                   <Input
                     id="vendor"
                     placeholder="e.g., Joe's Repair Shop"
-                    value={formData.vendor || ''}
+                    value={formData.vendor}
                     onChange={(e) => handleChange('vendor', e.target.value)}
                     required
-                    className="mt-2 select-text w-full"
+                    className="mt-2 select-text"
                   />
                 )}
               </div>
@@ -284,10 +267,11 @@ Return a perfectly cropped, oriented document scan.`,
               <Input
                 id="bill_date"
                 type="date"
-                value={formData.bill_date || ''}
+                value={formData.bill_date}
                 onChange={(e) => handleChange('bill_date', e.target.value)}
                 required
-                className="mt-2 select-text w-full max-w-full"
+                className="mt-2 select-text"
+                style={{ minWidth: 0 }}
               />
             </div>
 
@@ -296,9 +280,9 @@ Return a perfectly cropped, oriented document scan.`,
               <Input
                 id="bill_number"
                 placeholder="Invoice #"
-                value={formData.bill_number || ''}
+                value={formData.bill_number}
                 onChange={(e) => handleChange('bill_number', e.target.value)}
-                className="mt-2 select-text w-full"
+                className="mt-2 select-text"
               />
             </div>
 
@@ -434,30 +418,32 @@ Return a perfectly cropped, oriented document scan.`,
             <div className="space-y-3 mb-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
               <Input
                 placeholder="Item description"
-                value={newItem.description || ''}
+                value={newItem.description}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                className="select-text w-full"
+                className="select-text"
               />
               <div className="grid grid-cols-2 gap-2">
                 <Input
                   type="number"
                   placeholder="Qty"
-                  value={newItem.quantity || ''}
+                  value={newItem.quantity}
                   onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
-                  className="select-text w-full"
+                  className="select-text"
+                  style={{ minWidth: 0 }}
                 />
                 <Input
                   type="number"
                   placeholder="Unit Price"
-                  value={newItem.unit_price || ''}
+                  value={newItem.unit_price}
                   onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
-                  className="select-text w-full"
+                  className="select-text"
+                  style={{ minWidth: 0 }}
                 />
               </div>
 
               <div className="border-t dark:border-slate-700 pt-3 mt-3">
                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Optional: Link to Vehicle or Stock Item</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2">
                   <ResponsiveSelect
                     value={newItem.vehicle_id || ''}
                     onValueChange={(value) => setNewItem({ ...newItem, vehicle_id: value === 'none' ? '' : value })}
@@ -479,11 +465,13 @@ Return a perfectly cropped, oriented document scan.`,
                           variant="outline"
                           role="combobox"
                           aria-expanded={itemSearchOpen}
-                          className="flex-1 justify-between"
+                          className="flex-1 justify-between min-w-0"
                         >
-                          {newItem.item_id
-                            ? items.find((item) => item.id === newItem.item_id)?.name
-                            : "Stock Item (optional)"}
+                          <span className="truncate">
+                            {newItem.item_id
+                              ? items.find((item) => item.id === newItem.item_id)?.name
+                              : "Stock Item (optional)"}
+                          </span>
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
@@ -546,12 +534,13 @@ Return a perfectly cropped, oriented document scan.`,
                       variant="outline"
                       size="sm"
                       onClick={() => setShowNewItemDialog(true)}
+                      className="shrink-0"
                     >
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>
                   </div>
-                  </div>
+                   </div>
 
               <Button
                 type="button"
