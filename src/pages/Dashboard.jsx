@@ -75,21 +75,24 @@ export default function Dashboard() {
       </div>
       
       <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
-        <Link to={createPageUrl('Bills')} className="flex-1 sm:flex-none">
-          <Button className="w-full sm:w-auto" style={{ backgroundColor: 'var(--color-primary)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}>
-            <Plus className="w-4 h-4 mr-2" /> New Bill
-          </Button>
-        </Link>
-        <Link to={createPageUrl('Maintenance')} className="flex-1 sm:flex-none">
-          <Button 
-            className="w-full sm:w-auto"
-            style={{ backgroundColor: 'var(--color-primary)' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
-          >
-            <Plus className="w-4 h-4 mr-2" /> New Maintenance
-          </Button>
-        </Link>
+        <Button 
+          onClick={() => window.location.href = createPageUrl('Bills') + '?new=true'}
+          className="flex-1 sm:flex-none" 
+          style={{ backgroundColor: 'var(--color-primary)' }} 
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'} 
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+        >
+          <Plus className="w-4 h-4 mr-2" /> New Bill
+        </Button>
+        <Button 
+          onClick={() => window.location.href = createPageUrl('Maintenance') + '?new=true'}
+          className="flex-1 sm:flex-none"
+          style={{ backgroundColor: 'var(--color-primary)' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+        >
+          <Plus className="w-4 h-4 mr-2" /> New Maintenance
+        </Button>
       </div>
 
       {/* Stats */}

@@ -88,7 +88,7 @@ export default function Maintenance() {
     const editId = urlParams.get('edit');
     const editIntervalId = urlParams.get('editInterval');
     const calendarConnectedParam = urlParams.get('calendar_connected');
-    const returnTo = urlParams.get('returnTo');
+    const newParam = urlParams.get('new');
     
     if (calendarConnectedParam === 'true') {
       setCalendarConnected(true);
@@ -96,7 +96,12 @@ export default function Maintenance() {
       window.history.replaceState({}, '', window.location.pathname);
     }
     
-    if (editId && records.length > 0) {
+    if (newParam === 'true') {
+      setEditingRecord(null);
+      setShowRecordForm(true);
+      setActiveTab('records');
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (editId && records.length > 0) {
       const record = records.find(r => r.id === editId);
       if (record) {
         setEditingRecord(record);

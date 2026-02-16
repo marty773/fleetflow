@@ -68,20 +68,23 @@ export default function Bills() {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
     const editId = urlParams.get('edit');
+    const newParam = urlParams.get('new');
     
-    if (editId && bills.length > 0) {
+    if (newParam === 'true') {
+      setEditingBill(null);
+      setShowForm(true);
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (editId && bills.length > 0) {
       const bill = bills.find(b => b.id === editId);
       if (bill) {
         setEditingBill(bill);
         setShowForm(true);
-        // Clean up URL to prevent conflicts
         window.history.replaceState({}, '', window.location.pathname);
       }
     } else if (viewId && bills.length > 0) {
       const bill = bills.find(b => b.id === viewId);
       if (bill) {
         setViewingBill(bill);
-        // Clean up URL to prevent conflicts
         window.history.replaceState({}, '', window.location.pathname);
       }
     }
