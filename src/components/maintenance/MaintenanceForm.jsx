@@ -170,7 +170,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
       <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+            <div className="w-full min-w-0">
                 <Label htmlFor="vehicle_id">Vehicle *</Label>
                 <div className="mt-2">
                   <ResponsiveSelect
@@ -188,7 +188,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 </div>
               </div>
 
-            <div>
+            <div className="w-full min-w-0">
               <Label htmlFor="maintenance_type">Type *</Label>
               <div className="mt-2">
                 <ResponsiveSelect
@@ -208,27 +208,27 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               </div>
             </div>
 
-            <div>
+            <div className="w-full min-w-0">
               <Label htmlFor="title">Title *</Label>
               <Input
                 id="title"
                 placeholder="e.g., Regular Service"
-                value={formData.title}
+                value={formData.title || ''}
                 onChange={(e) => handleChange('title', e.target.value)}
                 required
-                className="mt-2 select-text"
+                className="mt-2 select-text w-full"
               />
             </div>
 
-            <div>
+            <div className="w-full min-w-0">
               <Label htmlFor="performed_date">Date Performed *</Label>
               <Input
                 id="performed_date"
                 type="date"
-                value={formData.performed_date}
+                value={formData.performed_date || ''}
                 onChange={(e) => handleChange('performed_date', e.target.value)}
                 required
-                className="mt-2 select-text"
+                className="mt-2 select-text w-full max-w-full"
               />
             </div>
 
@@ -280,24 +280,24 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
             <div className="space-y-3 mb-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
               <Input
                 placeholder="Work description"
-                value={newItem.description}
+                value={newItem.description || ''}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                className="select-text"
+                className="select-text w-full"
               />
               <div className="grid grid-cols-2 gap-2">
                 <Input
                   type="number"
                   placeholder="Qty"
-                  value={newItem.quantity}
+                  value={newItem.quantity || ''}
                   onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
-                  className="select-text"
+                  className="select-text w-full"
                 />
                 <Input
                   type="number"
                   placeholder="Price"
-                  value={newItem.unit_price}
+                  value={newItem.unit_price || ''}
                   onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
-                  className="select-text"
+                  className="select-text w-full"
                 />
               </div>
               <div className="border-t dark:border-slate-700 pt-3 mt-3">

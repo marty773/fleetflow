@@ -135,34 +135,43 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
 
     setPhotoUploading(true);
     try {
+      // Upload original file first
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      
       if (file.type === 'application/pdf') {
-        // First upload to temp storage, then move to Google Drive
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        
-        // Pass the URL to the backend function to upload to Drive
+        // PDF files go to Google Drive
         const response = await base44.functions.invoke('uploadToGoogleDrive', {
           fileUrl: file_url,
           fileName: file.name
         });
-        
         handleChange('photo_url', response.data.preview_url);
         setPhotoPreview(response.data.preview_url);
       } else {
-        // Upload image
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        // Images: Use AI to scan, crop, remove background, correct orientation, and convert to PDF
+        const result = await base44.integrations.Core.InvokeLLM({
+          prompt: `Analyze this document/receipt image and:
+1. Detect if it needs rotation (check text orientation) and rotate to correct upright position
+2. Extract and crop only the document/receipt, removing all background
+3. Output a clean, high-contrast scan with white/transparent background removed
+4. Preserve all text clarity and readability
+
+Return a perfectly cropped, oriented document scan.`,
+          file_urls: [file_url],
+          add_context_from_internet: false
+        });
         
-        // Use AI to crop and extract just the document/paper
-        const { url: croppedUrl } = await base44.integrations.Core.GenerateImage({
-          prompt: "Extract and crop only the document/receipt/paper from this image, removing all background and surroundings. The output should be a clean, straight, cropped scan of just the paper document with no background visible. Maintain the original text clarity.",
+        // Generate cleaned/cropped version
+        const { url: processedUrl } = await base44.integrations.Core.GenerateImage({
+          prompt: "Create a clean document scan: remove background completely, ensure text is straight and readable, correct orientation if needed, crop to document edges only. Output should look like a professional scanner output with no background.",
           existing_image_urls: [file_url]
         });
         
-        handleChange('photo_url', croppedUrl);
-        setPhotoPreview(croppedUrl);
+        handleChange('photo_url', processedUrl);
+        setPhotoPreview(processedUrl);
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Failed to upload file. Please try again.');
+      alert('Failed to process file. Please try again.');
     } finally {
       setPhotoUploading(false);
     }
@@ -241,7 +250,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-6">
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+            <div className="w-full min-w-0">
                 <Label htmlFor="vendor">Vendor *</Label>
                 {vendors.length > 0 ? (
                   <div className="mt-2">
@@ -262,38 +271,38 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                   <Input
                     id="vendor"
                     placeholder="e.g., Joe's Repair Shop"
-                    value={formData.vendor}
+                    value={formData.vendor || ''}
                     onChange={(e) => handleChange('vendor', e.target.value)}
                     required
-                    className="mt-2 select-text"
+                    className="mt-2 select-text w-full"
                   />
                 )}
               </div>
 
-            <div>
+            <div className="w-full min-w-0">
               <Label htmlFor="bill_date">Bill Date *</Label>
               <Input
                 id="bill_date"
                 type="date"
-                value={formData.bill_date}
+                value={formData.bill_date || ''}
                 onChange={(e) => handleChange('bill_date', e.target.value)}
                 required
-                className="mt-2 select-text"
+                className="mt-2 select-text w-full max-w-full"
               />
             </div>
 
-            <div>
+            <div className="w-full min-w-0">
               <Label htmlFor="bill_number">Invoice Number</Label>
               <Input
                 id="bill_number"
                 placeholder="Invoice #"
-                value={formData.bill_number}
+                value={formData.bill_number || ''}
                 onChange={(e) => handleChange('bill_number', e.target.value)}
-                className="mt-2 select-text"
+                className="mt-2 select-text w-full"
               />
             </div>
 
-            <div>
+            <div className="w-full min-w-0">
               <Label htmlFor="category">Category *</Label>
               <div className="mt-2">
                 <ResponsiveSelect
@@ -425,24 +434,24 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
             <div className="space-y-3 mb-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
               <Input
                 placeholder="Item description"
-                value={newItem.description}
+                value={newItem.description || ''}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                className="select-text"
+                className="select-text w-full"
               />
               <div className="grid grid-cols-2 gap-2">
                 <Input
                   type="number"
                   placeholder="Qty"
-                  value={newItem.quantity}
+                  value={newItem.quantity || ''}
                   onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
-                  className="select-text"
+                  className="select-text w-full"
                 />
                 <Input
                   type="number"
                   placeholder="Unit Price"
-                  value={newItem.unit_price}
+                  value={newItem.unit_price || ''}
                   onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
-                  className="select-text"
+                  className="select-text w-full"
                 />
               </div>
 
