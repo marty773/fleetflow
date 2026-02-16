@@ -33,8 +33,8 @@ Deno.serve(async (req) => {
     const tokens = await tokenResponse.json();
 
     if (!tokens.access_token) {
-      console.error('Token response:', tokens);
-      throw new Error('Failed to get access token');
+      console.error('Google token error:', JSON.stringify(tokens, null, 2));
+      throw new Error(`Failed to get access token: ${tokens.error || 'Unknown error'} - ${tokens.error_description || ''}`);
     }
 
     console.log('Tokens received successfully');
