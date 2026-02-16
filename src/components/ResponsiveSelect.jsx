@@ -23,7 +23,7 @@ export default function ResponsiveSelect({ value, onValueChange, placeholder, ch
           onClick={() => setOpen(true)}
           className="w-full justify-start text-left font-normal select-text"
         >
-          {children?.props?.children?.find(child => child?.props?.value === value)?.props?.children || placeholder}
+          {React.Children.toArray(children).find(child => child?.props?.value === value)?.props?.children || placeholder}
         </Button>
       </div>
 
