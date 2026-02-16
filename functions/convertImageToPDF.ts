@@ -32,11 +32,13 @@ Deno.serve(async (req) => {
     // For images: Use AI to crop background and fix orientation
     console.log('Processing image with AI...');
     const aiResult = await base44.integrations.Core.GenerateImage({
-      prompt: `Clean up this receipt/document image by:
-1. Rotating it to the correct upright orientation if needed
-2. Cropping out any background, keeping only the document/receipt itself
-3. Enhance contrast slightly for better readability
-Keep all text and details intact. Output should be a clean, properly oriented document scan.`,
+      prompt: `Transform this receipt/document photo into a clean scan:
+- ROTATE the image so all text reads upright (0°, 90°, 180°, or 270°)
+- CROP tightly to remove ALL background - only the document should remain
+- Fill the entire frame with just the document
+- Slightly enhance contrast for readability
+- Preserve all text and details exactly as shown
+The output must be a properly oriented, tightly cropped document with no background visible.`,
       existing_image_urls: [fileUrl]
     });
 
