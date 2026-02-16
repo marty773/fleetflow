@@ -15,17 +15,43 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'fileUrl is required' }, { status: 400 });
     }
 
-    // Simple approach: just upload the file directly to Google Drive
-    // No AI processing, no complex transformations
+    // If it's a PDF, just upload directly without processing
+    if (fileUrl.toLowerCase().endsWith('.pdf')) {
+      const driveUploadResponse = await base44.functions.invoke('uploadToGoogleDrive', {
+        fileUrl: fileUrl,
+        fileName: fileName || 'document'
+      });
+      
+      return Response.json({
+        preview_url: driveUploadResponse.data.preview_url,
+        file_type: 'pdf',
+        message: 'PDF uploaded to Google Drive successfully'
+      });
+    }
+
+    // For images: Use AI to crop background and fix orientation
+    console.log('Processing image with AI...');
+    const aiResult = await base44.integrations.Core.GenerateImage({
+      prompt: `Clean up this receipt/document image by:
+1. Rotating it to the correct upright orientation if needed
+2. Cropping out any background, keeping only the document/receipt itself
+3. Enhance contrast slightly for better readability
+Keep all text and details intact. Output should be a clean, properly oriented document scan.`,
+      existing_image_urls: [fileUrl]
+    });
+
+    console.log('AI processing complete, uploading to Drive...');
+    
+    // Upload the AI-processed image to Google Drive
     const driveUploadResponse = await base44.functions.invoke('uploadToGoogleDrive', {
-      fileUrl: fileUrl,
-      fileName: fileName || 'document'
+      fileUrl: aiResult.url,
+      fileName: fileName || 'receipt'
     });
     
     return Response.json({
       preview_url: driveUploadResponse.data.preview_url,
-      file_type: fileUrl.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image',
-      message: 'Document uploaded to Google Drive successfully'
+      file_type: 'image',
+      message: 'Image processed and uploaded successfully'
     });
 
   } catch (error) {
