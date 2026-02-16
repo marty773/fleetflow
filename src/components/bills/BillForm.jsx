@@ -145,12 +145,11 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
         handleChange('photo_url', response.data.preview_url);
         setPhotoPreview(response.data.preview_url);
       } else {
-        const { url: processedUrl } = await base44.integrations.Core.GenerateImage({
-          prompt: "Scan and clean this document: crop to document edges only, remove all background, correct orientation if text is sideways or upside down, straighten if tilted, enhance contrast for readability. Output a clean professional scan.",
-          existing_image_urls: [file_url]
+        const response = await base44.functions.invoke('convertImageToPDF', {
+          fileUrl: file_url
         });
-        handleChange('photo_url', processedUrl);
-        setPhotoPreview(processedUrl);
+        handleChange('photo_url', response.data.processedImageUrl);
+        setPhotoPreview(response.data.processedImageUrl);
       }
     } catch (error) {
       console.error('Upload error:', error);
