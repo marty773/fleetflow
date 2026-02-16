@@ -137,20 +137,13 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
-      if (file.type === 'application/pdf') {
-        const response = await base44.functions.invoke('uploadToGoogleDrive', {
-          fileUrl: file_url,
-          fileName: file.name
-        });
-        handleChange('photo_url', response.data.preview_url);
-        setPhotoPreview(response.data.preview_url);
-      } else {
-        const response = await base44.functions.invoke('convertImageToPDF', {
-          fileUrl: file_url
-        });
-        handleChange('photo_url', response.data.processedImageUrl);
-        setPhotoPreview(response.data.processedImageUrl);
-      }
+      // Always convert through convertImageToPDF - it handles both images and PDFs
+      const response = await base44.functions.invoke('convertImageToPDF', {
+        fileUrl: file_url,
+        fileName: file.name.replace(/\.[^/.]+$/, '') // Remove file extension
+      });
+      handleChange('photo_url', response.data.preview_url);
+      setPhotoPreview(response.data.preview_url);
     } catch (error) {
       console.error('Upload error:', error);
       alert('Failed to upload file. Please try again.');
