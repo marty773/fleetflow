@@ -28,6 +28,8 @@ import ItemDetailDialog from '@/components/dialogs/ItemDetailDialog';
 import BillDetailDialog from '@/components/dialogs/BillDetailDialog';
 import MaintenanceRecordDetailDialog from '@/components/dialogs/MaintenanceRecordDetailDialog';
 import { useCompany } from '@/components/CompanyContext';
+import PageTransition from '@/components/PageTransition';
+import PullToRefresh from '@/components/PullToRefresh';
 
 export default function Items() {
   const navigate = useNavigate();
@@ -198,6 +200,10 @@ export default function Items() {
     queryClient.invalidateQueries({ queryKey: ['items'] });
   };
 
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries();
+  };
+
   const recalculateInventory = async () => {
     if (!confirm('This will recalculate all inventory quantities based on bills and maintenance records. Continue?')) {
       return;
@@ -252,7 +258,9 @@ export default function Items() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 md:p-8 pb-24 lg:pb-0">
+    <PageTransition>
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 md:p-8 pb-24 lg:pb-0">
       {/* Header */}
       <div className="mb-8 pt-14 lg:pt-0">
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">Item Gallery</h1>
@@ -267,7 +275,7 @@ export default function Items() {
             placeholder="Search items..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 select-text"
           />
         </div>
 
@@ -304,6 +312,7 @@ export default function Items() {
             size="icon"
             className="h-11 w-11"
             title="Recalculate Inventory"
+            aria-label="Recalculate inventory"
           >
             {recalculating ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -515,6 +524,8 @@ export default function Items() {
           setPhotoLightbox(url);
         }}
       />
-    </div>
+        </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Settings, LogOut, Trash2 } from 'lucide-react';
+import PageTransition from '@/components/PageTransition';
 
 export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
@@ -33,7 +34,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-32 lg:pb-8">
+    <PageTransition>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-32 lg:pb-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Settings className="w-6 h-6 text-amber-600" />
@@ -135,6 +137,7 @@ export default function SettingsPage() {
           </div>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </PageTransition>
   );
 }

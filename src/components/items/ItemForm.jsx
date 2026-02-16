@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ResponsiveSelect from '@/components/ResponsiveSelect';
 import { X } from 'lucide-react';
 
 export default function ItemForm({ item, onSubmit, onCancel, isLoading }) {
@@ -45,7 +45,7 @@ export default function ItemForm({ item, onSubmit, onCancel, isLoading }) {
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 required
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
@@ -65,19 +65,20 @@ export default function ItemForm({ item, onSubmit, onCancel, isLoading }) {
 
             <div>
               <Label htmlFor="category">Category</Label>
-              <Select value={formData.category} onValueChange={(value) => handleChange('category', value)}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fuel">Fuel</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                  <SelectItem value="repairs">Repairs</SelectItem>
-                  <SelectItem value="parts">Parts</SelectItem>
-                  <SelectItem value="labor">Labor</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+              <ResponsiveSelect
+                value={formData.category}
+                onValueChange={(value) => handleChange('category', value)}
+                placeholder="Select category"
+                options={[
+                  { value: 'fuel', label: 'Fuel' },
+                  { value: 'maintenance', label: 'Maintenance' },
+                  { value: 'repairs', label: 'Repairs' },
+                  { value: 'parts', label: 'Parts' },
+                  { value: 'labor', label: 'Labor' },
+                  { value: 'other', label: 'Other' }
+                ]}
+                className="mt-2"
+              />
             </div>
 
             <div>
@@ -87,7 +88,7 @@ export default function ItemForm({ item, onSubmit, onCancel, isLoading }) {
                 placeholder="Optional description"
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
           </div>

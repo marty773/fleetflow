@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ResponsiveSelect from '@/components/ResponsiveSelect';
 import { Badge } from '@/components/ui/badge';
 import { Users, Plus, Trash2, UserPlus } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import PageTransition from '@/components/PageTransition';
 
 export default function UserManagement() {
   const [inviteEmail, setInviteEmail] = useState('');
@@ -102,7 +103,8 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6">
+    <PageTransition>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8 pt-14 lg:pt-0">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">User Management</h1>
@@ -128,20 +130,21 @@ export default function UserManagement() {
                     placeholder="user@example.com"
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
-                    className="mt-2"
+                    className="mt-2 select-text"
                   />
                 </div>
                 <div>
                   <Label htmlFor="role" className="text-slate-700 dark:text-slate-300">Role</Label>
-                  <Select value={inviteRole} onValueChange={setInviteRole}>
-                    <SelectTrigger className="mt-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <ResponsiveSelect
+                    value={inviteRole}
+                    onValueChange={setInviteRole}
+                    placeholder="Select role"
+                    options={[
+                      { value: 'user', label: 'User' },
+                      { value: 'admin', label: 'Admin' }
+                    ]}
+                    className="mt-2"
+                  />
                 </div>
               </div>
 
@@ -237,6 +240,7 @@ export default function UserManagement() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </PageTransition>
   );
 }

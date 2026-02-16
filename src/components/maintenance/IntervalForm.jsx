@@ -3,13 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import ResponsiveSelect from '@/components/ResponsiveSelect';
 import { X } from 'lucide-react';
 
 export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, isLoading }) {
@@ -81,21 +75,16 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="vehicle_id">Vehicle *</Label>
-              <Select
+              <ResponsiveSelect
                 value={formData.vehicle_id}
                 onValueChange={(value) => handleChange('vehicle_id', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select vehicle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vehicles.map(v => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name} ({v.license_plate})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Select vehicle"
+                options={vehicles.map(v => ({
+                  value: v.id,
+                  label: `${v.name} (${v.license_plate})`
+                }))}
+                className="mt-2"
+              />
             </div>
 
             <div>
@@ -106,29 +95,27 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 value={formData.interval_name}
                 onChange={(e) => handleChange('interval_name', e.target.value)}
                 required
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
             <div>
               <Label htmlFor="maintenance_type">Type *</Label>
-              <Select
+              <ResponsiveSelect
                 value={formData.maintenance_type}
                 onValueChange={(value) => handleChange('maintenance_type', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="oil_change">Oil Change</SelectItem>
-                  <SelectItem value="filter_change">Filter Change</SelectItem>
-                  <SelectItem value="tire_rotation">Tire Rotation</SelectItem>
-                  <SelectItem value="inspection">Inspection</SelectItem>
-                  <SelectItem value="repair">Repair</SelectItem>
-                  <SelectItem value="cleaning">Cleaning</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+                placeholder="Select type"
+                options={[
+                  { value: 'oil_change', label: 'Oil Change' },
+                  { value: 'filter_change', label: 'Filter Change' },
+                  { value: 'tire_rotation', label: 'Tire Rotation' },
+                  { value: 'inspection', label: 'Inspection' },
+                  { value: 'repair', label: 'Repair' },
+                  { value: 'cleaning', label: 'Cleaning' },
+                  { value: 'other', label: 'Other' }
+                ]}
+                className="mt-2"
+              />
             </div>
 
             <div>
@@ -194,7 +181,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
               placeholder="Additional notes..."
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
-              className="mt-2"
+              className="mt-2 select-text"
             />
           </div>
 

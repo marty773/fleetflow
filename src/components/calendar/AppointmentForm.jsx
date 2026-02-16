@@ -4,13 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import ResponsiveSelect from '@/components/ResponsiveSelect';
 import { X } from 'lucide-react';
 
 export default function AppointmentForm({ appointment, vehicles, onSubmit, onCancel, isLoading }) {
@@ -46,21 +40,16 @@ export default function AppointmentForm({ appointment, vehicles, onSubmit, onCan
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="vehicle_id">Vehicle *</Label>
-              <Select
+              <ResponsiveSelect
                 value={formData.vehicle_id}
                 onValueChange={(value) => handleChange('vehicle_id', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select vehicle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vehicles.map(v => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name} ({v.license_plate})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Select vehicle"
+                options={vehicles.map(v => ({
+                  value: v.id,
+                  label: `${v.name} (${v.license_plate})`
+                }))}
+                className="mt-2"
+              />
             </div>
 
             <div>
@@ -71,7 +60,7 @@ export default function AppointmentForm({ appointment, vehicles, onSubmit, onCan
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
                 required
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
@@ -105,7 +94,7 @@ export default function AppointmentForm({ appointment, vehicles, onSubmit, onCan
                 placeholder="e.g., Joe's Auto Shop"
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
@@ -116,7 +105,7 @@ export default function AppointmentForm({ appointment, vehicles, onSubmit, onCan
                 placeholder="Brief description"
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                className="mt-2"
+                className="mt-2 select-text"
               />
             </div>
 
@@ -127,7 +116,7 @@ export default function AppointmentForm({ appointment, vehicles, onSubmit, onCan
                 placeholder="Additional notes..."
                 value={formData.notes}
                 onChange={(e) => handleChange('notes', e.target.value)}
-                className="mt-2 h-24"
+                className="mt-2 h-24 select-text"
               />
             </div>
           </div>
