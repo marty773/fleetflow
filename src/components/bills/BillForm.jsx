@@ -324,35 +324,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
            <div className="mt-2">
              {photoPreview ? (
                <div className="relative inline-block w-full">
-                 {photoPreview.includes('drive.google.com') ? (
-                   <div className="relative w-full border rounded-lg overflow-hidden">
-                     <iframe
-                       src={`${photoPreview}#toolbar=0&navpanes=0&view=FitH`}
-                       className="w-full h-96 pointer-events-none"
-                       title="PDF Preview"
-                     />
-                     <button
-                       type="button"
-                       onClick={(e) => {
-                         e.preventDefault();
-                         e.stopPropagation();
-                         setPhotoPreview('');
-                         handleChange('photo_url', '');
-                       }}
-                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-lg hover:bg-red-600"
-                     >
-                       <X className="w-4 h-4" />
-                     </button>
-                     <a
-                       href={photoPreview}
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm"
-                     >
-                       Download PDF
-                     </a>
-                   </div>
-                 ) : photoPreview.toLowerCase().endsWith('.pdf') ? (
+                 {photoPreview.toLowerCase().endsWith('.pdf') ? (
                    <div className="relative w-full border dark:border-slate-700 rounded-lg p-6 bg-slate-50 dark:bg-slate-800 flex flex-col items-center justify-center gap-3">
                      <ImageIcon className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                      <p className="text-sm text-slate-600 dark:text-slate-400">PDF uploaded</p>
@@ -392,31 +364,6 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                          Remove
                        </Button>
                      </div>
-                   </div>
-                 ) : photoPreview.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                   <div className="relative inline-block">
-                     <img
-                       src={photoPreview}
-                       alt="Bill preview"
-                       className="h-40 rounded-lg object-cover border"
-                     />
-                     <button
-                       type="button"
-                       onClick={() => {
-                         setPhotoPreview('');
-                         handleChange('photo_url', '');
-                       }}
-                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-lg hover:bg-red-600"
-                     >
-                       <X className="w-4 h-4" />
-                     </button>
-                     <a
-                       href={photoPreview}
-                       download="bill-photo.jpg"
-                       className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm"
-                     >
-                       Download Photo
-                     </a>
                    </div>
                  ) : (
                    <div className="relative inline-block">

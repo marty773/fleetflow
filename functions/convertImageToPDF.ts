@@ -40,18 +40,13 @@ Keep all text and details intact. Output should be a clean, properly oriented do
       existing_image_urls: [fileUrl]
     });
 
-    console.log('AI processing complete, uploading to Drive...');
+    console.log('AI processing complete. URL:', aiResult.url);
     
-    // Upload the AI-processed image to Google Drive
-    const driveUploadResponse = await base44.functions.invoke('uploadToGoogleDrive', {
-      fileUrl: aiResult.url,
-      fileName: fileName || 'receipt'
-    });
-    
+    // Return the AI-processed image URL directly (no Drive upload for images)
     return Response.json({
-      preview_url: driveUploadResponse.data.preview_url,
+      preview_url: aiResult.url,
       file_type: 'image',
-      message: 'Image processed and uploaded successfully'
+      message: 'Image processed successfully'
     });
 
   } catch (error) {
