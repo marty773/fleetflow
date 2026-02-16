@@ -25,8 +25,8 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
     return (
       <Card className="border-2 border-dashed">
         <CardContent className="p-12 text-center">
-          <Clock className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-          <p className="text-slate-600">No maintenance intervals scheduled yet</p>
+          <Clock className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+          <p className="text-slate-600 dark:text-slate-400">No maintenance intervals scheduled yet</p>
         </CardContent>
       </Card>
     );
@@ -65,8 +65,8 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
             <CardContent className="p-4 md:p-6">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap mb-2">
-                    <h3 className="text-base md:text-lg font-semibold text-slate-900">{interval.interval_name}</h3>
+                <div className="flex items-center gap-2 flex-wrap mb-2">
+                  <h3 className="text-base md:text-lg font-semibold text-slate-900 dark:text-white">{interval.interval_name}</h3>
                     <Badge className={maintenanceColors[interval.maintenance_type]}>
                       {interval.maintenance_type?.replace('_', ' ')}
                     </Badge>
@@ -79,27 +79,27 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, is
                   </div>
                   <div className="grid grid-cols-2 gap-3 md:gap-4 mt-3 text-sm">
                     <div>
-                      <p className="text-slate-600">Vehicle</p>
-                      <p className="font-semibold text-slate-900">
+                      <p className="text-slate-600 dark:text-slate-400">Vehicle</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">
                         {vehicleMap[interval.vehicle_id]?.name || 'Unknown'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-slate-600">Interval</p>
-                      <p className="font-semibold text-slate-900">
+                      <p className="text-slate-600 dark:text-slate-400">Interval</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">
                         Every {interval.interval_months} month{interval.interval_months > 1 ? 's' : ''}
                         {interval.interval_miles ? ` / ${interval.interval_miles} mi` : ''}
                       </p>
                     </div>
                     <div>
-                      <p className="text-slate-600">Last Done</p>
-                      <p className="font-semibold text-slate-900">
+                      <p className="text-slate-600 dark:text-slate-400">Last Done</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">
                         {interval.last_performed_date ? format(new Date(interval.last_performed_date), 'MMM dd, yyyy') : 'Not set'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-slate-600">Next Due</p>
-                      <p className="font-semibold text-slate-900">
+                      <p className="text-slate-600 dark:text-slate-400">Next Due</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">
                         {interval.next_due_date ? format(new Date(interval.next_due_date), 'MMM dd, yyyy') : 'Not calculated'}
                       </p>
                     </div>

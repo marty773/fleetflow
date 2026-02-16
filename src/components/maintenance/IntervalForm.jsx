@@ -72,8 +72,8 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     <Card className="mb-6 border-0 shadow-sm">
       <CardHeader className="border-b flex flex-row items-center justify-between">
         <CardTitle>{interval ? 'Edit Interval' : 'Create Maintenance Interval'}</CardTitle>
-        <button onClick={onCancel} className="p-1 hover:bg-slate-100 rounded-lg">
-          <X className="w-5 h-5 text-slate-500" />
+        <button onClick={onCancel} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+          <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
         </button>
       </CardHeader>
       <CardContent className="p-6">
@@ -143,7 +143,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 required
                 className="mt-2"
               />
-              <p className="text-xs text-slate-500 mt-1">How often this maintenance should occur</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">How often this maintenance should occur</p>
             </div>
 
             <div>
@@ -157,7 +157,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 onChange={(e) => handleChange('interval_miles', e.target.value)}
                 className="mt-2"
               />
-              <p className="text-xs text-slate-500 mt-1">Leave empty if not mileage-based</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Leave empty if not mileage-based</p>
             </div>
 
             <div>
@@ -170,7 +170,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 required
                 className="mt-2"
               />
-              <p className="text-xs text-slate-500 mt-1">When was this maintenance last done?</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">When was this maintenance last done?</p>
             </div>
 
             <div>
@@ -183,7 +183,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 onChange={(e) => handleChange('last_performed_mileage', e.target.value)}
                 className="mt-2"
               />
-              <p className="text-xs text-slate-500 mt-1">Odometer reading at last maintenance</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Odometer reading at last maintenance</p>
             </div>
           </div>
 
