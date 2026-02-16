@@ -24,20 +24,15 @@ Deno.serve(async (req) => {
       });
       return Response.json({
         preview_url: driveUploadResponse.data.preview_url,
+        file_type: 'pdf',
         message: 'PDF uploaded to Google Drive successfully'
       });
     }
 
-    // Use AI to process the document image - emphasizing rotation to correct orientation
-    const { url: processedImageUrl } = await base44.integrations.Core.GenerateImage({
-      prompt: "Professional document scan: FIRST detect if upside-down or sideways and auto-rotate to CORRECT UPRIGHT orientation (text should be readable normally), crop precisely to document edges only, remove all background completely, straighten if tilted, enhance text contrast for maximum readability. Output clean white-background scan like a professional scanner. Document MUST be in proper upright orientation with text readable.",
-      existing_image_urls: [fileUrl]
-    });
-
-    // Fetch the processed image
-    const imageResponse = await fetch(processedImageUrl);
+    // Fetch the image
+    const imageResponse = await fetch(fileUrl);
     if (!imageResponse.ok) {
-        throw new Error('Failed to fetch processed image');
+        throw new Error('Failed to fetch image');
     }
     const imageBlob = await imageResponse.blob();
     
@@ -82,7 +77,8 @@ Deno.serve(async (req) => {
     
     return Response.json({ 
       preview_url: driveUploadResponse.data.preview_url,
-      message: 'Document processed and uploaded to Google Drive as PDF successfully'
+      file_type: 'pdf',
+      message: 'Document uploaded to Google Drive as PDF successfully'
     });
 
   } catch (error) {
