@@ -52,7 +52,7 @@ export default function PullToRefresh({ onRefresh, children }) {
   }, [pullDistance, isRefreshing, onRefresh]);
 
   return (
-    <div ref={containerRef} className="h-full overflow-y-auto" style={{ overscrollBehavior: 'none' }}>
+    <div ref={containerRef} style={{ overscrollBehavior: 'none' }}>
       {pullDistance > 0 && (
         <motion.div
           className="flex justify-center items-center py-4"
