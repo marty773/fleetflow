@@ -88,10 +88,12 @@ export default function Items() {
     }
   }, [items]);
 
-  const { data: vendors = [] } = useQuery({
+  const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list(),
   });
+
+  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
