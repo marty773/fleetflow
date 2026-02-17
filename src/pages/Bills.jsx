@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Image as ImageIcon } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
 import PullToRefresh from '../components/PullToRefresh';
 import PageTransition from '../components/PageTransition';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -137,7 +138,38 @@ export default function Bills() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Bill.delete(id),
+    mutationFn: async (id) => {
+      // Find the bill being deleted
+      const billToDelete = allBills.find(b => b.id === id);
+      
+      if (billToDelete) {
+        // Reverse inventory changes
+        const itemQuantityMap = {};
+        (billToDelete.line_items || [])
+          .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
+          .forEach(item => {
+            if (!itemQuantityMap[item.item_id]) {
+              itemQuantityMap[item.item_id] = 0;
+            }
+            itemQuantityMap[item.item_id] += item.item_quantity;
+          });
+
+        // Subtract quantities from inventory
+        for (const [item_id, quantity_to_subtract] of Object.entries(itemQuantityMap)) {
+          const currentItem = items.find(i => i.id === item_id);
+          if (currentItem) {
+            const newQty = Math.max(0, (currentItem.quantity_on_hand || 0) - quantity_to_subtract);
+            await base44.entities.Item.update(item_id, { quantity_on_hand: newQty });
+          }
+        }
+        
+        if (Object.keys(itemQuantityMap).length > 0) {
+          queryClient.invalidateQueries({ queryKey: ['items'] });
+        }
+      }
+      
+      return base44.entities.Bill.delete(id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bills'] });
     },
@@ -145,6 +177,28 @@ export default function Bills() {
 
   const handleSubmit = async (data) => {
     const dataWithCompany = { ...data, company_id: selectedCompany };
+    
+    // If editing, first reverse the old inventory changes
+    if (editingBill) {
+      const oldItemQuantityMap = {};
+      (editingBill.line_items || [])
+        .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
+        .forEach(item => {
+          if (!oldItemQuantityMap[item.item_id]) {
+            oldItemQuantityMap[item.item_id] = 0;
+          }
+          oldItemQuantityMap[item.item_id] += item.item_quantity;
+        });
+
+      // Subtract old quantities
+      for (const [item_id, quantity_to_subtract] of Object.entries(oldItemQuantityMap)) {
+        const currentItem = filteredItems.find(i => i.id === item_id);
+        if (currentItem) {
+          const newQty = Math.max(0, (currentItem.quantity_on_hand || 0) - quantity_to_subtract);
+          await base44.entities.Item.update(item_id, { quantity_on_hand: newQty });
+        }
+      }
+    }
     
     // Group line items by item_id and sum quantities (only for items NOT assigned to vehicles)
     const itemQuantityMap = {};
@@ -157,7 +211,7 @@ export default function Bills() {
         itemQuantityMap[item.item_id] += item.item_quantity;
       });
 
-    // Update inventory using atomic operations
+    // Add new quantities
     for (const [item_id, quantity_to_add] of Object.entries(itemQuantityMap)) {
       const currentItem = filteredItems.find(i => i.id === item_id);
       if (currentItem) {
@@ -166,7 +220,7 @@ export default function Bills() {
       }
     }
     
-    if (Object.keys(itemQuantityMap).length > 0) {
+    if (Object.keys(itemQuantityMap).length > 0 || editingBill) {
       queryClient.invalidateQueries({ queryKey: ['items'] });
     }
 
