@@ -341,13 +341,13 @@ export default function Items() {
         </div>
       ) : filteredItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-            <Package className="h-10 w-10 text-slate-400" />
+          <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+            <Package className="h-10 w-10 text-slate-400 dark:text-slate-500" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-1">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
             {searchQuery ? 'No items found' : 'No items yet'}
           </h3>
-          <p className="text-slate-600 mb-4">
+          <p className="text-slate-600 dark:text-slate-400 mb-4">
             {searchQuery
               ? 'Try adjusting your search'
               : 'Add your first item to get started'}
@@ -385,17 +385,17 @@ export default function Items() {
                onClick={() => setViewingItem(item)}
              >
                <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 overflow-hidden flex-shrink-0">
-                {item.photo_url ? (
-                  <img
-                    src={item.photo_url}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Package className="h-6 w-6 text-slate-300" />
-                  </div>
-                )}
+               {item.photo_url ? (
+                 <img
+                   src={item.photo_url}
+                   alt={item.name}
+                   className="w-full h-full object-cover"
+                 />
+               ) : (
+                 <div className="w-full h-full flex items-center justify-center">
+                   <Package className="h-6 w-6 text-slate-300 dark:text-slate-600" />
+                 </div>
+               )}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-slate-900 dark:text-white truncate">{item.name}</h3>
@@ -475,7 +475,7 @@ export default function Items() {
                 className="max-w-full max-h-[90vh] object-contain"
               />
             </div>
-            <div className="flex gap-2 p-4 bg-white">
+            <div className="flex gap-2 p-4 bg-white dark:bg-slate-900">
               <Button 
                 variant="outline"
                 onClick={() => setPhotoLightbox(null)}

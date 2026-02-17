@@ -22,30 +22,30 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           )}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-slate-500">Name</Label>
-              <p className="font-medium">{item.name}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Name</Label>
+              <p className="font-medium text-slate-900 dark:text-white">{item.name}</p>
             </div>
             <div>
-              <Label className="text-slate-500">Price</Label>
-              <p className="font-medium">${item.price?.toFixed(2) || '0.00'}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Price</Label>
+              <p className="font-medium text-slate-900 dark:text-white">${item.price?.toFixed(2) || '0.00'}</p>
             </div>
             <div>
-              <Label className="text-slate-500">Item Number</Label>
-              <p className="font-medium">{item.item_number || '-'}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Item Number</Label>
+              <p className="font-medium text-slate-900 dark:text-white">{item.item_number || '-'}</p>
             </div>
             <div>
-              <Label className="text-slate-500">Quantity on Hand</Label>
-              <p className="font-medium">{item.quantity_on_hand || 0}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Quantity on Hand</Label>
+              <p className="font-medium text-slate-900 dark:text-white">{item.quantity_on_hand || 0}</p>
             </div>
             <div>
-              <Label className="text-slate-500">Vendor</Label>
-              <p className="font-medium">{item.vendor || '-'}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Vendor</Label>
+              <p className="font-medium text-slate-900 dark:text-white">{item.vendor || '-'}</p>
             </div>
           </div>
           {item.description && (
             <div>
-              <Label className="text-slate-500">Description</Label>
-              <p className="text-sm mt-1">{item.description}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Description</Label>
+              <p className="text-sm mt-1 text-slate-900 dark:text-white">{item.description}</p>
             </div>
           )}
           {transactions.length > 0 && (
