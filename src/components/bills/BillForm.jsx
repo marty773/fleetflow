@@ -324,7 +324,28 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
            <div className="mt-2">
              {photoPreview ? (
                <div className="relative inline-block w-full">
-                 {photoPreview.toLowerCase().endsWith('.pdf') ? (
+                 {photoPreview.includes('drive.google.com') || photoPreview.includes('preview') ? (
+                   <div className="relative w-full">
+                     <iframe
+                       src={photoPreview}
+                       className="w-full h-96 rounded-lg border"
+                       title="PDF Preview"
+                     />
+                     <div className="flex gap-2 mt-2">
+                       <Button 
+                         type="button"
+                         variant="outline"
+                         size="sm"
+                         onClick={() => {
+                           setPhotoPreview('');
+                           handleChange('photo_url', '');
+                         }}
+                       >
+                         Remove
+                       </Button>
+                     </div>
+                   </div>
+                 ) : photoPreview.toLowerCase().endsWith('.pdf') ? (
                    <div className="relative w-full border dark:border-slate-700 rounded-lg p-6 bg-slate-50 dark:bg-slate-800 flex flex-col items-center justify-center gap-3">
                      <ImageIcon className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                      <p className="text-sm text-slate-600 dark:text-slate-400">PDF uploaded</p>
