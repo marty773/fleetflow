@@ -172,11 +172,9 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
                     <SelectValue placeholder="Select vendor" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={null}>None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {vendors.map(v => (
-                      <SelectItem key={v.id} value={v.name}>
-                        {v.name}
-                      </SelectItem>
+                      <SelectItem key={v.id} value={v.name}>{v.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
