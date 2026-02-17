@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2, Check, ChevronsUpDown, Package } from 'lucide-react';
+import { X, Upload, Trash2, Plus, ChevronDown, Edit, ImageIcon, Loader2, Check, ChevronsUpDown, Package, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
    Table,
@@ -97,6 +97,8 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
   });
   const [creatingItem, setCreatingItem] = useState(false);
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
+  const [vendorSearchOpen, setVendorSearchOpen] = useState(false);
+  const [vehicleSearchOpen, setVehicleSearchOpen] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -248,20 +250,50 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
             <div className="w-full min-w-0">
                 <Label htmlFor="vendor">Vendor *</Label>
                 {vendors.length > 0 ? (
-                  <div className="mt-2">
-                    <ResponsiveSelect
-                      value={formData.vendor}
-                      onValueChange={(value) => handleChange('vendor', value)}
-                      placeholder="Select vendor"
-                      label="Vendor"
-                    >
-                      {vendors.map(v => (
-                        <SelectItem key={v.id} value={v.name}>
-                          {v.name}
-                        </SelectItem>
-                      ))}
-                    </ResponsiveSelect>
-                  </div>
+                  <Popover open={vendorSearchOpen} onOpenChange={setVendorSearchOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={vendorSearchOpen}
+                        className="w-full justify-between mt-2 select-text"
+                      >
+                        <span className="truncate">
+                          {formData.vendor || "Select vendor"}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search vendors..." />
+                        <CommandList>
+                          <CommandEmpty>No vendor found.</CommandEmpty>
+                          <CommandGroup>
+                            {vendors.map((v) => (
+                              <CommandItem
+                                key={v.id}
+                                value={v.name}
+                                onSelect={() => {
+                                  handleChange('vendor', v.name);
+                                  setVendorSearchOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    formData.vendor === v.name ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {v.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 ) : (
                   <Input
                     id="vendor"
@@ -456,19 +488,67 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
               <div className="border-t dark:border-slate-700 pt-3 mt-3">
                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Optional: Link to Vehicle or Stock Item</p>
                 <div className="space-y-2">
-                  <ResponsiveSelect
-                    value={newItem.vehicle_id || ''}
-                    onValueChange={(value) => setNewItem({ ...newItem, vehicle_id: value === 'none' ? '' : value })}
-                    placeholder="Vehicle (optional)"
-                    label="Vehicle"
-                  >
-                    <SelectItem value="none">None</SelectItem>
-                    {vehicles.map(v => (
-                      <SelectItem key={v.id} value={v.id}>
-                        {v.name} ({v.license_plate})
-                      </SelectItem>
-                    ))}
-                  </ResponsiveSelect>
+                  <Popover open={vehicleSearchOpen} onOpenChange={setVehicleSearchOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={vehicleSearchOpen}
+                        className="w-full justify-between select-text"
+                      >
+                        <span className="truncate">
+                          {newItem.vehicle_id
+                            ? vehicles.find((v) => v.id === newItem.vehicle_id)?.name
+                            : "Vehicle (optional)"}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search vehicles..." />
+                        <CommandList>
+                          <CommandEmpty>No vehicle found.</CommandEmpty>
+                          <CommandGroup>
+                            <CommandItem
+                              value="none"
+                              onSelect={() => {
+                                setNewItem({ ...newItem, vehicle_id: '' });
+                                setVehicleSearchOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  !newItem.vehicle_id ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              None
+                            </CommandItem>
+                            {vehicles.map((v) => (
+                              <CommandItem
+                                key={v.id}
+                                value={`${v.name} ${v.license_plate}`}
+                                onSelect={() => {
+                                  setNewItem({ ...newItem, vehicle_id: v.id });
+                                  setVehicleSearchOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    newItem.vehicle_id === v.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {v.name} ({v.license_plate})
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <div className="flex gap-2">
                     <Popover open={itemSearchOpen} onOpenChange={setItemSearchOpen}>
                       <PopoverTrigger asChild>

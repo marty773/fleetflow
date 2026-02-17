@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Plus, Trash2, Edit, Package } from 'lucide-react';
+import { X, Plus, Trash2, Edit, Package, Check, ChevronsUpDown } from 'lucide-react';
 import {
    Table,
    TableBody,
@@ -21,6 +21,20 @@ import {
    TableRow,
  } from '@/components/ui/table';
 import ResponsiveSelect from '@/components/ResponsiveSelect';
+import {
+   Command,
+   CommandEmpty,
+   CommandGroup,
+   CommandInput,
+   CommandItem,
+   CommandList,
+ } from '@/components/ui/command';
+import {
+   Popover,
+   PopoverContent,
+   PopoverTrigger,
+ } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
   // When editing, merge parts_used back into work_items so they show correctly
@@ -84,6 +98,9 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
     unit_price: 0,
     item_id: '',
   });
+  const [vehicleSearchOpen, setVehicleSearchOpen] = useState(false);
+  const [vendorSearchOpen, setVendorSearchOpen] = useState(false);
+  const [itemSearchOpen, setItemSearchOpen] = useState(false);
 
   // Update form data when record prop changes (important for editing)
   React.useEffect(() => {
@@ -192,20 +209,52 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="w-full min-w-0">
                 <Label htmlFor="vehicle_id">Vehicle *</Label>
-                <div className="mt-2">
-                  <ResponsiveSelect
-                    value={formData.vehicle_id}
-                    onValueChange={(value) => handleChange('vehicle_id', value)}
-                    placeholder="Select vehicle"
-                    label="Vehicle"
-                  >
-                    {vehicles.map(v => (
-                      <SelectItem key={v.id} value={v.id}>
-                        {v.name} ({v.license_plate})
-                      </SelectItem>
-                    ))}
-                  </ResponsiveSelect>
-                </div>
+                <Popover open={vehicleSearchOpen} onOpenChange={setVehicleSearchOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={vehicleSearchOpen}
+                      className="w-full justify-between mt-2 select-text"
+                    >
+                      <span className="truncate">
+                        {formData.vehicle_id
+                          ? vehicles.find((v) => v.id === formData.vehicle_id)?.name
+                          : "Select vehicle"}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[300px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search vehicles..." />
+                      <CommandList>
+                        <CommandEmpty>No vehicle found.</CommandEmpty>
+                        <CommandGroup>
+                          {vehicles.map((v) => (
+                            <CommandItem
+                              key={v.id}
+                              value={`${v.name} ${v.license_plate}`}
+                              onSelect={() => {
+                                handleChange('vehicle_id', v.id);
+                                setVehicleSearchOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.vehicle_id === v.id ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {v.name} ({v.license_plate})
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
             <div className="w-full min-w-0">
@@ -255,21 +304,65 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
             <div>
               <Label htmlFor="vendor">Service Provider</Label>
               {vendors.length > 0 ? (
-                <div className="mt-2">
-                  <ResponsiveSelect
-                    value={formData.vendor}
-                    onValueChange={(value) => handleChange('vendor', value)}
-                    placeholder="Select service provider"
-                    label="Service Provider"
-                  >
-                    <SelectItem value={null}>None</SelectItem>
-                    {vendors.map(v => (
-                      <SelectItem key={v.id} value={v.name}>
-                        {v.name}
-                      </SelectItem>
-                    ))}
-                  </ResponsiveSelect>
-                </div>
+                <Popover open={vendorSearchOpen} onOpenChange={setVendorSearchOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={vendorSearchOpen}
+                      className="w-full justify-between mt-2 select-text"
+                    >
+                      <span className="truncate">
+                        {formData.vendor || "Select service provider"}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[300px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search vendors..." />
+                      <CommandList>
+                        <CommandEmpty>No vendor found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="none"
+                            onSelect={() => {
+                              handleChange('vendor', '');
+                              setVendorSearchOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                !formData.vendor ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            None
+                          </CommandItem>
+                          {vendors.map((v) => (
+                            <CommandItem
+                              key={v.id}
+                              value={v.name}
+                              onSelect={() => {
+                                handleChange('vendor', v.name);
+                                setVendorSearchOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.vendor === v.name ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {v.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               ) : (
                 <Input
                   id="vendor"
@@ -324,31 +417,72 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               </div>
               <div className="border-t dark:border-slate-700 pt-3 mt-3">
                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Optional: Select from Stock Items</p>
-                <ResponsiveSelect
-                  value={newItem.item_id || 'none'}
-                  onValueChange={(value) => {
-                    if (value === 'none') {
-                      setNewItem({ ...newItem, item_id: '' });
-                    } else {
-                      const selectedItem = items.find(i => i.id === value);
-                      setNewItem({ 
-                        ...newItem, 
-                        item_id: value,
-                        description: selectedItem?.name || newItem.description,
-                        unit_price: selectedItem?.price || newItem.unit_price
-                      });
-                    }
-                  }}
-                  placeholder="Stock Item (optional)"
-                  label="Stock Item"
-                >
-                  <SelectItem value="none">None</SelectItem>
-                  {items.map(item => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.name} - ${item.price?.toFixed(2) || '0.00'}
-                    </SelectItem>
-                  ))}
-                </ResponsiveSelect>
+                <Popover open={itemSearchOpen} onOpenChange={setItemSearchOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={itemSearchOpen}
+                      className="w-full justify-between select-text"
+                    >
+                      <span className="truncate">
+                        {newItem.item_id
+                          ? items.find((item) => item.id === newItem.item_id)?.name
+                          : "Stock Item (optional)"}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[300px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search items..." />
+                      <CommandList>
+                        <CommandEmpty>No item found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="none"
+                            onSelect={() => {
+                              setNewItem({ ...newItem, item_id: '' });
+                              setItemSearchOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                !newItem.item_id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            None
+                          </CommandItem>
+                          {items.map((item) => (
+                            <CommandItem
+                              key={item.id}
+                              value={`${item.name} ${item.item_number || ''}`}
+                              onSelect={() => {
+                                setNewItem({ 
+                                  ...newItem, 
+                                  item_id: item.id,
+                                  description: item.name,
+                                  unit_price: item.price
+                                });
+                                setItemSearchOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  newItem.item_id === item.id ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {item.name} - ${item.price?.toFixed(2) || '0.00'}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <Button type="button" onClick={handleAddItem} variant="outline" size="sm" className="w-full">
                 <Plus className="w-4 h-4 mr-2" /> Add Item
