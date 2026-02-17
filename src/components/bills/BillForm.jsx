@@ -814,7 +814,9 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                     >
                       <SelectItem value="none">None</SelectItem>
                       {vendors.map(v => (
-                        <SelectItem key={v.id} value={v.name}>{v.name}</SelectItem>
+                        <SelectItem key={v.id} value={v.name}>
+                          <span>{v.name}</span>
+                        </SelectItem>
                       ))}
                     </ResponsiveSelect>
                   ) : (

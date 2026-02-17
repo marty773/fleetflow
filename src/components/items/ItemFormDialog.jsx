@@ -174,7 +174,9 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
                     {vendors.map(v => (
-                      <SelectItem key={v.id} value={v.name}>{v.name}</SelectItem>
+                      <SelectItem key={v.id} value={v.name}>
+                        <span>{v.name}</span>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
