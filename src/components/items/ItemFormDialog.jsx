@@ -110,7 +110,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
             <Label>Photo</Label>
             <div className="relative">
               {formData.photo_url ? (
-                <div className="relative w-full h-48 rounded-xl overflow-hidden bg-slate-100">
+                <div className="relative w-full h-48 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900">
                   <img
                     src={formData.photo_url}
                     alt="Item preview"
@@ -127,14 +127,14 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
                   </Button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors">
+                <label className="flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors">
                   {uploading ? (
-                    <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-slate-400 dark:text-slate-500 animate-spin" />
                   ) : (
                     <>
-                      <ImageIcon className="h-10 w-10 text-slate-400 mb-2" />
-                      <span className="text-sm text-slate-600">Click to upload photo</span>
-                      <span className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</span>
+                      <ImageIcon className="h-10 w-10 text-slate-400 dark:text-slate-500 mb-2" />
+                      <span className="text-sm text-slate-600 dark:text-slate-400">Click to upload photo</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500 mt-1">PNG, JPG up to 10MB</span>
                     </>
                   )}
                   <input
@@ -158,7 +158,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
               onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Enter item name"
               required
-              className="h-11"
+              className="h-11 select-text"
             />
           </div>
 
@@ -186,14 +186,14 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
                   value={formData.vendor}
                   onChange={e => setFormData(prev => ({ ...prev, vendor: e.target.value }))}
                   placeholder="Vendor name"
-                  className="h-11"
+                  className="h-11 select-text"
                 />
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="price">Price</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400">$</span>
                 <Input
                   id="price"
                   type="number"
@@ -202,7 +202,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
                   value={formData.price}
                   onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
                   placeholder="0.00"
-                  className="h-11 pl-7"
+                  className="h-11 pl-7 select-text"
                 />
               </div>
             </div>
@@ -220,7 +220,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
                 value={formData.quantity_on_hand}
                 onChange={e => setFormData(prev => ({ ...prev, quantity_on_hand: e.target.value }))}
                 placeholder="0"
-                className="h-11"
+                className="h-11 select-text"
               />
             </div>
             <div className="space-y-2">
@@ -233,7 +233,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
                 value={formData.low_stock_threshold}
                 onChange={e => setFormData(prev => ({ ...prev, low_stock_threshold: e.target.value }))}
                 placeholder="2"
-                className="h-11"
+                className="h-11 select-text"
               />
             </div>
           </div>
@@ -246,7 +246,7 @@ export default function ItemFormDialog({ open, onOpenChange, item, onSave, vendo
               value={formData.item_number}
               onChange={e => setFormData(prev => ({ ...prev, item_number: e.target.value }))}
               placeholder="e.g. SKU-12345"
-              className="h-11"
+              className="h-11 select-text"
             />
           </div>
 
