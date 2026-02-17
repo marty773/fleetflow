@@ -812,11 +812,9 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                       placeholder="Select vendor"
                       label="Vendor"
                     >
-                      <SelectItem value={null}>None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {vendors.map(v => (
-                        <SelectItem key={v.id} value={v.name}>
-                          {v.name}
-                        </SelectItem>
+                        <SelectItem key={v.id} value={v.name}>{v.name}</SelectItem>
                       ))}
                     </ResponsiveSelect>
                   ) : (
