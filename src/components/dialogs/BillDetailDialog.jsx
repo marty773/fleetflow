@@ -40,11 +40,11 @@ export default function BillDetailDialog({ bill, vehicles = [], onClose, onEdit,
                 </Button>
               </div>
               <div className="flex justify-center">
-                {bill.photo_url.includes('drive.google.com') ? (
+                {bill.photo_url.includes('drive.google.com') || bill.photo_url.includes('preview') ? (
                   <div className="w-full">
                     <iframe
-                      src={`${bill.photo_url}#toolbar=0&navpanes=0&view=FitH`}
-                      className="w-full h-96 rounded-lg border pointer-events-none"
+                      src={bill.photo_url}
+                      className="w-full h-96 rounded-lg border"
                       title="PDF Preview"
                     />
                   </div>
