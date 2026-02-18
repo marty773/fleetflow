@@ -126,6 +126,46 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        {notifSettings && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                <Bell className="w-5 h-5" /> Notifications — {selectedCompany}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">New Bill Notifications</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Send an email when a new bill is created</p>
+                </div>
+                <button
+                  onClick={() => setNotifSettings(s => ({ ...s, bill_notification_enabled: !s.bill_notification_enabled }))}
+                  className={`w-12 h-6 rounded-full relative transition-colors ${notifSettings.bill_notification_enabled ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-transform ${notifSettings.bill_notification_enabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+              {notifSettings.bill_notification_enabled && (
+                <div className="space-y-1">
+                  <Label className="text-slate-700 dark:text-slate-300">Notification Email</Label>
+                  <Input
+                    type="email"
+                    placeholder="email@example.com"
+                    value={notifSettings.bill_notification_email || ''}
+                    onChange={e => setNotifSettings(s => ({ ...s, bill_notification_email: e.target.value }))}
+                    className="dark:bg-slate-950 dark:border-slate-700"
+                  />
+                </div>
+              )}
+              <Button onClick={handleSaveNotifications} disabled={notifSaving} className="w-full" style={{ backgroundColor: 'var(--color-primary)' }}>
+                <Save className="w-4 h-4 mr-2" />
+                {notifSaved ? 'Saved!' : notifSaving ? 'Saving...' : 'Save Notifications'}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg text-slate-900 dark:text-white">Danger Zone</CardTitle>
