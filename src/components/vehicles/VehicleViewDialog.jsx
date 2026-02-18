@@ -128,19 +128,19 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label className="text-slate-500">Make</Label>
-              <p className="text-base font-medium">{vehicle.make}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Make</Label>
+              <p className="text-base font-medium text-slate-900 dark:text-white">{vehicle.make}</p>
             </div>
             <div className="space-y-1">
-              <Label className="text-slate-500">Model</Label>
-              <p className="text-base font-medium">{vehicle.model}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Model</Label>
+              <p className="text-base font-medium text-slate-900 dark:text-white">{vehicle.model}</p>
             </div>
             <div className="space-y-1">
-              <Label className="text-slate-500">Year</Label>
-              <p className="text-base font-medium">{vehicle.year}</p>
+              <Label className="text-slate-500 dark:text-slate-400">Year</Label>
+              <p className="text-base font-medium text-slate-900 dark:text-white">{vehicle.year}</p>
             </div>
             <div className="space-y-1">
-              <Label className="text-slate-500">Status</Label>
+              <Label className="text-slate-500 dark:text-slate-400">Status</Label>
               <div className="flex items-center gap-2">
                 {vehicle.is_active ? (
                   <>
