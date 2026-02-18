@@ -60,6 +60,10 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
   const handleSubmit = (e) => {
     e.preventDefault();
     const submissionData = calculateNextDue();
+    // Convert empty strings to null for optional number fields
+    if (submissionData.interval_miles === '') submissionData.interval_miles = null;
+    if (submissionData.last_performed_mileage === '') submissionData.last_performed_mileage = null;
+    if (submissionData.next_due_mileage === '') submissionData.next_due_mileage = null;
     onSubmit(submissionData);
   };
 
