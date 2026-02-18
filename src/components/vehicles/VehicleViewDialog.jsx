@@ -337,11 +337,11 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                     {/* Parts Used */}
                     {record.parts_used && record.parts_used.length > 0 && (
                       <div className="mt-3 space-y-1">
-                        <Label className="text-xs text-slate-500">Parts Used:</Label>
+                        <Label className="text-xs text-slate-500 dark:text-slate-400">Parts Used:</Label>
                         {record.parts_used.map((part, idx) => {
                           const item = allItems.find(i => i.id === part.item_id);
                           return (
-                            <div key={idx} className="flex justify-between text-sm bg-blue-50 p-2 rounded">
+                            <div key={idx} className="flex justify-between text-sm bg-blue-50 dark:bg-blue-950 text-slate-900 dark:text-slate-200 p-2 rounded">
                               <span>
                                 {item?.name || 'Unknown Item'} (×{part.quantity_used})
                               </span>
