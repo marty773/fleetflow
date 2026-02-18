@@ -284,7 +284,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                 {maintenanceRecords.map((record) => (
                   <div 
                     key={record.id} 
-                    className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+                    className="border dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
