@@ -248,7 +248,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             {showAddMaintenance ? (
               <div className="border dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Add Maintenance Record</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Add Maintenance Record</h3>
                   <Button 
                     variant="ghost" 
                     size="sm"
