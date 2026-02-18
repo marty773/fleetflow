@@ -309,7 +309,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                       </div>
                       {record.total_cost && (
                         <div className="text-right">
-                          <div className="text-lg font-bold text-slate-900">
+                          <div className="text-lg font-bold text-slate-900 dark:text-white">
                             ${record.total_cost.toFixed(2)}
                           </div>
                         </div>
