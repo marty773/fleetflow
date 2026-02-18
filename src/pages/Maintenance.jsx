@@ -178,8 +178,6 @@ export default function Maintenance() {
     mutationFn: (data) => base44.entities.MaintenanceInterval.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
-      setShowIntervalForm(false);
-      setEditingInterval(null);
     },
   });
 
