@@ -197,14 +197,14 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           <div className="grid grid-cols-2 gap-4">
             {vehicle.gvw && (
               <div className="space-y-1">
-                <Label className="text-slate-500">GVW</Label>
-                <p className="text-base font-medium">{vehicle.gvw.toLocaleString()} lbs</p>
+                <Label className="text-slate-500 dark:text-slate-400">GVW</Label>
+                <p className="text-base font-medium text-slate-900 dark:text-white">{vehicle.gvw.toLocaleString()} lbs</p>
               </div>
             )}
             {vehicle.purchase_date && (
               <div className="space-y-1">
-                <Label className="text-slate-500">Purchase Date</Label>
-                <p className="text-base font-medium">
+                <Label className="text-slate-500 dark:text-slate-400">Purchase Date</Label>
+                <p className="text-base font-medium text-slate-900 dark:text-white">
                   {format(new Date(vehicle.purchase_date), 'MMM dd, yyyy')}
                 </p>
               </div>
