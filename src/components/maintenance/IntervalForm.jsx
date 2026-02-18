@@ -80,12 +80,14 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 value={formData.vehicle_id}
                 onValueChange={(value) => handleChange('vehicle_id', value)}
                 placeholder="Select vehicle"
-                options={vehicles.map(v => ({
-                  value: v.id,
-                  label: `${v.name} (${v.license_plate})`
-                }))}
-                className="mt-2"
-              />
+                label="Select Vehicle"
+              >
+                {vehicles.map(v => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {v.name}{v.license_plate ? ` (${v.license_plate})` : ''}
+                  </SelectItem>
+                ))}
+              </ResponsiveSelect>
             </div>
 
             <div>
