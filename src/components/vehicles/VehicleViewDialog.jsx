@@ -364,7 +364,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             ) : !showAddMaintenance && (
               <div className="text-center py-12 border-2 border-dashed rounded-lg">
                 <History className="w-12 h-12 mx-auto text-slate-400 mb-3" />
-                <p className="text-slate-600 mb-4">No maintenance history yet</p>
+                <p className="text-slate-600 dark:text-slate-400 mb-4">No maintenance history yet</p>
                 <p className="text-sm text-slate-500">
                   Add past service records to track this vehicle's maintenance history
                 </p>
