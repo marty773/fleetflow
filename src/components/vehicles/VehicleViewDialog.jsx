@@ -289,7 +289,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-base">{record.title}</h4>
+                          <h4 className="font-semibold text-base text-slate-900 dark:text-white">{record.title}</h4>
                           <Badge className={getCategoryColor(record.maintenance_type)}>
                             {record.maintenance_type.replace('_', ' ')}
                           </Badge>
