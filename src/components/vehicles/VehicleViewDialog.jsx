@@ -214,7 +214,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           {/* Trailer Features */}
           {vehicle.type === 'trailer' && (
             <div className="space-y-2">
-              <Label className="text-slate-500">Features</Label>
+              <Label className="text-slate-500 dark:text-slate-400">Features</Label>
               <div className="flex flex-wrap gap-2">
                 {vehicle.hydraulic_dump && (
                   <Badge variant="secondary">Hydraulic Dump</Badge>
