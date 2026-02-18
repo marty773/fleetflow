@@ -177,9 +177,9 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           {/* VIN with Copy */}
           {vehicle.vin && (
             <div className="space-y-1">
-              <Label className="text-slate-500">VIN Number</Label>
+              <Label className="text-slate-500 dark:text-slate-400">VIN Number</Label>
               <div className="flex items-center gap-2">
-                <p className="text-base font-mono bg-slate-50 px-3 py-2 rounded border flex-1">
+                <p className="text-base font-mono bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white px-3 py-2 rounded border dark:border-slate-700 flex-1">
                   {vehicle.vin}
                 </p>
                 <Button
