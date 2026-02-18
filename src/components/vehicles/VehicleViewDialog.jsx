@@ -354,8 +354,8 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                     {/* Notes */}
                     {record.notes && (
                       <div className="mt-3">
-                        <Label className="text-xs text-slate-500">Notes:</Label>
-                        <p className="text-sm text-slate-700 mt-1">{record.notes}</p>
+                        <Label className="text-xs text-slate-500 dark:text-slate-400">Notes:</Label>
+                        <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">{record.notes}</p>
                       </div>
                     )}
                   </div>
