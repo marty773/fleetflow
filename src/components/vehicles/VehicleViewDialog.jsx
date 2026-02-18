@@ -246,7 +246,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           <TabsContent value="history" className="space-y-4 mt-4">
             {/* Add Maintenance Form */}
             {showAddMaintenance ? (
-              <div className="border rounded-lg p-4 bg-white">
+              <div className="border dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Add Maintenance Record</h3>
                   <Button 
