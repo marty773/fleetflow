@@ -294,7 +294,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                             {record.maintenance_type.replace('_', ' ')}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-slate-600">
+                        <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {format(new Date(record.performed_date), 'MMM dd, yyyy')}
