@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Settings, LogOut, Trash2 } from 'lucide-react';
+import { Settings, LogOut, Trash2, Bell, Save } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
+import { useCompany } from '@/components/CompanyContext';
 
 export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
