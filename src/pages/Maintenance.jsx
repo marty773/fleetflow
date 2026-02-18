@@ -280,8 +280,11 @@ export default function Maintenance() {
     let createdInterval;
     if (editingInterval) {
       await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data: dataWithCompany });
+      setEditingInterval(null);
+      setShowIntervalForm(false);
     } else {
       createdInterval = await createIntervalMutation.mutateAsync(dataWithCompany);
+      setShowIntervalForm(false);
     }
 
     // Sync to Google Calendar if there's a next due date
