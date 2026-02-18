@@ -108,17 +108,16 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 value={formData.maintenance_type}
                 onValueChange={(value) => handleChange('maintenance_type', value)}
                 placeholder="Select type"
-                options={[
-                  { value: 'oil_change', label: 'Oil Change' },
-                  { value: 'filter_change', label: 'Filter Change' },
-                  { value: 'tire_rotation', label: 'Tire Rotation' },
-                  { value: 'inspection', label: 'Inspection' },
-                  { value: 'repair', label: 'Repair' },
-                  { value: 'cleaning', label: 'Cleaning' },
-                  { value: 'other', label: 'Other' }
-                ]}
-                className="mt-2"
-              />
+                label="Select Type"
+              >
+                <SelectItem value="oil_change">Oil Change</SelectItem>
+                <SelectItem value="filter_change">Filter Change</SelectItem>
+                <SelectItem value="tire_rotation">Tire Rotation</SelectItem>
+                <SelectItem value="inspection">Inspection</SelectItem>
+                <SelectItem value="repair">Repair</SelectItem>
+                <SelectItem value="cleaning">Cleaning</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </ResponsiveSelect>
             </div>
 
             <div>
