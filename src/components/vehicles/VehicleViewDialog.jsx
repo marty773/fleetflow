@@ -375,7 +375,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             </div>
 
             {/* Actions - Floating Bottom */}
-            <div className="sticky bottom-0 flex gap-3 p-6 bg-white border-t border-slate-200 flex-wrap sm:flex-nowrap">
+            <div className="sticky bottom-0 flex gap-3 p-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex-wrap sm:flex-nowrap">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
             Close
             </Button>
