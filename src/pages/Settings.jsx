@@ -14,11 +14,42 @@ export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [notifSettings, setNotifSettings] = useState(null);
+  const [notifSettingsId, setNotifSettingsId] = useState(null);
+  const [notifSaving, setNotifSaving] = useState(false);
+  const [notifSaved, setNotifSaved] = useState(false);
+  const { selectedCompany } = useCompany();
   const navigate = useNavigate();
 
   React.useEffect(() => {
     base44.auth.me().then(setUser);
   }, []);
+
+  useEffect(() => {
+    if (!selectedCompany) return;
+    base44.entities.CompanyNotificationSettings.filter({ company_id: selectedCompany }).then(results => {
+      if (results.length > 0) {
+        setNotifSettings(results[0]);
+        setNotifSettingsId(results[0].id);
+      } else {
+        setNotifSettings({ company_id: selectedCompany, bill_notification_enabled: false, bill_notification_email: '' });
+        setNotifSettingsId(null);
+      }
+    });
+  }, [selectedCompany]);
+
+  const handleSaveNotifications = async () => {
+    setNotifSaving(true);
+    if (notifSettingsId) {
+      await base44.entities.CompanyNotificationSettings.update(notifSettingsId, notifSettings);
+    } else {
+      const created = await base44.entities.CompanyNotificationSettings.create(notifSettings);
+      setNotifSettingsId(created.id);
+    }
+    setNotifSaving(false);
+    setNotifSaved(true);
+    setTimeout(() => setNotifSaved(false), 2000);
+  };
 
   const handleLogout = () => {
     base44.auth.logout();
