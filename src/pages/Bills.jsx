@@ -231,15 +231,18 @@ export default function Bills() {
       createdBill = await createMutation.mutateAsync(dataWithCompany);
     }
 
-    // Send email notification for Fisher's Enterprise bills only
-    if (!editingBill && createdBill && selectedCompany === "Fisher's Enterprise") {
-      const billUrl = `${window.location.origin}${window.location.pathname}?view=${createdBill.id}`;
-      
-      await base44.integrations.Core.SendEmail({
-        to: 'manny@fishersbackyardstructures.com',
-        subject: `New Bill from ${dataWithCompany.vendor}`,
-        body: `A new bill has been recorded.\n\nCompany: ${selectedCompany}\nVendor: ${dataWithCompany.vendor}\nDate: ${format(parseISO(dataWithCompany.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}\nCategory: ${dataWithCompany.category?.replace('_', ' ')}\nTotal: $${dataWithCompany.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
-      });
+    // Send email notification if enabled for this company
+    if (!editingBill && createdBill) {
+      const notifResults = await base44.entities.CompanyNotificationSettings.filter({ company_id: selectedCompany });
+      const notifSettings = notifResults?.[0];
+      if (notifSettings?.bill_notification_enabled && notifSettings?.bill_notification_email) {
+        const billUrl = `${window.location.origin}${window.location.pathname}?view=${createdBill.id}`;
+        await base44.integrations.Core.SendEmail({
+          to: notifSettings.bill_notification_email,
+          subject: `New Bill from ${dataWithCompany.vendor}`,
+          body: `A new bill has been recorded.\n\nCompany: ${selectedCompany}\nVendor: ${dataWithCompany.vendor}\nDate: ${format(parseISO(dataWithCompany.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}\nCategory: ${dataWithCompany.category?.replace('_', ' ')}\nTotal: $${dataWithCompany.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
+        });
+      }
     }
   };
 
