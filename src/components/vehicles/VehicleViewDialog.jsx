@@ -319,9 +319,9 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                     {/* Work Items */}
                     {record.work_items && record.work_items.length > 0 && (
                       <div className="mt-3 space-y-1">
-                        <Label className="text-xs text-slate-500">Work Performed:</Label>
+                        <Label className="text-xs text-slate-500 dark:text-slate-400">Work Performed:</Label>
                         {record.work_items.map((item, idx) => (
-                          <div key={idx} className="flex justify-between text-sm bg-slate-50 p-2 rounded">
+                          <div key={idx} className="flex justify-between text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 p-2 rounded">
                             <span>
                               {item.description} 
                               {item.quantity > 1 && ` (×${item.quantity})`}
