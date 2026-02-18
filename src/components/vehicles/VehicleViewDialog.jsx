@@ -97,11 +97,11 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           <div className="flex items-start justify-between">
             <div>
               <DialogTitle className="text-2xl">{vehicle.name}</DialogTitle>
-              <p className="text-slate-600 mt-1">
+              <p className="text-slate-600 dark:text-slate-400 mt-1">
                 {vehicle.make} {vehicle.model} • {vehicle.year}
               </p>
             </div>
-            <Badge variant="secondary" className="bg-slate-100">
+            <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 dark:text-slate-200">
               {vehicle.type === 'truck' ? (
                 <Truck className="w-4 h-4 mr-1" />
               ) : (
