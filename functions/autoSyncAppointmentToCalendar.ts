@@ -1,141 +1,90 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
+// Entity automation: fires on CalendarAppointment create/update/delete
+// Syncs to the "Vehicle Maintenance" calendar via app connector (marty's account)
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    
+
     const { event, data, old_data } = await req.json();
 
-    // Get company calendar auth
-    const companyAuths = await base44.asServiceRole.entities.CompanyCalendarAuth.filter({ 
-      company_id: data.company_id 
+    const accessToken = await base44.asServiceRole.connectors.getAccessToken('googlecalendar');
+
+    // Get or create Vehicle Maintenance calendar
+    const calListRes = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
+    const calListData = await calListRes.json();
+    let calendar = (calListData.items || []).find(c => c.summary === 'Vehicle Maintenance');
 
-    if (!companyAuths || companyAuths.length === 0) {
-      return Response.json({ message: 'Company calendar not connected, skipping sync' });
-    }
-
-    const companyAuth = companyAuths[0];
-    let accessToken = companyAuth.calendar_access_token;
-
-    // Refresh token if expired
-    if (new Date(companyAuth.token_expires_at) <= new Date()) {
-      const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
+    if (!calendar) {
+      const createRes = await fetch('https://www.googleapis.com/calendar/v3/calendars', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: Deno.env.get('GOOGLE_CLIENT_ID'),
-          client_secret: Deno.env.get('GOOGLE_CLIENT_SECRET'),
-          refresh_token: companyAuth.calendar_refresh_token,
-          grant_type: 'refresh_token',
-        }),
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ summary: 'Vehicle Maintenance', description: 'Fleet vehicle maintenance schedule', timeZone: 'America/New_York' }),
       });
-      const refreshData = await refreshResponse.json();
-      accessToken = refreshData.access_token;
-      await base44.asServiceRole.entities.CompanyCalendarAuth.update(companyAuth.id, {
-        calendar_access_token: accessToken,
-        token_expires_at: new Date(Date.now() + refreshData.expires_in * 1000).toISOString(),
-      });
+      calendar = await createRes.json();
     }
 
-    const calendarId = companyAuth.calendar_id || 'primary';
-
-    // Handle create
-    if (event.type === 'create') {
-      const vehicle = await base44.asServiceRole.entities.Vehicle.filter({ id: data.vehicle_id });
-      const vehicleName = vehicle?.[0]?.name || 'Vehicle';
-
-      const eventData = {
-        summary: `${data.title} - ${vehicleName}`,
-        description: data.description || '',
-        location: data.location || '',
-        start: {
-          date: data.appointment_date,
-        },
-        end: {
-          date: data.appointment_date,
-        },
-      };
-
-      if (data.appointment_time) {
-        const dateTime = `${data.appointment_date}T${data.appointment_time}:00`;
-        eventData.start = { dateTime, timeZone: 'America/New_York' };
-        eventData.end = { dateTime, timeZone: 'America/New_York' };
-      }
-
-      const response = await fetch(
-        `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(eventData),
-        }
-      );
-
-      if (response.ok) {
-        const createdEvent = await response.json();
-        // Store Google event ID for future updates/deletes
-        await base44.asServiceRole.entities.CalendarAppointment.update(event.entity_id, {
-          google_event_id: createdEvent.id,
-        });
-      }
-    }
-
-    // Handle update
-    if (event.type === 'update' && data.google_event_id) {
-      const vehicle = await base44.asServiceRole.entities.Vehicle.filter({ id: data.vehicle_id });
-      const vehicleName = vehicle?.[0]?.name || 'Vehicle';
-
-      const eventData = {
-        summary: `${data.title} - ${vehicleName}`,
-        description: data.description || '',
-        location: data.location || '',
-        start: {
-          date: data.appointment_date,
-        },
-        end: {
-          date: data.appointment_date,
-        },
-      };
-
-      if (data.appointment_time) {
-        const dateTime = `${data.appointment_date}T${data.appointment_time}:00`;
-        eventData.start = { dateTime, timeZone: 'America/New_York' };
-        eventData.end = { dateTime, timeZone: 'America/New_York' };
-      }
-
-      await fetch(
-        `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${data.google_event_id}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(eventData),
-        }
-      );
-    }
+    const calendarId = calendar.id;
 
     // Handle delete
     if (event.type === 'delete' && old_data?.google_event_id) {
       await fetch(
-        `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${old_data.google_event_id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
+        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${old_data.google_event_id}`,
+        { method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` } }
       );
+      return Response.json({ success: true, message: 'Event deleted from calendar' });
     }
 
-    return Response.json({ success: true, message: 'Synced to Google Calendar' });
+    const eventData = data || {};
+    const vehicles = await base44.asServiceRole.entities.Vehicle.filter({ id: eventData.vehicle_id });
+    const vehicleName = vehicles?.[0]?.name || 'Vehicle';
+
+    const googleEvent = {
+      summary: `${eventData.title} - ${vehicleName}`,
+      description: eventData.description || '',
+      location: eventData.location || '',
+      start: { date: eventData.appointment_date },
+      end: { date: eventData.appointment_date },
+    };
+
+    if (eventData.appointment_time) {
+      const dateTime = `${eventData.appointment_date}T${eventData.appointment_time}:00`;
+      googleEvent.start = { dateTime, timeZone: 'America/New_York' };
+      googleEvent.end = { dateTime, timeZone: 'America/New_York' };
+    }
+
+    if (event.type === 'update' && eventData.google_event_id) {
+      await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${eventData.google_event_id}`,
+        {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(googleEvent),
+        }
+      );
+    } else {
+      const postRes = await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(googleEvent),
+        }
+      );
+      if (postRes.ok) {
+        const created = await postRes.json();
+        await base44.asServiceRole.entities.CalendarAppointment.update(event.entity_id, { google_event_id: created.id });
+      } else {
+        const err = await postRes.text();
+        console.error('Create appointment event error:', err);
+      }
+    }
+
+    return Response.json({ success: true, message: 'Synced to Vehicle Maintenance calendar' });
   } catch (error) {
-    console.error('Auto sync error:', error);
+    console.error('autoSyncAppointmentToCalendar error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
