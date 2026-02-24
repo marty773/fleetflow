@@ -76,12 +76,6 @@ export default function Maintenance() {
     const calendarConnectedParam = urlParams.get('calendar_connected');
     const newParam = urlParams.get('new');
     
-    if (calendarConnectedParam === 'true') {
-      setCalendarConnected(true);
-      toast.success('Google Calendar connected successfully!');
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-    
     if (newParam === 'true') {
       setEditingRecord(null);
       setShowRecordForm(true);
