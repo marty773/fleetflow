@@ -32,7 +32,7 @@ export default function Maintenance() {
   const [editingInterval, setEditingInterval] = useState(null);
   const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('records');
-  const [calendarConnected, setCalendarConnected] = useState(false);
+
   const [deletingRecord, setDeletingRecord] = useState(null);
   const queryClient = useQueryClient();
 
