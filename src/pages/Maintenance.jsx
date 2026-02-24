@@ -67,20 +67,6 @@ export default function Maintenance() {
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
   const filteredItems = items.filter(i => i.company_id === selectedCompany);
 
-  // Check calendar connection status
-  React.useEffect(() => {
-    const checkCalendarConnection = async () => {
-      try {
-        const user = await base44.auth.me();
-        const userAuths = await base44.entities.UserCalendarAuth.filter({ user_email: user.email });
-        setCalendarConnected(userAuths.length > 0);
-      } catch (error) {
-        setCalendarConnected(false);
-      }
-    };
-    checkCalendarConnection();
-  }, []);
-
   // Check for URL parameter to auto-open a specific record or interval
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
