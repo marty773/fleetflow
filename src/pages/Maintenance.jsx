@@ -278,29 +278,15 @@ export default function Maintenance() {
     }
   };
 
-  const handleConnectCalendar = async () => {
-    try {
-      const result = await base44.functions.invoke('authorizeUserCalendar', {});
-      window.location.href = result.data.authUrl;
-    } catch (error) {
-      toast.error('Failed to connect calendar');
-    }
-  };
-
   const handleSyncAll = async () => {
-    if (!calendarConnected) {
-      toast.error('Please connect your Google Calendar first');
-      return;
-    }
-    
     try {
-      toast.loading('Syncing to your Google Calendar...');
-      const result = await base44.functions.invoke('syncUserMaintenanceToCalendar', {});
+      toast.loading('Syncing to Vehicle Maintenance calendar...');
+      const result = await base44.functions.invoke('syncMaintenanceToCalendar', {});
       toast.dismiss();
-      toast.success(result.data.message);
+      toast.success(`Synced ${result.data.synced} interval(s) to Google Calendar`);
     } catch (error) {
       toast.dismiss();
-      toast.error(error.response?.data?.error || 'Failed to sync to calendar');
+      toast.error('Failed to sync to calendar');
     }
   };
 
