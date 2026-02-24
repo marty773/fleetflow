@@ -381,23 +381,13 @@ export default function Maintenance() {
                   <Download className="w-4 h-4 mr-2" /> Import from Motive
                 </Button>
               )}
-              {!calendarConnected ? (
-                <Button
-                  onClick={handleConnectCalendar}
-                  variant="outline"
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Connect Calendar
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSyncAll}
-                  variant="outline"
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
-                </Button>
-              )}
+              <Button
+                onClick={handleSyncAll}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                Sync All to Google Calendar
+              </Button>
               <Button
                 onClick={() => {
                   setEditingInterval(null);
