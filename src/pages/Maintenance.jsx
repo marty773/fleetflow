@@ -63,6 +63,11 @@ export default function Maintenance() {
     queryFn: () => base44.entities.MaintenanceInterval.list(),
   });
 
+  const { data: allBills = [] } = useQuery({
+    queryKey: ['bills'],
+    queryFn: () => base44.entities.Bill.list(),
+  });
+
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const vendors = allVendors.filter(v => v.company_id === selectedCompany);
   const records = allRecords.filter(r => r.company_id === selectedCompany);
