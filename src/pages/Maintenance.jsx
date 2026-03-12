@@ -21,6 +21,7 @@ import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalForm from '../components/maintenance/IntervalForm';
 import IntervalList from '../components/maintenance/IntervalList';
 import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
+import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 import { format } from 'date-fns';
 import { useCompany } from '../components/CompanyContext';
 
