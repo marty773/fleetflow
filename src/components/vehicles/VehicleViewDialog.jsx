@@ -9,16 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Copy, Edit2, Truck, Package, CheckCircle, XCircle, History, Plus, FileText, Calendar, Radio } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { Copy, Edit2, Truck, Package, CheckCircle, XCircle, History, Plus, FileText, Calendar, Radio, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import FleetMap from './FleetMap';
-import MotiveLivePanel from './MotiveLivePanel';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import FleetMap from './FleetMap';
+import MotiveLivePanel from './MotiveLivePanel';
 import MaintenanceForm from '../maintenance/MaintenanceForm';
 
 export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit }) {
