@@ -40,6 +40,9 @@ import {
 import { cn } from '@/lib/utils';
 
 export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
+  const { selectedCompany } = useCompany();
+  const serviceTypes = useServiceTypes(selectedCompany, 'records');
+
   // When editing, merge parts_used back into work_items so they show correctly
   const initializeFormData = () => {
     if (!record) {

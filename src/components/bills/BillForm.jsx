@@ -46,6 +46,9 @@ import {
 import ResponsiveSelect from '@/components/ResponsiveSelect';
 
 export default function BillForm({ bill, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
+  const { selectedCompany } = useCompany();
+  const serviceTypes = useServiceTypes(selectedCompany, 'bills');
+
   const [formData, setFormData] = useState(bill || {
     vendor: '',
     bill_date: new Date().toISOString().split('T')[0],
