@@ -460,6 +460,15 @@ export default function Maintenance() {
           </TabsContent>
           </Tabs>
 
+          {/* Mark Complete Dialog */}
+          <MarkCompleteDialog
+            interval={completingInterval}
+            records={records}
+            bills={bills}
+            onConfirm={handleMarkComplete}
+            onClose={() => setCompletingInterval(null)}
+          />
+
           {/* View Maintenance Record Dialog */}
           <MaintenanceRecordDetailDialog
             record={viewingRecord}
