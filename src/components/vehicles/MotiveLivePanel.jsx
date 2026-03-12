@@ -36,18 +36,23 @@ export default function MotiveLivePanel({ motiveVehicle }) {
     <div className="space-y-4">
       {/* Status + Driver */}
       <div className="flex items-center gap-3 flex-wrap">
-        <Badge variant={status === 'active' ? 'default' : 'secondary'} className="capitalize">
-          {status || 'unknown'}
-        </Badge>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-slate-500 dark:text-slate-400">Status:</span>
+          <Badge variant={status === 'active' ? 'default' : 'secondary'} className="capitalize">
+            {status || 'Unknown'}
+          </Badge>
+        </div>
         {current_driver && (
           <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
             <User className="w-3 h-3" />
+            <span className="text-xs text-slate-500 dark:text-slate-400">Driver:</span>
             {current_driver.first_name} {current_driver.last_name}
           </div>
         )}
         {located_at && (
           <div className="flex items-center gap-1 text-xs text-slate-400">
             <Clock className="w-3 h-3" />
+            <span className="text-slate-500 dark:text-slate-400">Last seen:</span>
             {new Date(located_at).toLocaleString()}
           </div>
         )}
