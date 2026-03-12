@@ -27,7 +27,15 @@ export default function Vehicles() {
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const vehicles = allVehicles
+    .filter(v => v.company_id === selectedCompany && (filterType === 'all' || v.type === filterType))
+    .sort((a, b) => {
+      if (sortBy === 'type') {
+        if (a.type !== b.type) return a.type.localeCompare(b.type);
+        return (a.name || '').localeCompare(b.name || '');
+      }
+      return (a.name || '').localeCompare(b.name || '');
+    });
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Vehicle.create(data),
