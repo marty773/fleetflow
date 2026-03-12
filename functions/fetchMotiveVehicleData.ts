@@ -26,10 +26,6 @@ Deno.serve(async (req) => {
     const locRes = await fetch('https://api.gomotive.com/v1/vehicle_locations?per_page=100', { headers });
     const locData = locRes.ok ? await locRes.json() : { vehicles: [] };
 
-    console.log('Raw response keys:', Object.keys(locData));
-    const firstItem = (locData.vehicles || locData.vehicle_locations || [])[0];
-    console.log('First item:', JSON.stringify(firstItem || null));
-
     const rawList = locData.vehicles || locData.vehicle_locations || [];
 
     const vehicles = rawList.map(entry => {
