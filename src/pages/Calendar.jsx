@@ -297,50 +297,6 @@ export default function Calendar() {
           </div>
           
           <div className="flex flex-col gap-3">
-            {/* Calendar buttons row */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              {/* User's personal calendar */}
-              {!userCalendarConnected ? (
-                <Button
-                   onClick={handleConnectUserCalendar}
-                   variant="outline"
-                   className="border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                 >
-                   <CalendarIcon className="w-4 h-4 mr-2" /> Connect My Calendar
-                 </Button>
-                ) : (
-                 <Button
-                   onClick={handleOpenUserSync}
-                   variant="outline"
-                   className="border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                 >
-                  <CalendarIcon className="w-4 h-4 mr-2" /> Sync to My Calendar
-                </Button>
-              )}
-
-              {/* Company calendar (admin only) */}
-              {currentUser?.role === 'admin' && (
-                !companyCalendarConnected ? (
-                  <Button
-                   onClick={handleConnectCompanyCalendar}
-                   variant="outline"
-                   className="border-green-300 dark:border-green-700 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"
-                  >
-                   <CalendarIcon className="w-4 h-4 mr-2" /> Connect Company Calendar
-                  </Button>
-                  ) : (
-                  <Button
-                   onClick={handleOpenCompanySync}
-                   variant="outline"
-                   className="border-green-300 dark:border-green-700 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"
-                  >
-                    <CalendarIcon className="w-4 h-4 mr-2" /> Sync to Company Calendar
-                  </Button>
-                )
-              )}
-            </div>
-
-            {/* Vehicle filter below buttons */}
             <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
               <SelectTrigger className="w-full sm:w-64 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 <SelectValue />

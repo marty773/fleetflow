@@ -5,41 +5,8 @@ const CompanyContext = createContext();
 
 export function CompanyProvider({ children }) {
   const [selectedCompany, setSelectedCompany] = useState("Fisher's Enterprise");
-  const [allowedCompanies, setAllowedCompanies] = useState(["Fisher's Enterprise", "Pencroft Structures"]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserAccess = async () => {
-      try {
-        const user = await base44.auth.me();
-        if (user?.role === 'admin') {
-          setAllowedCompanies(["Fisher's Enterprise", "Pencroft Structures"]);
-        } else {
-          // Fetch user's company access from UserCompanyAccess entity
-          const userAccess = await base44.entities.UserCompanyAccess.filter({ user_email: user.email });
-          const companies = userAccess.map(a => a.company_id);
-          
-          if (companies.length > 0) {
-            setAllowedCompanies(companies);
-            // Auto-select first allowed company if current selection is not allowed
-            if (!companies.includes(selectedCompany)) {
-              setSelectedCompany(companies[0]);
-            }
-          } else {
-            // Default fallback
-            setAllowedCompanies(["Fisher's Enterprise"]);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching user access:', error);
-        setAllowedCompanies(["Fisher's Enterprise"]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserAccess();
-  }, []);
+  const [allowedCompanies, setAllowedCompanies] = useState(["Fisher's Enterprise"]);
+  const [loading, setLoading] = useState(false);
 
   return (
     <CompanyContext.Provider value={{ selectedCompany, setSelectedCompany, allowedCompanies, loading }}>
