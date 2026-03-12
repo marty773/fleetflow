@@ -6,8 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ResponsiveSelect from '@/components/ResponsiveSelect';
 import { SelectItem } from '@/components/ui/select';
 import { X } from 'lucide-react';
+import { useCompany } from '@/components/CompanyContext';
+import { useServiceTypes } from '@/components/useServiceTypes';
 
 export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, isLoading }) {
+  const { selectedCompany } = useCompany();
+  const serviceTypes = useServiceTypes(selectedCompany, 'records');
   const [formData, setFormData] = useState({
     vehicle_id: interval?.vehicle_id || '',
     interval_name: interval?.interval_name || '',

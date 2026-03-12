@@ -4,12 +4,22 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, FileText, Receipt } from 'lucide-react';
+import { useCompany } from '@/components/CompanyContext';
+import { useServiceTypes } from '@/components/useServiceTypes';
 
 export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, isDeleting }) {
+  const { selectedCompany } = useCompany();
+  const serviceTypes = useServiceTypes(selectedCompany, 'records');
+
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
   }, {});
+
+  const getTypeLabel = (value) => {
+    const found = serviceTypes.find(t => t.value === value);
+    return found ? found.label : (value?.replace(/_/g, ' ') || '');
+  };
 
   const maintenanceColors = {
     oil_change: 'bg-blue-100 text-blue-800',
@@ -20,6 +30,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     cleaning: 'bg-green-100 text-green-800',
     other: 'bg-slate-100 text-slate-800',
   };
+  const getTypeColor = (value) => maintenanceColors[value] || 'bg-slate-100 text-slate-800';
 
   if (intervals.length === 0) {
     return (

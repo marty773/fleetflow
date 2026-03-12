@@ -4,12 +4,22 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { Eye, Edit2, Trash2, Wrench } from 'lucide-react';
+import { useCompany } from '@/components/CompanyContext';
+import { useServiceTypes } from '@/components/useServiceTypes';
 
 export default function MaintenanceList({ records, vehicles, items, onView, onEdit, onDelete, isDeleting }) {
+  const { selectedCompany } = useCompany();
+  const serviceTypes = useServiceTypes(selectedCompany, 'records');
+
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
   }, {});
+
+  const getTypeLabel = (value) => {
+    const found = serviceTypes.find(t => t.value === value);
+    return found ? found.label : (value?.replace(/_/g, ' ') || '');
+  };
 
   const maintenanceColors = {
      oil_change: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
@@ -20,6 +30,7 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
      cleaning: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
      other: 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300',
    };
+  const getTypeColor = (value) => maintenanceColors[value] || 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300';
 
   if (records.length === 0) {
      return (
