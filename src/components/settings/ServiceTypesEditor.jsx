@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Wrench, Plus, Trash2 } from 'lucide-react';
+import { Wrench, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
 import { BUILT_IN_TYPES } from '@/components/useServiceTypes';
 
 export default function ServiceTypesEditor({ selectedCompany }) {
@@ -14,6 +14,9 @@ export default function ServiceTypesEditor({ selectedCompany }) {
   const [newAppliesTo, setNewAppliesTo] = useState('both');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editLabel, setEditLabel] = useState('');
+  const [editAppliesTo, setEditAppliesTo] = useState('both');
 
   useEffect(() => {
     if (!selectedCompany) return;
@@ -48,6 +51,30 @@ export default function ServiceTypesEditor({ selectedCompany }) {
     setCustomTypes(prev => prev.filter(t => t.id !== id));
   };
 
+  const handleEdit = (type) => {
+    setEditingId(type.id);
+    setEditLabel(type.label);
+    setEditAppliesTo(type.applies_to);
+  };
+
+  const handleSaveEdit = async (id) => {
+    if (!editLabel.trim()) return;
+    setSaving(true);
+    const updated = await base44.entities.ServiceType.update(id, {
+      label: editLabel.trim(),
+      applies_to: editAppliesTo,
+    });
+    setCustomTypes(prev => prev.map(t => t.id === id ? updated : t));
+    setEditingId(null);
+    setSaving(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditLabel('');
+    setEditAppliesTo('both');
+  };
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -80,19 +107,66 @@ export default function ServiceTypesEditor({ selectedCompany }) {
             <Label className="text-xs text-slate-500 uppercase tracking-wide mb-2 block">Custom Types — {selectedCompany}</Label>
             <div className="space-y-2">
               {customTypes.map(t => (
-                <div key={t.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                  <div>
-                    <span className="font-medium text-slate-900 dark:text-white text-sm">{t.label}</span>
-                    <span className="ml-2 text-xs text-slate-400">({t.applies_to})</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(t.id)}
-                    className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                <div key={t.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  {editingId === t.id ? (
+                    <>
+                      <Input
+                        value={editLabel}
+                        onChange={e => setEditLabel(e.target.value)}
+                        className="flex-1 h-8"
+                      />
+                      <Select value={editAppliesTo} onValueChange={setEditAppliesTo}>
+                        <SelectTrigger className="w-32 h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="both">Both</SelectItem>
+                          <SelectItem value="bills">Bills only</SelectItem>
+                          <SelectItem value="records">Records only</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleSaveEdit(t.id)}
+                        disabled={saving}
+                        className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
+                      >
+                        <Check className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleCancelEdit}
+                        className="h-7 w-7"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex-1">
+                        <span className="font-medium text-slate-900 dark:text-white text-sm">{t.label}</span>
+                        <span className="ml-2 text-xs text-slate-400">({t.applies_to})</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(t)}
+                        className="h-7 w-7 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(t.id)}
+                        className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
