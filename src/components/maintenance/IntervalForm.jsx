@@ -118,13 +118,9 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 placeholder="Select type"
                 label="Select Type"
               >
-                <SelectItem value="oil_change">Oil Change</SelectItem>
-                <SelectItem value="filter_change">Filter Change</SelectItem>
-                <SelectItem value="tire_rotation">Tire Rotation</SelectItem>
-                <SelectItem value="inspection">Inspection</SelectItem>
-                <SelectItem value="repair">Repair</SelectItem>
-                <SelectItem value="cleaning">Cleaning</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                {serviceTypes.map(t => (
+                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                ))}
               </ResponsiveSelect>
             </div>
 

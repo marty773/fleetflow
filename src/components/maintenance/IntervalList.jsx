@@ -78,8 +78,8 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                 <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap mb-2">
                   <h3 className="text-base md:text-lg font-semibold text-slate-900 dark:text-white">{interval.interval_name}</h3>
-                    <Badge className={maintenanceColors[interval.maintenance_type]}>
-                      {interval.maintenance_type?.replace('_', ' ')}
+                    <Badge className={getTypeColor(interval.maintenance_type)}>
+                      {getTypeLabel(interval.maintenance_type)}
                     </Badge>
                     <div className="flex items-center gap-1">
                       <StatusIcon className={`w-4 h-4 ${status.color}`} />

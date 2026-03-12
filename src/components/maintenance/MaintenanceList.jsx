@@ -60,8 +60,8 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
                <div className="flex-1">
                  <div className="flex items-center gap-3 mb-2">
                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{record.title}</h3>
-                   <Badge className={maintenanceColors[record.maintenance_type]}>
-                     {record.maintenance_type?.replace('_', ' ')}
+                   <Badge className={getTypeColor(record.maintenance_type)}>
+                     {getTypeLabel(record.maintenance_type)}
                    </Badge>
                  </div>
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
