@@ -105,7 +105,17 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 justify-end md:justify-start">
+                <div className="flex gap-2 justify-end md:justify-start flex-wrap">
+                  {(status.label === 'Overdue' || status.label === 'Urgent' || status.label === 'Due Soon') && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onMarkComplete(interval)}
+                      className="border-green-400 text-green-700 hover:bg-green-50 gap-1"
+                    >
+                      <CheckCircle2 className="w-4 h-4" /> Mark Complete
+                    </Button>
+                  )}
                    <Button
                      variant="outline"
                      onClick={() => onEdit(interval)}
