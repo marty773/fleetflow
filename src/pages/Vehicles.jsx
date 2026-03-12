@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, ArrowUpDown } from 'lucide-react';
 import VehicleForm from '../components/vehicles/VehicleForm';
 import VehicleCard from '../components/vehicles/VehicleCard';
 import VehicleViewDialog from '../components/vehicles/VehicleViewDialog';
@@ -17,6 +17,8 @@ export default function Vehicles() {
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [viewingVehicle, setViewingVehicle] = useState(null);
+  const [sortBy, setSortBy] = useState('name'); // 'name', 'type'
+  const [filterType, setFilterType] = useState('all'); // 'all', 'truck', 'trailer'
   const queryClient = useQueryClient();
   const formRef = useRef(null);
 
