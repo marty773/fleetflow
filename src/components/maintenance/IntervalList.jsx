@@ -104,6 +104,20 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                       </p>
                     </div>
                   </div>
+                  {(interval.linked_record_id || interval.linked_bill_id) && (
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      {interval.linked_record_id && (
+                        <Badge variant="outline" className="gap-1 text-blue-700 border-blue-300 bg-blue-50">
+                          <FileText className="w-3 h-3" /> Maintenance Record Linked
+                        </Badge>
+                      )}
+                      {interval.linked_bill_id && (
+                        <Badge variant="outline" className="gap-1 text-purple-700 border-purple-300 bg-purple-50">
+                          <Receipt className="w-3 h-3" /> Bill Linked
+                        </Badge>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2 justify-end md:justify-start flex-wrap">
                   {(status.label === 'Overdue' || status.label === 'Urgent' || status.label === 'Due Soon') && (
