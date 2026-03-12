@@ -136,14 +136,18 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
         </DialogHeader>
 
         <Tabs defaultValue="details" className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">
               <FileText className="w-4 h-4 mr-2" />
               Details
             </TabsTrigger>
+            <TabsTrigger value="live">
+              <Radio className="w-4 h-4 mr-2" />
+              Live Data
+            </TabsTrigger>
             <TabsTrigger value="history">
               <History className="w-4 h-4 mr-2" />
-              Maintenance History ({maintenanceRecords.length})
+              History ({maintenanceRecords.length})
             </TabsTrigger>
           </TabsList>
 
