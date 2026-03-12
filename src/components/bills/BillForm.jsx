@@ -338,18 +338,14 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
               <Label htmlFor="category">Category *</Label>
               <div className="mt-2">
                 <ResponsiveSelect
-                  value={formData.category}
-                  onValueChange={(value) => handleChange('category', value)}
-                  placeholder="Select category"
-                  label="Category"
+                 value={formData.category}
+                 onValueChange={(value) => handleChange('category', value)}
+                 placeholder="Select category"
+                 label="Category"
                 >
-                  <SelectItem value="fuel">Fuel</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                  <SelectItem value="repairs">Repairs</SelectItem>
-                  <SelectItem value="insurance">Insurance</SelectItem>
-                  <SelectItem value="registration">Registration</SelectItem>
-                  <SelectItem value="tolls">Tolls</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                 {serviceTypes.map(t => (
+                   <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                 ))}
                 </ResponsiveSelect>
               </div>
             </div>

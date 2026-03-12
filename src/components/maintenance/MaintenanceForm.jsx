@@ -267,18 +267,14 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               <Label htmlFor="maintenance_type">Type *</Label>
               <div className="mt-2">
                 <ResponsiveSelect
-                  value={formData.maintenance_type}
-                  onValueChange={(value) => handleChange('maintenance_type', value)}
-                  placeholder="Select maintenance type"
-                  label="Type"
+                 value={formData.maintenance_type}
+                 onValueChange={(value) => handleChange('maintenance_type', value)}
+                 placeholder="Select maintenance type"
+                 label="Type"
                 >
-                  <SelectItem value="oil_change">Oil Change</SelectItem>
-                  <SelectItem value="filter_change">Filter Change</SelectItem>
-                  <SelectItem value="tire_rotation">Tire Rotation</SelectItem>
-                  <SelectItem value="inspection">Inspection</SelectItem>
-                  <SelectItem value="repair">Repair</SelectItem>
-                  <SelectItem value="cleaning">Cleaning</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                 {serviceTypes.map(t => (
+                   <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                 ))}
                 </ResponsiveSelect>
               </div>
             </div>
