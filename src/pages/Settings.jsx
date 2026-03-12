@@ -167,6 +167,8 @@ export default function SettingsPage() {
           </Card>
         )}
 
+        <ServiceTypesEditor selectedCompany={selectedCompany} />
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg text-slate-900 dark:text-white">Danger Zone</CardTitle>
