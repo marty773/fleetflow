@@ -5,22 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Wrench, Plus, Trash2, Save } from 'lucide-react';
-
-// Built-in defaults that are always available (shown greyed out, not deletable)
-const BUILT_IN_TYPES = [
-  { value: 'oil_change', label: 'Oil Change' },
-  { value: 'filter_change', label: 'Filter Change' },
-  { value: 'tire_rotation', label: 'Tire Rotation' },
-  { value: 'inspection', label: 'Inspection' },
-  { value: 'repair', label: 'Repair' },
-  { value: 'cleaning', label: 'Cleaning' },
-  { value: 'fuel', label: 'Fuel' },
-  { value: 'insurance', label: 'Insurance' },
-  { value: 'registration', label: 'Registration' },
-  { value: 'tolls', label: 'Tolls' },
-  { value: 'other', label: 'Other' },
-];
+import { Wrench, Plus, Trash2 } from 'lucide-react';
+import { BUILT_IN_TYPES } from '@/components/useServiceTypes';
 
 export default function ServiceTypesEditor({ selectedCompany }) {
   const [customTypes, setCustomTypes] = useState([]);
