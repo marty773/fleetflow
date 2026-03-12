@@ -201,13 +201,7 @@ function LayoutContent({ children, currentPageName }) {
 
       {/* Main Content */}
       <main className="flex-1 w-full pb-24 lg:pb-0 overflow-x-hidden overflow-y-auto" style={{ marginTop: 'env(safe-area-inset-top)' }}>
-        <div 
-          className="mt-14 lg:mt-0 hidden lg:flex items-center justify-between px-6 h-14 text-base font-semibold"
-          style={{ color: themeColors.primary }}
-        >
-          <span>{selectedCompany}</span>
-
-        </div>
+        <div className="mt-14 lg:mt-0 hidden lg:block h-4" />
         {children}
       </main>
 
