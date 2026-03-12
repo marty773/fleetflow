@@ -22,57 +22,37 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json'
     };
 
-    // Fetch all vehicles and current locations from Motive
-    const [vehiclesRes, locationsRes] = await Promise.all([
-      fetch('https://api.gomotive.com/v1/vehicles?per_page=100', { headers }),
-      fetch('https://api.gomotive.com/v2/vehicle_locations?per_page=100', { headers })
-    ]);
+    // v1/vehicle_locations returns vehicles with current_location embedded — single call needed
+    const locRes = await fetch('https://api.gomotive.com/v1/vehicle_locations?per_page=100', { headers });
+    const locData = locRes.ok ? await locRes.json() : { vehicles: [] };
 
-    const vehiclesData = vehiclesRes.ok ? await vehiclesRes.json() : { vehicles: [] };
-    const locationsRaw = locationsRes.ok ? await locationsRes.json() : {};
-
-    // Log for debugging
-    console.log('Locations keys:', Object.keys(locationsRaw));
-    console.log('Locations sample:', JSON.stringify(locationsRaw).slice(0, 500));
-
-    // Motive v2 vehicle_locations returns { vehicle_locations: [...] } each with { id, vehicle: {...}, location: {...} }
-    const locationList = locationsRaw.vehicle_locations || locationsRaw.vehicles || [];
-
-    // Build location map keyed by vehicle id
-    const locationMap = {};
-    for (const entry of locationList) {
-      const vid = entry.vehicle?.id || entry.id;
-      if (vid) locationMap[vid] = entry;
-    }
-
-    // Merge vehicle info with location data
-    const vehicles = (vehiclesData.vehicles || []).map(v => {
-      const vData = v.vehicle || v;
-      const locEntry = locationMap[vData.id] || {};
-      const locData = locEntry.location || locEntry;
+    // Each item: { id, number, vin, make, model, year, current_location: { lat, lon, speed, ... }, current_driver, ... }
+    const vehicles = (locData.vehicles || []).map(v => {
+      const loc = v.current_location || {};
       return {
-        motive_id: vData.id,
-        number: vData.number,
-        make: vData.make,
-        model: vData.model,
-        year: vData.year,
-        vin: vData.vin,
-        license_plate: vData.license_plate_number,
-        status: vData.status,
-        current_driver: vData.current_driver,
+        motive_id: v.id,
+        number: v.number,
+        make: v.make,
+        model: v.model,
+        year: v.year,
+        vin: v.vin,
+        license_plate: v.license_plate_number,
+        status: v.status,
+        current_driver: v.current_driver,
         // Location
-        lat: locData.lat,
-        lon: locData.lon,
-        located_at: locData.located_at,
-        speed: locData.speed,
-        bearing: locData.bearing,
-        description: locData.description,
+        lat: loc.lat,
+        lon: loc.lon,
+        located_at: loc.located_at,
+        speed: loc.speed,
+        bearing: loc.bearing,
+        description: loc.description,
+        location_type: loc.type,
         // Odometer / engine
-        odometer: vData.odometer || locData.odometer,
-        fuel_level: vData.fuel_level_percent,
-        engine_hours: vData.engine_hours || locData.engine_hours,
-        // Engine fault codes
-        fault_codes: vData.active_fault_codes || [],
+        odometer: loc.odometer || loc.true_odometer,
+        fuel_level: loc.fuel_primary_remaining_percentage,
+        engine_hours: loc.engine_hours || loc.true_engine_hours,
+        // Fault codes
+        fault_codes: v.active_fault_codes || [],
       };
     });
 
