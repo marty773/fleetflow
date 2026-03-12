@@ -35,6 +35,7 @@ export default function Maintenance() {
   const [activeTab, setActiveTab] = useState('records');
 
   const [deletingRecord, setDeletingRecord] = useState(null);
+  const [completingInterval, setCompletingInterval] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
