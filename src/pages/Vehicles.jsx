@@ -120,6 +120,41 @@ export default function Vehicles() {
           </Button>
         </div>
 
+        {/* Sort & Filter Controls */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            {['all', 'truck', 'trailer'].map(type => (
+              <button
+                key={type}
+                onClick={() => setFilterType(type)}
+                className={`px-4 py-2 text-sm font-medium transition-colors capitalize ${
+                  filterType === type
+                    ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                }`}
+              >
+                {type === 'all' ? 'All' : type + 's'}
+              </button>
+            ))}
+          </div>
+          <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            {[{ value: 'name', label: 'A–Z' }, { value: 'type', label: 'By Type' }].map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setSortBy(opt.value)}
+                className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-1 ${
+                  sortBy === opt.value
+                    ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                }`}
+              >
+                <ArrowUpDown className="w-3 h-3" />
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <FleetLiveSection vehicles={vehicles} />
 
         {showForm && (
