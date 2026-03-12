@@ -73,6 +73,7 @@ export default function Maintenance() {
   const records = allRecords.filter(r => r.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
   const filteredItems = items.filter(i => i.company_id === selectedCompany);
+  const bills = allBills.filter(b => b.company_id === selectedCompany);
 
   // Check for URL parameter to auto-open a specific record or interval
   React.useEffect(() => {
