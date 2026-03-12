@@ -22,27 +22,34 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json'
     };
 
-    // Fetch all vehicles with current locations from Motive
+    // Fetch all vehicles and current locations from Motive
     const [vehiclesRes, locationsRes] = await Promise.all([
       fetch('https://api.gomotive.com/v1/vehicles?per_page=100', { headers }),
-      fetch('https://api.gomotive.com/v1/vehicle_locations?per_page=100', { headers })
+      fetch('https://api.gomotive.com/v2/vehicle_locations?per_page=100', { headers })
     ]);
 
     const vehiclesData = vehiclesRes.ok ? await vehiclesRes.json() : { vehicles: [] };
-    const locationsData = locationsRes.ok ? await locationsRes.json() : { vehicle_locations: [] };
+    const locationsRaw = locationsRes.ok ? await locationsRes.json() : {};
+
+    // Log for debugging
+    console.log('Locations keys:', Object.keys(locationsRaw));
+    console.log('Locations sample:', JSON.stringify(locationsRaw).slice(0, 500));
+
+    // Motive v2 vehicle_locations returns { vehicle_locations: [...] } each with { id, vehicle: {...}, location: {...} }
+    const locationList = locationsRaw.vehicle_locations || locationsRaw.vehicles || [];
 
     // Build location map keyed by vehicle id
     const locationMap = {};
-    for (const loc of (locationsData.vehicle_locations || [])) {
-      const vid = loc.id || loc.vehicle?.id;
-      if (vid) locationMap[vid] = loc;
+    for (const entry of locationList) {
+      const vid = entry.vehicle?.id || entry.id;
+      if (vid) locationMap[vid] = entry;
     }
 
     // Merge vehicle info with location data
     const vehicles = (vehiclesData.vehicles || []).map(v => {
       const vData = v.vehicle || v;
-      const loc = locationMap[vData.id] || {};
-      const locData = loc.location || loc;
+      const locEntry = locationMap[vData.id] || {};
+      const locData = locEntry.location || locEntry;
       return {
         motive_id: vData.id,
         number: vData.number,
@@ -59,10 +66,11 @@ Deno.serve(async (req) => {
         located_at: locData.located_at,
         speed: locData.speed,
         bearing: locData.bearing,
+        description: locData.description,
         // Odometer / engine
-        odometer: vData.odometer,
+        odometer: vData.odometer || locData.odometer,
         fuel_level: vData.fuel_level_percent,
-        engine_hours: vData.engine_hours,
+        engine_hours: vData.engine_hours || locData.engine_hours,
         // Engine fault codes
         fault_codes: vData.active_fault_codes || [],
       };
