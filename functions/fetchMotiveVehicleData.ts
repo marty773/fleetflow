@@ -26,8 +26,15 @@ Deno.serve(async (req) => {
     const locRes = await fetch('https://api.gomotive.com/v1/vehicle_locations?per_page=100', { headers });
     const locData = locRes.ok ? await locRes.json() : { vehicles: [] };
 
+    console.log('Raw response keys:', Object.keys(locData));
+    const firstItem = (locData.vehicles || locData.vehicle_locations || [])[0];
+    console.log('First item:', JSON.stringify(firstItem || null));
+
+    const rawList = locData.vehicles || locData.vehicle_locations || [];
+
     // Each item: { id, number, vin, make, model, year, current_location: { lat, lon, speed, ... }, current_driver, ... }
-    const vehicles = (locData.vehicles || []).map(v => {
+    const vehicles = rawList.map(entry => {
+      const v = entry.vehicle || entry;
       const loc = v.current_location || {};
       return {
         motive_id: v.id,
