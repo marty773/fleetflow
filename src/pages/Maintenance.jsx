@@ -454,6 +454,7 @@ export default function Maintenance() {
                 setShowIntervalForm(true);
               }}
               onDelete={(id) => deleteIntervalMutation.mutate(id)}
+              onMarkComplete={setCompletingInterval}
               isDeleting={deleteIntervalMutation.isPending}
             />
           </TabsContent>
