@@ -270,6 +270,25 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           )}
           </TabsContent>
 
+          <TabsContent value="live" className="space-y-4 mt-4">
+            {motiveLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {motiveVehicle?.lat && motiveVehicle?.lon && (
+                  <FleetMap
+                    motiveVehicles={[motiveVehicle]}
+                    selectedMotiveId={motiveVehicle.motive_id}
+                    height="220px"
+                  />
+                )}
+                <MotiveLivePanel motiveVehicle={motiveVehicle} />
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="history" className="space-y-4 mt-4">
             {/* Add Maintenance Form */}
             {showAddMaintenance ? (
