@@ -286,6 +286,32 @@ export default function Maintenance() {
     }
   };
 
+  const handleMarkComplete = async ({ performed_date, odometer, linked_record_id, linked_bill_id }) => {
+    const interval = completingInterval;
+    const updateData = {
+      last_performed_date: performed_date,
+      linked_record_id: linked_record_id || null,
+      linked_bill_id: linked_bill_id || null,
+    };
+
+    if (odometer) {
+      updateData.last_performed_mileage = odometer;
+      if (interval.interval_miles) {
+        updateData.next_due_mileage = odometer + parseFloat(interval.interval_miles);
+      }
+    }
+
+    if (interval.interval_months) {
+      const nextDate = new Date(performed_date);
+      nextDate.setMonth(nextDate.getMonth() + parseInt(interval.interval_months));
+      updateData.next_due_date = nextDate.toISOString().split('T')[0];
+    }
+
+    await updateIntervalMutation.mutateAsync({ id: interval.id, data: updateData });
+    setCompletingInterval(null);
+    toast.success('Interval marked as complete');
+  };
+
   const handleSyncAll = async () => {
     try {
       toast.loading('Syncing to Vehicle Maintenance calendar...');
