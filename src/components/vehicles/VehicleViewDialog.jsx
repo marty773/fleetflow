@@ -25,6 +25,24 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
   const [showAddMaintenance, setShowAddMaintenance] = useState(false);
   const queryClient = useQueryClient();
 
+  // Fetch motive live data for this vehicle
+  const { data: motiveData, isLoading: motiveLoading } = useQuery({
+    queryKey: ['motive-vehicle-data'],
+    queryFn: async () => {
+      const res = await base44.functions.invoke('fetchMotiveVehicleData', {});
+      return res.data;
+    },
+    enabled: open,
+    refetchInterval: 60000,
+  });
+
+  const motiveVehicle = vehicle && motiveData?.vehicles
+    ? motiveData.vehicles.find(v =>
+        (vehicle.vin && v.vin && vehicle.vin === v.vin) ||
+        (vehicle.license_plate && v.license_plate && vehicle.license_plate === v.license_plate)
+      )
+    : null;
+
   // Fetch maintenance records for this vehicle
   const { data: allMaintenanceRecords = [] } = useQuery({
     queryKey: ['maintenance-records'],

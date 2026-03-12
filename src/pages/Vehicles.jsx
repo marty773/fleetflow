@@ -110,6 +110,8 @@ export default function Vehicles() {
           </Button>
         </div>
 
+        <FleetLiveSection vehicles={vehicles} />
+
         {showForm && (
           <div ref={formRef}>
             <VehicleForm
