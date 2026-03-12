@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, FileText, Receipt } from 'lucide-react';
 
-export default function IntervalList({ intervals, vehicles, onEdit, onDelete, isDeleting }) {
+export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, isDeleting }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
