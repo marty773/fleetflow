@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw } from 'lucide-react';
+import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw, ArrowUpDown } from 'lucide-react';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
 import ItemDetailDialog from '@/components/dialogs/ItemDetailDialog';
@@ -44,6 +44,7 @@ export default function Items() {
   const [viewingItem, setViewingItem] = useState(null);
   const [photoLightbox, setPhotoLightbox] = useState(null);
   const [recalculating, setRecalculating] = useState(false);
+  const [sortBy, setSortBy] = useState('name'); // 'name', 'price_asc', 'price_desc', 'stock'
   const [viewingMaintenanceRecord, setViewingMaintenanceRecord] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
 
