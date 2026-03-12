@@ -179,15 +179,22 @@ export default function Items() {
     },
   });
 
-  const filteredItems = items.filter(item => {
-    const query = searchQuery.toLowerCase();
-    return (
-      item.name?.toLowerCase().includes(query) ||
-      item.vendor?.toLowerCase().includes(query) ||
-      item.item_number?.toLowerCase().includes(query) ||
-      item.description?.toLowerCase().includes(query)
-    );
-  });
+  const filteredItems = items
+    .filter(item => {
+      const query = searchQuery.toLowerCase();
+      return (
+        item.name?.toLowerCase().includes(query) ||
+        item.vendor?.toLowerCase().includes(query) ||
+        item.item_number?.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === 'price_asc') return (a.price || 0) - (b.price || 0);
+      if (sortBy === 'price_desc') return (b.price || 0) - (a.price || 0);
+      if (sortBy === 'stock') return (b.quantity_on_hand || 0) - (a.quantity_on_hand || 0);
+      return (a.name || '').localeCompare(b.name || ''); // default: name A-Z
+    });
 
   const handleEdit = (item) => {
     setEditingItem(item);
