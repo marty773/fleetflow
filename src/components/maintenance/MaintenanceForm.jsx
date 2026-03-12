@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import React from 'react';
+import { useCompany } from '@/components/CompanyContext';
+import { useServiceTypes } from '@/components/useServiceTypes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
