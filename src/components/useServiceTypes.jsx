@@ -5,7 +5,7 @@ export const BUILT_IN_TYPES = [
   { value: 'oil_change', label: 'Oil Change', applies_to: 'records' },
   { value: 'filter_change', label: 'Filter Change', applies_to: 'records' },
   { value: 'tire_rotation', label: 'Tire Rotation', applies_to: 'records' },
-  { value: 'inspection', label: 'Inspection', applies_to: 'records' },
+  { value: 'inspection', label: 'Inspection', applies_to: 'both' },
   { value: 'repair', label: 'Repair', applies_to: 'both' },
   { value: 'cleaning', label: 'Cleaning', applies_to: 'records' },
   { value: 'fuel', label: 'Fuel', applies_to: 'bills' },
