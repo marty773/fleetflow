@@ -485,6 +485,7 @@ export default function Maintenance() {
             interval={completingInterval}
             records={records}
             bills={bills}
+            vendors={vendors}
             onConfirm={handleMarkComplete}
             onClose={() => setCompletingInterval(null)}
           />
