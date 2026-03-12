@@ -12,7 +12,7 @@ export const BUILT_IN_TYPES = [
   { value: 'maintenance', label: 'Maintenance', applies_to: 'bills' },
   { value: 'repairs', label: 'Repairs', applies_to: 'bills' },
   { value: 'insurance', label: 'Insurance', applies_to: 'bills' },
-  { value: 'registration', label: 'Registration', applies_to: 'bills' },
+  { value: 'registration', label: 'Registration', applies_to: 'both' },
   { value: 'tolls', label: 'Tolls', applies_to: 'bills' },
   { value: 'other', label: 'Other', applies_to: 'both' },
 ];
