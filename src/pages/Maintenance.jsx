@@ -286,11 +286,31 @@ export default function Maintenance() {
     }
   };
 
-  const handleMarkComplete = async ({ performed_date, odometer, linked_record_id, linked_bill_id }) => {
+  const handleMarkComplete = async ({ performed_date, odometer, linked_record_id, linked_bill_id, create_record, new_record }) => {
     const interval = completingInterval;
+
+    let resolvedRecordId = linked_record_id || null;
+
+    // Create a new maintenance record if requested
+    if (create_record && new_record) {
+      const createdRecord = await base44.entities.MaintenanceRecord.create({
+        company_id: selectedCompany,
+        vehicle_id: interval.vehicle_id,
+        maintenance_type: interval.maintenance_type || 'other',
+        title: new_record.title || interval.interval_name,
+        performed_date,
+        vendor: new_record.vendor && new_record.vendor !== 'none' ? new_record.vendor : undefined,
+        odometer_reading: odometer ? String(odometer) : undefined,
+        total_cost: new_record.total_cost || undefined,
+        notes: new_record.notes || undefined,
+      });
+      resolvedRecordId = createdRecord.id;
+      queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
+    }
+
     const updateData = {
       last_performed_date: performed_date,
-      linked_record_id: linked_record_id || null,
+      linked_record_id: resolvedRecordId,
       linked_bill_id: linked_bill_id || null,
     };
 
