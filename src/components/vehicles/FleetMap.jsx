@@ -83,6 +83,30 @@ export default function FleetMap({ motiveVehicles = [], selectedMotiveId = null,
             icon={createTruckIcon(String(v.motive_id) === String(selectedMotiveId))}
             eventHandlers={{ click: () => onSelectVehicle && onSelectVehicle(v) }}
           >
+            <Tooltip permanent={false} direction="top" offset={[0, -18]} opacity={1}>
+              <div style={{ minWidth: '160px' }}>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '4px' }}>{v.number || `Vehicle ${v.motive_id}`}</div>
+                {v.current_driver && (
+                  <div style={{ fontSize: '11px', color: '#475569' }}>
+                    👤 {v.current_driver.first_name} {v.current_driver.last_name}
+                  </div>
+                )}
+                {v.description && (
+                  <div style={{ fontSize: '11px', color: '#475569' }}>📍 {v.description}</div>
+                )}
+                {v.speed != null && (
+                  <div style={{ fontSize: '11px', color: '#475569' }}>🚀 {v.speed} mph</div>
+                )}
+                {v.odometer != null && (
+                  <div style={{ fontSize: '11px', color: '#475569' }}>🔢 {Math.round(v.odometer).toLocaleString()} mi</div>
+                )}
+                {v.located_at && (
+                  <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>
+                    {new Date(v.located_at).toLocaleString()}
+                  </div>
+                )}
+              </div>
+            </Tooltip>
             <Popup>
               <div className="text-sm font-medium">{v.number || `Vehicle ${v.motive_id}`}</div>
               {v.speed != null && <div className="text-xs text-slate-500">{v.speed} mph</div>}
