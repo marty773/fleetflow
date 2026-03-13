@@ -22,11 +22,8 @@ import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceReco
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 import BillDetailDialog from '../components/dialogs/BillDetailDialog';
 import { format } from 'date-fns';
-import { useCompany } from '../components/CompanyContext';
-
 export default function Maintenance() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const [viewingRecord, setViewingRecord] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('records');
