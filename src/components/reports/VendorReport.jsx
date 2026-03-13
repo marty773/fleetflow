@@ -246,11 +246,7 @@ export default function VendorReport() {
           <Card key={vendor.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
             <button
               onClick={() => {
-                if (window.innerWidth < 768 && vendor.transactions.length > 0) {
-                  setViewingTransaction(vendor.transactions[0]);
-                } else {
-                  setExpandedVendor(expandedVendor === vendor.id ? null : vendor.id);
-                }
+                setExpandedVendor(expandedVendor === vendor.id ? null : vendor.id);
               }}
               className="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900"
               >

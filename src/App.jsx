@@ -5,6 +5,12 @@ import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
+import VehicleFormPage from './pages/VehicleForm';
+import VendorFormPageComp from './pages/VendorFormPage';
+import ItemFormPageComp from './pages/ItemFormPage';
+import BillFormPageComp from './pages/BillFormPage';
+import MaintenanceRecordFormPageComp from './pages/MaintenanceRecordFormPage';
+import MaintenanceIntervalFormPageComp from './pages/MaintenanceIntervalFormPage';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
@@ -58,6 +64,12 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      <Route path="/VehicleForm" element={<LayoutWrapper currentPageName="VehicleForm"><VehicleFormPage /></LayoutWrapper>} />
+      <Route path="/VendorFormPage" element={<LayoutWrapper currentPageName="VendorFormPage"><VendorFormPageComp /></LayoutWrapper>} />
+      <Route path="/ItemFormPage" element={<LayoutWrapper currentPageName="ItemFormPage"><ItemFormPageComp /></LayoutWrapper>} />
+      <Route path="/BillFormPage" element={<LayoutWrapper currentPageName="BillFormPage"><BillFormPageComp /></LayoutWrapper>} />
+      <Route path="/MaintenanceRecordFormPage" element={<LayoutWrapper currentPageName="MaintenanceRecordFormPage"><MaintenanceRecordFormPageComp /></LayoutWrapper>} />
+      <Route path="/MaintenanceIntervalFormPage" element={<LayoutWrapper currentPageName="MaintenanceIntervalFormPage"><MaintenanceIntervalFormPageComp /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

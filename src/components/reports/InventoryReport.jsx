@@ -354,11 +354,7 @@ export default function InventoryReport({ highlightItemId }) {
                         id={`item-row-${item.id}`}
                         className="hover:bg-slate-50 cursor-pointer transition-colors" 
                         onClick={() => {
-                        if (window.innerWidth < 768 && transactions.length > 0) {
-                          setViewingTransaction(transactions[0]);
-                        } else {
-                          toggleExpanded(item.id);
-                        }
+                        toggleExpanded(item.id);
                       }}>
                         <TableCell onClick={(e) => {
                           e.stopPropagation();
