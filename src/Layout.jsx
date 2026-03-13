@@ -155,7 +155,7 @@ function LayoutContent({ children, currentPageName }) {
         style={{ zIndex: 700 }}
       >
         <div className="p-6">
-          <div className="flex items-center gap-2 mb-4 mt-12 lg:mt-0">
+          <div className="flex items-center gap-2 mb-6 mt-12 lg:mt-0">
             <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695d462470d43f37f0539478/e0b7746bb_ChatGPTImageFeb2202602_58_12PM.png" alt="FleetFlow" className="w-10 h-10 rounded-lg" />
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">FleetFlow</h1>
           </div>
