@@ -155,7 +155,6 @@ export default function Maintenance() {
     try {
       toast.loading('Syncing to Google Calendar...');
       const result = await base44.functions.invoke('syncToGoogleCalendar', {
-        company_id: selectedCompany,
         futureOnly: false,
       });
       toast.dismiss();
