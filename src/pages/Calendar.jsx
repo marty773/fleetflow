@@ -447,7 +447,7 @@ export default function Calendar() {
               <CardContent className="p-6 space-y-3 max-h-96 overflow-y-auto">
                 {(filteredIntervals.filter(i => i.next_due_date).length > 0 || filteredAppointments.length > 0) ? (
                   [
-                    ...filteredIntervals.filter(i => i.next_due_date).map(i => ({ ...i, type: 'interval', sortDate: new Date(i.next_due_date) })),
+                    ...filteredIntervals.filter(i => i.next_due_date || i.scheduled_date).map(i => ({ ...i, type: 'interval', sortDate: new Date((i.scheduled_date || i.next_due_date) + 'T12:00:00') })),
                     ...filteredAppointments.map(a => ({ ...a, type: 'appointment', sortDate: new Date(a.appointment_date) }))
                   ]
                     .sort((a, b) => a.sortDate - b.sortDate)
