@@ -151,7 +151,7 @@ function LayoutContent({ children, currentPageName }) {
         className={`fixed lg:relative w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 h-screen overflow-y-auto transition-transform duration-200 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
-        style={{ zIndex: 700 }}`}
+        style={{ zIndex: 700 }}
       >
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4 mt-12 lg:mt-0">
