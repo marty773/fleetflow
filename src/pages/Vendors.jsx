@@ -28,51 +28,10 @@ export default function Vendors() {
 
   const vendors = allVendors.filter(v => v.company_id === selectedCompany);
 
-  // Check for URL parameter to auto-open edit form
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const editId = urlParams.get('edit');
-    
-    if (editId && vendors.length > 0) {
-      const vendor = vendors.find(v => v.id === editId);
-      if (vendor) {
-        setEditingVendor(vendor);
-        setShowForm(true);
-      }
-    }
-  }, [vendors]);
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Vendor.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      setShowForm(false);
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Vendor.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      setEditingVendor(null);
-      setShowForm(false);
-    },
-  });
-
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Vendor.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendors'] }),
   });
-
-  const handleSubmit = async (data) => {
-    if (editingVendor) {
-      await updateMutation.mutateAsync({ id: editingVendor.id, data });
-    } else {
-      await createMutation.mutateAsync(data);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8">
@@ -83,34 +42,19 @@ export default function Vendors() {
             <p className="text-slate-600 dark:text-slate-400 mt-2">Manage vendor information and contacts</p>
           </div>
           <Button
-            onClick={() => {
-              setEditingVendor(null);
-              setShowForm(!showForm);
-            }}
+            onClick={() => navigate('/VendorFormPage')}
             className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Vendor
           </Button>
         </div>
 
-        {showForm && (
-          <VendorForm
-            vendor={editingVendor}
-            onSubmit={handleSubmit}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingVendor(null);
-            }}
-            isLoading={createMutation.isPending || updateMutation.isPending}
-          />
-        )}
-
         {vendors.length === 0 ? (
           <Card className="border-2 border-dashed">
             <CardContent className="p-12 text-center">
               <p className="text-slate-600 dark:text-slate-400 mb-4">No vendors yet</p>
               <Button
-                onClick={() => setShowForm(true)}
+                onClick={() => navigate('/VendorFormPage')}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" /> Create First Vendor
@@ -124,10 +68,7 @@ export default function Vendors() {
                 key={vendor.id}
                 vendor={vendor}
                 onView={setViewingVendor}
-                onEdit={(v) => {
-                  setEditingVendor(v);
-                  setShowForm(true);
-                }}
+                onEdit={(v) => navigate(`/VendorFormPage?edit=${v.id}`)}
                 onDelete={(id) => deleteMutation.mutate(id)}
                 isDeleting={deleteMutation.isPending}
               />
@@ -204,9 +145,9 @@ export default function Vendors() {
                 </Button>
                 <Button 
                   onClick={() => {
-                    setEditingVendor(viewingVendor);
+                    const v = viewingVendor;
                     setViewingVendor(null);
-                    setShowForm(true);
+                    navigate(`/VendorFormPage?edit=${v.id}`);
                   }}
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
                 >
