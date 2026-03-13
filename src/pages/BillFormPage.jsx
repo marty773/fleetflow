@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCompany } from '@/components/CompanyContext';
 import BillForm from '@/components/bills/BillForm';
 import CreateMaintenanceFromBillDialog from '@/components/bills/CreateMaintenanceFromBillDialog';
 import PageTransition from '@/components/PageTransition';
@@ -11,7 +10,6 @@ import { useState } from 'react';
 
 export default function BillFormPage() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const queryClient = useQueryClient();
   const [maintenancePromptBill, setMaintenancePromptBill] = useState(null);
 
@@ -23,9 +21,9 @@ export default function BillFormPage() {
   const { data: allVendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
   const { data: allBills = [] } = useQuery({ queryKey: ['bills'], queryFn: () => base44.entities.Bill.list(), enabled: !!editId });
 
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
-  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
-  const filteredItems = allItems.filter(i => i.company_id === selectedCompany);
+  const vehicles = allVehicles;
+  const vendors = allVendors;
+  const filteredItems = allItems;
   const editingBill = editId ? allBills.find(b => b.id === editId) || null : null;
 
   const createMutation = useMutation({
@@ -42,7 +40,6 @@ export default function BillFormPage() {
   });
 
   const handleSubmit = async (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
 
     // Reverse old inventory if editing
     if (editingBill) {
@@ -58,7 +55,7 @@ export default function BillFormPage() {
 
     // Apply new inventory
     const newMap = {};
-    dataWithCompany.line_items
+    data.line_items
       .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
       .forEach(item => { newMap[item.item_id] = (newMap[item.item_id] || 0) + item.item_quantity; });
     for (const [item_id, qty] of Object.entries(newMap)) {
@@ -68,28 +65,16 @@ export default function BillFormPage() {
     if (Object.keys(newMap).length > 0 || editingBill) queryClient.invalidateQueries({ queryKey: ['items'] });
 
     if (editingBill) {
-      await updateMutation.mutateAsync({ id: editingBill.id, data: dataWithCompany });
+      await updateMutation.mutateAsync({ id: editingBill.id, data });
     } else {
-      const createdBill = await createMutation.mutateAsync(dataWithCompany);
+      const createdBill = await createMutation.mutateAsync(data);
 
       // Prompt maintenance record if vehicle-linked items
       if (createdBill) {
-        const hasVehicleItems = (createdBill.line_items || dataWithCompany.line_items || []).some(i => i.vehicle_id);
+        const hasVehicleItems = (createdBill.line_items || data.line_items || []).some(i => i.vehicle_id);
         if (hasVehicleItems) {
-          setMaintenancePromptBill({ ...dataWithCompany, id: createdBill.id });
+          setMaintenancePromptBill({ ...data, id: createdBill.id });
           return;
-        }
-
-        // Email notification
-        const notifResults = await base44.entities.CompanyNotificationSettings.filter({ company_id: selectedCompany });
-        const notifSettings = notifResults?.[0];
-        if (notifSettings?.bill_notification_enabled && notifSettings?.bill_notification_email) {
-          const billUrl = `${window.location.origin}/Bills?view=${createdBill.id}`;
-          await base44.integrations.Core.SendEmail({
-            to: notifSettings.bill_notification_email,
-            subject: `New Bill from ${dataWithCompany.vendor}`,
-            body: `A new bill has been recorded.\n\nCompany: ${selectedCompany}\nVendor: ${dataWithCompany.vendor}\nDate: ${format(parseISO(dataWithCompany.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}\nTotal: $${dataWithCompany.total_amount?.toFixed(2)}\n\nView: ${billUrl}`
-          });
         }
         navigate('/Bills');
       }
@@ -124,12 +109,11 @@ export default function BillFormPage() {
       </div>
 
       <CreateMaintenanceFromBillDialog
-        bill={maintenancePromptBill}
-        vehicles={vehicles}
-        companyId={selectedCompany}
-        onClose={() => { setMaintenancePromptBill(null); navigate('/Bills'); }}
-        onCreated={() => { queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] }); navigate('/Bills'); }}
-      />
+         bill={maintenancePromptBill}
+         vehicles={vehicles}
+         onClose={() => { setMaintenancePromptBill(null); navigate('/Bills'); }}
+         onCreated={() => { queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] }); navigate('/Bills'); }}
+       />
     </PageTransition>
   );
 }

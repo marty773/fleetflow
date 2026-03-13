@@ -2,13 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCompany } from '@/components/CompanyContext';
 import VehicleForm from '@/components/vehicles/VehicleForm';
 import PageTransition from '@/components/PageTransition';
 
 export default function VehicleFormPage() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -39,11 +37,10 @@ export default function VehicleFormPage() {
   });
 
   const handleSubmit = (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
     if (editId && vehicle) {
-      updateMutation.mutate({ id: vehicle.id, data: dataWithCompany });
+      updateMutation.mutate({ id: vehicle.id, data });
     } else {
-      createMutation.mutate(dataWithCompany);
+      createMutation.mutate(data);
     }
   };
 
