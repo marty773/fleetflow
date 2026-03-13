@@ -577,6 +577,51 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
             </Select>
           </div>
 
+          {/* Create Recurring Interval */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center gap-3">
+              <Checkbox 
+                id="create_interval"
+                checked={createRecurringInterval}
+                onCheckedChange={setCreateRecurringInterval}
+              />
+              <Label htmlFor="create_interval" className="text-blue-800 dark:text-blue-300 font-semibold cursor-pointer mb-0">
+                Create as Recurring Interval
+              </Label>
+            </div>
+            {createRecurringInterval && (
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <Label htmlFor="interval_months" className="text-sm">Repeat Every (Months)</Label>
+                  <Input
+                    id="interval_months"
+                    type="number"
+                    min="1"
+                    placeholder="e.g., 3"
+                    value={intervalMonths}
+                    onChange={(e) => setIntervalMonths(e.target.value)}
+                    className="mt-1 select-text"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="interval_miles" className="text-sm">Repeat Every (Miles)</Label>
+                  <Input
+                    id="interval_miles"
+                    type="number"
+                    min="1"
+                    placeholder="e.g., 3000"
+                    value={intervalMiles}
+                    onChange={(e) => setIntervalMiles(e.target.value)}
+                    className="mt-1 select-text"
+                  />
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+              When saved, this record will create a linked maintenance interval using the selected vehicle and type.
+            </p>
+          </div>
+
           <div>
             <Label htmlFor="notes">Notes</Label>
             <Textarea
