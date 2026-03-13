@@ -451,13 +451,13 @@ export default function Calendar() {
                     ...filteredAppointments.map(a => ({ ...a, type: 'appointment', sortDate: new Date(a.appointment_date) }))
                   ]
                     .sort((a, b) => a.sortDate - b.sortDate)
-                    .slice(0, 10)
                     .map(item => {
                       if (item.type === 'appointment') {
                         return (
                           <div
                             key={item.id}
-                            className="p-3 rounded-lg bg-indigo-100 border-l-4 border-indigo-500"
+                            className="p-3 rounded-lg bg-indigo-100 border-l-4 border-indigo-500 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => setSelectedDay(item.sortDate)}
                           >
                             <p className="font-semibold text-sm text-slate-900 mb-1">
                               📅 {item.title}
