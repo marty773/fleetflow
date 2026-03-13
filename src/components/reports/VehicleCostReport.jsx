@@ -108,7 +108,7 @@ export default function VehicleCostReport() {
             fullData: bill,
           })),
         ...filteredMaintenance
-          .filter((m) => m.vehicle_id === vehicleId)
+          .filter((m) => m.vehicle_id === vehicleId && !m.linked_bill_id)
           .map((m) => ({
             type: 'maintenance',
             id: m.id,
