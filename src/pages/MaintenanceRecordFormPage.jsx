@@ -57,12 +57,15 @@ export default function MaintenanceRecordFormPage() {
       createdRecord = await createMutation.mutateAsync(data);
     }
 
-    // Update related intervals
+    // Update related intervals and link the record
     const relatedIntervals = allIntervals.filter(
       i => i.vehicle_id === data.vehicle_id && i.maintenance_type === data.maintenance_type
     );
     for (const interval of relatedIntervals) {
-      const updateData = { last_performed_date: data.performed_date };
+      const updateData = { 
+        last_performed_date: data.performed_date,
+        linked_record_id: createdRecord?.id || editingRecord?.id
+      };
       if (data.odometer_reading) {
         updateData.last_performed_mileage = parseFloat(data.odometer_reading);
         if (interval.interval_miles) updateData.next_due_mileage = parseFloat(data.odometer_reading) + parseFloat(interval.interval_miles);
@@ -75,6 +78,11 @@ export default function MaintenanceRecordFormPage() {
       await base44.entities.MaintenanceInterval.update(interval.id, updateData);
     }
     queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+
+    // Link record back to interval
+    if (relatedIntervals.length > 0 && !editingRecord) {
+      await base44.entities.MaintenanceRecord.update(createdRecord.id, { linked_interval_id: relatedIntervals[0].id });
+    }
 
     navigate('/Maintenance');
   };
