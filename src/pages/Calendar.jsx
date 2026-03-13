@@ -25,36 +25,10 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState('all');
   const [selectedDay, setSelectedDay] = useState(null);
-  const [companyCalendarConnected, setCompanyCalendarConnected] = useState(false);
-  const [userCalendarConnected, setUserCalendarConnected] = useState(false);
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [showUserSyncDialog, setShowUserSyncDialog] = useState(false);
   const [showCompanySyncDialog, setShowCompanySyncDialog] = useState(false);
-  const [companyCalendars, setCompanyCalendars] = useState([]);
-  const [isSyncingUser, setIsSyncingUser] = useState(false);
   const [isSyncingCompany, setIsSyncingCompany] = useState(false);
-
-  React.useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
-  }, []);
-
-  // Check if user calendar is connected
-  React.useEffect(() => {
-    if (currentUser) {
-      base44.entities.UserCalendarAuth.filter({ user_email: currentUser.email })
-        .then(auths => setUserCalendarConnected(auths && auths.length > 0))
-        .catch(() => setUserCalendarConnected(false));
-    }
-  }, [currentUser]);
-
-  // Check if company calendar is connected
-  React.useEffect(() => {
-    base44.entities.CompanyCalendarAuth.filter({ company_id: selectedCompany })
-      .then(auths => setCompanyCalendarConnected(auths && auths.length > 0))
-      .catch(() => setCompanyCalendarConnected(false));
-  }, [selectedCompany]);
 
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
