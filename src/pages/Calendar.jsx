@@ -243,6 +243,28 @@ export default function Calendar() {
     }
   };
 
+  const [reschedulingInterval, setReschedulingInterval] = React.useState(null);
+  const [rescheduleDate, setRescheduleDate] = React.useState('');
+
+  const updateIntervalMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.MaintenanceInterval.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+      setReschedulingInterval(null);
+      setRescheduleDate('');
+      toast.success('Schedule date updated');
+    },
+  });
+
+  const handleReschedule = (interval) => {
+    setReschedulingInterval(interval.id);
+    setRescheduleDate(interval.scheduled_date || interval.next_due_date || '');
+  };
+
+  const handleSaveReschedule = (intervalId) => {
+    updateIntervalMutation.mutate({ id: intervalId, data: { scheduled_date: rescheduleDate || null } });
+  };
+
   const createAppointmentMutation = useMutation({
     mutationFn: (data) => base44.entities.CalendarAppointment.create(data),
     onSuccess: () => {
@@ -517,7 +539,7 @@ export default function Calendar() {
               <DialogHeader>
                 <DialogTitle className="text-slate-900 dark:text-white">Events for {format(selectedDay, 'MMMM d, yyyy')}</DialogTitle>
               </DialogHeader>
-              <div className="space-y-3 px-1">
+              <div className="space-y-3">
                 {getDayEvents(selectedDay).length > 0 ? (
                   getDayEvents(selectedDay).map(event => {
                     if (event.type === 'appointment') {
@@ -582,6 +604,8 @@ export default function Calendar() {
                       );
                     } else {
                       const status = getEventStatus(event);
+                      const calDate = event.scheduled_date || event.next_due_date;
+                      const isRescheduling = reschedulingInterval === event.id;
                       return (
                        <div
                          key={event.id}
@@ -616,6 +640,33 @@ export default function Calendar() {
                              <AlertCircle className="w-4 h-4" />
                              <span className="text-sm font-semibold">Overdue</span>
                            </div>
+                         )}
+                         {/* Reschedule control */}
+                         {isRescheduling ? (
+                           <div className="mt-3 flex items-center gap-2">
+                             <input
+                               type="date"
+                               value={rescheduleDate}
+                               onChange={e => setRescheduleDate(e.target.value)}
+                               className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
+                             />
+                             <Button size="sm" onClick={() => handleSaveReschedule(event.id)} disabled={updateIntervalMutation.isPending}>
+                               Save
+                             </Button>
+                             <Button size="sm" variant="outline" onClick={() => setReschedulingInterval(null)}>
+                               Cancel
+                             </Button>
+                             {event.scheduled_date && (
+                               <Button size="sm" variant="ghost" className="text-slate-500 text-xs"
+                                 onClick={() => updateIntervalMutation.mutate({ id: event.id, data: { scheduled_date: null } })}>
+                                 Clear pin
+                               </Button>
+                             )}
+                           </div>
+                         ) : (
+                           <Button size="sm" variant="outline" className="mt-3 text-xs" onClick={() => handleReschedule(event)}>
+                             📌 {event.scheduled_date ? 'Change scheduled date' : 'Pin to a date'}
+                           </Button>
                          )}
                        </div>
                       );
