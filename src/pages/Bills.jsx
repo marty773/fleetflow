@@ -359,6 +359,15 @@ export default function Bills() {
           }}
         />
 
+        {/* Maintenance Record Prompt */}
+        <CreateMaintenanceFromBillDialog
+          bill={maintenancePromptBill}
+          vehicles={vehicles}
+          companyId={selectedCompany}
+          onClose={() => setMaintenancePromptBill(null)}
+          onCreated={() => queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] })}
+        />
+
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={!!deletingBill} onOpenChange={() => setDeletingBill(null)}>
           <AlertDialogContent>
