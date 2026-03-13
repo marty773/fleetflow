@@ -26,13 +26,11 @@ import ItemFormDialog from '@/components/items/ItemFormDialog';
 import ItemDetailDialog from '@/components/dialogs/ItemDetailDialog';
 import BillDetailDialog from '@/components/dialogs/BillDetailDialog';
 import MaintenanceRecordDetailDialog from '@/components/dialogs/MaintenanceRecordDetailDialog';
-import { useCompany } from '@/components/CompanyContext';
 import PageTransition from '@/components/PageTransition';
 import PullToRefresh from '@/components/PullToRefresh';
 
 export default function Items() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('itemsViewMode') || 'list';
