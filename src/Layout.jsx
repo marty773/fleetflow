@@ -8,7 +8,6 @@ import { useState, useEffect, useCallback } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
 import CompanySelector from '@/components/CompanySelector';
 import BottomTabs from '@/components/mobile/BottomTabs';
-import { CompanyProvider, useCompany } from '@/components/CompanyContext';
 
 function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
