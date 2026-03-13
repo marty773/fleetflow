@@ -54,7 +54,7 @@ export default function FleetLivePreview({ vehicles = [] }) {
         </div>
 
         {/* Mini map */}
-        <div className="relative pointer-events-none">
+        <div className="relative pointer-events-none" style={{ isolation: 'isolate' }}>
           {isLoading ? (
             <div className="flex items-center justify-center h-36 bg-slate-50 dark:bg-slate-800">
               <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
