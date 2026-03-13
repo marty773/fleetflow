@@ -233,6 +233,14 @@ export default function Bills() {
       createdBill = await createMutation.mutateAsync(dataWithCompany);
     }
 
+    // Prompt to create maintenance record if bill has vehicle-linked line items
+    if (!editingBill && createdBill) {
+      const hasVehicleItems = (createdBill.line_items || dataWithCompany.line_items || []).some(i => i.vehicle_id);
+      if (hasVehicleItems) {
+        setMaintenancePromptBill({ ...dataWithCompany, id: createdBill.id });
+      }
+    }
+
     // Send email notification if enabled for this company
     if (!editingBill && createdBill) {
       const notifResults = await base44.entities.CompanyNotificationSettings.filter({ company_id: selectedCompany });
