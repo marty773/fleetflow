@@ -64,6 +64,7 @@ function FitBounds({ vehicles }) {
 
 export default function FleetMap({ motiveVehicles = [], selectedMotiveId = null, onSelectVehicle, height = '400px' }) {
   const located = motiveVehicles.filter(v => v.lat && v.lon);
+  const selectedVehicle = located.find(v => String(v.motive_id) === String(selectedMotiveId)) || null;
 
   if (located.length === 0) {
     return (
