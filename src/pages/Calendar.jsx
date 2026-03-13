@@ -641,33 +641,6 @@ export default function Calendar() {
                              <span className="text-sm font-semibold">Overdue</span>
                            </div>
                          )}
-                         {/* Reschedule control */}
-                         {isRescheduling ? (
-                           <div className="mt-3 flex items-center gap-2">
-                             <input
-                               type="date"
-                               value={rescheduleDate}
-                               onChange={e => setRescheduleDate(e.target.value)}
-                               className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
-                             />
-                             <Button size="sm" onClick={() => handleSaveReschedule(event.id)} disabled={updateIntervalMutation.isPending}>
-                               Save
-                             </Button>
-                             <Button size="sm" variant="outline" onClick={() => setReschedulingInterval(null)}>
-                               Cancel
-                             </Button>
-                             {event.scheduled_date && (
-                               <Button size="sm" variant="ghost" className="text-slate-500 text-xs"
-                                 onClick={() => updateIntervalMutation.mutate({ id: event.id, data: { scheduled_date: null } })}>
-                                 Clear pin
-                               </Button>
-                             )}
-                           </div>
-                         ) : (
-                           <Button size="sm" variant="outline" className="mt-3 text-xs" onClick={() => handleReschedule(event)}>
-                             📌 {event.scheduled_date ? 'Change scheduled date' : 'Pin to a date'}
-                           </Button>
-                         )}
                        </div>
                       );
                     }
