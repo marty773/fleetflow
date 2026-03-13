@@ -243,28 +243,6 @@ export default function Calendar() {
     }
   };
 
-  const [reschedulingInterval, setReschedulingInterval] = React.useState(null);
-  const [rescheduleDate, setRescheduleDate] = React.useState('');
-
-  const updateIntervalMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.MaintenanceInterval.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
-      setReschedulingInterval(null);
-      setRescheduleDate('');
-      toast.success('Schedule date updated');
-    },
-  });
-
-  const handleReschedule = (interval) => {
-    setReschedulingInterval(interval.id);
-    setRescheduleDate(interval.scheduled_date || interval.next_due_date || '');
-  };
-
-  const handleSaveReschedule = (intervalId) => {
-    updateIntervalMutation.mutate({ id: intervalId, data: { scheduled_date: rescheduleDate || null } });
-  };
-
   const createAppointmentMutation = useMutation({
     mutationFn: (data) => base44.entities.CalendarAppointment.create(data),
     onSuccess: () => {
