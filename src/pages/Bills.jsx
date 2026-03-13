@@ -38,6 +38,7 @@ export default function Bills() {
   const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
   const [deletingBill, setDeletingBill] = useState(null);
+  const [maintenancePromptBill, setMaintenancePromptBill] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
