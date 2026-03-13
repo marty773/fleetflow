@@ -80,8 +80,8 @@ export default function FleetMap({ motiveVehicles = [], selectedMotiveId = null,
   const center = [located[0].lat, located[0].lon];
 
   return (
-    <div style={{ height }} className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
-      <MapContainer center={center} zoom={10} style={{ height: '100%', width: '100%' }}>
+    <div style={{ height, position: 'relative', zIndex: 0 }} className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+      <MapContainer center={center} zoom={10} style={{ height: '100%', width: '100%', zIndex: 0 }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
