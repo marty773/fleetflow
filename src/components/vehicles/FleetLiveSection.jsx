@@ -252,9 +252,9 @@ export default function FleetLiveSection({ vehicles = [] }) {
               <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-xs text-slate-400 font-medium">
                 <div className="w-2.5 flex-shrink-0" />
                 <div className="flex-1">Vehicle</div>
-                <div className="hidden sm:block w-[52px] text-center">Speed</div>
-                <div className="hidden md:block w-[48px] text-center">Fuel</div>
-                <div className="hidden sm:block w-[40px] text-center">Codes</div>
+                <div className="hidden sm:flex flex-col items-center min-w-[52px]">Speed</div>
+                <div className="hidden md:flex flex-col items-center min-w-[48px]">Fuel</div>
+                <div className="hidden sm:flex flex-col items-center w-[40px]">Codes</div>
                 <div className="w-[80px] text-right">Last Seen</div>
               </div>
               {filtered.map(mv => (
