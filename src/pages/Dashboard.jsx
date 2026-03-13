@@ -11,8 +11,6 @@ import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
 import FleetLiveSection from '../components/vehicles/FleetLiveSection';
 import { useCompany } from '../components/CompanyContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
 export default function Dashboard() {
