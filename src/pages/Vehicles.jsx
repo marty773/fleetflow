@@ -97,8 +97,8 @@ export default function Vehicles() {
         <FleetLivePreview vehicles={vehicles} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {vehicles.length > 0 ? (
-            vehicles.map((vehicle) => (
+           {filteredVehicles.length > 0 ? (
+             filteredVehicles.map((vehicle) => (
               <VehicleCard
                 key={vehicle.id}
                 vehicle={vehicle}
