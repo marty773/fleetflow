@@ -114,7 +114,6 @@ export default function Maintenance() {
     // Create a new maintenance record if requested
     if (create_record && new_record) {
       const createdRecord = await base44.entities.MaintenanceRecord.create({
-        company_id: selectedCompany,
         vehicle_id: interval.vehicle_id,
         maintenance_type: interval.maintenance_type || 'other',
         title: new_record.title || interval.interval_name,
