@@ -135,6 +135,15 @@ export default function VehicleCostReport() {
 
   const totalExpenses = costData.reduce((sum, item) => sum + item.totalCost, 0);
 
+  const [expandedTransactions, setExpandedTransactions] = useState(new Set());
+
+  const toggleTransaction = (txId) => {
+    const next = new Set(expandedTransactions);
+    if (next.has(txId)) next.delete(txId);
+    else next.add(txId);
+    setExpandedTransactions(next);
+  };
+
   const toggleVehicle = (vehicleId) => {
     const newExpanded = new Set(expandedVehicles);
     if (newExpanded.has(vehicleId)) {
