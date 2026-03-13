@@ -41,22 +41,14 @@ function LayoutContent({ children, currentPageName }) {
     }
   }, [darkMode]);
 
-  // Dynamic theming based on company
-  const themeColors = selectedCompany === "Pencroft Structures" 
-    ? {
-        primary: '#16a34a',      // green-600
-        primaryHover: '#15803d',  // green-700
-        primaryLight: '#bbf7d0',  // green-200
-        accent: '#22c55e',        // green-500
-        iconBg: '#16a34a'         // green-600
-      }
-    : {
-        primary: '#f59e0b',       // amber-500
-        primaryHover: '#d97706',  // amber-600
-        primaryLight: '#fde68a',  // amber-200
-        accent: '#f59e0b',        // amber-500
-        iconBg: '#d97706'         // amber-600
-      };
+  // Theme colors
+  const themeColors = {
+    primary: '#f59e0b',       // amber-500
+    primaryHover: '#d97706',  // amber-600
+    primaryLight: '#fde68a',  // amber-200
+    accent: '#f59e0b',        // amber-500
+    iconBg: '#d97706'         // amber-600
+  };
 
   const navItems = [
       { name: 'Dashboard', path: 'Dashboard', icon: Wrench },
