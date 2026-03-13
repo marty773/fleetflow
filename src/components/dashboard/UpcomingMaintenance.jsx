@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { AlertCircle, Calendar } from 'lucide-react';
 
-export default function UpcomingMaintenance({ intervals, vehicles }) {
+export default function UpcomingMaintenance({ intervals, vehicles, onSelectInterval }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
@@ -37,19 +37,23 @@ export default function UpcomingMaintenance({ intervals, vehicles }) {
               const urgency = getUrgency(interval.next_due_date);
               const vehicle = vehicleMap[interval.vehicle_id];
               return (
-                <div key={interval.id} className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition cursor-pointer">
+                <button
+                  key={interval.id}
+                  onClick={() => onSelectInterval?.(interval)}
+                  className="w-full text-left p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition cursor-pointer"
+                >
                    <div className="flex items-start justify-between mb-2">
-                     <div className="flex-1">
-                       <p className="font-medium text-sm text-slate-900 dark:text-white">{interval.name}</p>
-                       <p className="text-sm text-slate-600 dark:text-slate-400">{vehicle?.name}</p>
-                     </div>
-                     <Badge className={urgency.color}>{urgency.label}</Badge>
-                   </div>
-                   <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
-                     <Calendar className="w-3 h-3" />
-                     {format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy')}
-                   </div>
-                 </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-slate-900 dark:text-white">{interval.interval_name}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{vehicle?.name}</p>
+                      </div>
+                      <Badge className={urgency.color}>{urgency.label}</Badge>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                      <Calendar className="w-3 h-3" />
+                      {format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy')}
+                    </div>
+                  </button>
               );
             })}
           </div>
