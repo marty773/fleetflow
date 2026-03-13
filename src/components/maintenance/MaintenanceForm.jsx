@@ -564,7 +564,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 <SelectItem value="none">No bill</SelectItem>
                 {bills.map(b => (
                   <SelectItem key={b.id} value={b.id}>
-                    {b.vendor} — {format(new Date(b.bill_date), 'MMM dd, yyyy')}
+                    {b.vendor} — {format(new Date(b.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
                     {b.total_amount ? ` ($${b.total_amount.toFixed(2)})` : ''}
                   </SelectItem>
                 ))}

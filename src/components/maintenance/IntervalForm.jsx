@@ -47,7 +47,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     
     // Calculate next due date
     if (data.last_performed_date && data.interval_months) {
-      const lastDate = new Date(data.last_performed_date);
+      const lastDate = new Date(data.last_performed_date + 'T12:00:00');
       const nextDate = new Date(lastDate);
       nextDate.setMonth(nextDate.getMonth() + parseInt(data.interval_months));
       data.next_due_date = nextDate.toISOString().split('T')[0];

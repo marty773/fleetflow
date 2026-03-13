@@ -32,7 +32,7 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
             </div>
             <div>
               <Label className="text-slate-500">Date</Label>
-              <p className="font-medium">{new Date(record.performed_date).toLocaleDateString()}</p>
+              <p className="font-medium">{new Date(record.performed_date + 'T12:00:00').toLocaleDateString()}</p>
             </div>
             {record.vendor && (
               <div>
@@ -128,7 +128,7 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
                 <div>
                   <Label className="text-blue-700 dark:text-blue-300">Linked Bill</Label>
                   <p className="font-medium text-blue-900 dark:text-blue-100">
-                    {linkedBill.vendor} — {format(new Date(linkedBill.bill_date), 'MMM dd, yyyy')}
+                    {linkedBill.vendor} — {format(new Date(linkedBill.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}
                     {linkedBill.total_amount ? ` ($${linkedBill.total_amount.toFixed(2)})` : ''}
                   </p>
                   {linkedBill.bill_number && <p className="text-xs text-blue-600 dark:text-blue-400">Invoice #{linkedBill.bill_number}</p>}
@@ -147,7 +147,7 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
                   <p className="font-medium text-green-900 dark:text-green-100">{linkedInterval.interval_name}</p>
                   {linkedInterval.next_due_date && (
                     <p className="text-xs text-green-600 dark:text-green-400">
-                      Next due: {format(new Date(linkedInterval.next_due_date), 'MMM dd, yyyy')}
+                      Next due: {format(new Date(linkedInterval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy')}
                     </p>
                   )}
                 </div>

@@ -105,13 +105,13 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                     <div>
                       <p className="text-slate-600 dark:text-slate-400">Last Done</p>
                       <p className="font-semibold text-slate-900 dark:text-white">
-                        {interval.last_performed_date ? format(new Date(interval.last_performed_date), 'MMM dd, yyyy') : 'Not set'}
+                        {interval.last_performed_date ? format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not set'}
                       </p>
                     </div>
                     <div>
                       <p className="text-slate-600 dark:text-slate-400">Next Due</p>
                       <p className="font-semibold text-slate-900 dark:text-white">
-                        {interval.next_due_date ? format(new Date(interval.next_due_date), 'MMM dd, yyyy') : 'Not calculated'}
+                        {interval.next_due_date ? format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
                       </p>
                     </div>
                   </div>

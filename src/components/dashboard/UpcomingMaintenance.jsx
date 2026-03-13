@@ -47,7 +47,7 @@ export default function UpcomingMaintenance({ intervals, vehicles }) {
                    </div>
                    <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
                      <Calendar className="w-3 h-3" />
-                     {format(new Date(interval.next_due_date), 'MMM dd, yyyy')}
+                     {format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy')}
                    </div>
                  </div>
               );

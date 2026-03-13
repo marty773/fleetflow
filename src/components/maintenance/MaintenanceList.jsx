@@ -74,7 +74,7 @@ export default function MaintenanceList({ records, vehicles, items, onView, onEd
                    <div>
                      <p className="text-slate-600 dark:text-slate-400">Date</p>
                      <p className="font-semibold text-slate-900 dark:text-white">
-                       {format(new Date(record.performed_date), 'MMM dd, yyyy')}
+                       {format(new Date(record.performed_date + 'T12:00:00'), 'MMM dd, yyyy')}
                      </p>
                    </div>
                    {record.vendor && (

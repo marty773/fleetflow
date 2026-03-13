@@ -71,7 +71,7 @@ export default function BillDetailDialog({ bill, vehicles = [], onClose, onEdit,
             </div>
             <div>
               <Label className="text-slate-500">Date</Label>
-              <p className="font-medium">{format(parseISO(bill.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}</p>
+              <p className="font-medium">{format(new Date(bill.bill_date + 'T12:00:00'), 'MMM dd, yyyy')}</p>
             </div>
             <div>
               <Label className="text-slate-500">Bill Number</Label>
