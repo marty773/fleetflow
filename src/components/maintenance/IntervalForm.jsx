@@ -147,7 +147,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
 
             <div>
-              <Label htmlFor="interval_miles">Or Every (Miles) - Optional</Label>
+              <Label htmlFor="interval_miles">Or Every (Miles)</Label>
               <Input
                 id="interval_miles"
                 type="number"
@@ -157,7 +157,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 onChange={(e) => handleChange('interval_miles', e.target.value)}
                 className="mt-2"
               />
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Leave empty if not mileage-based</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Leave empty if using time-based interval only</p>
             </div>
 
             <div>
