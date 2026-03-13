@@ -133,7 +133,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
 
             <div>
-              <Label htmlFor="interval_months">Repeat Every (Months) *</Label>
+              <Label htmlFor="interval_months">Repeat Every (Months)</Label>
               <Input
                 id="interval_months"
                 type="number"
@@ -141,10 +141,9 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 placeholder="e.g., 3"
                 value={formData.interval_months}
                 onChange={(e) => handleChange('interval_months', e.target.value)}
-                required
                 className="mt-2"
               />
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">How often this maintenance should occur</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Leave empty if using mileage-based interval only</p>
             </div>
 
             <div>
