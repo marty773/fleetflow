@@ -196,13 +196,11 @@ export default function Items() {
     });
 
   const handleEdit = (item) => {
-    setEditingItem(item);
-    setFormOpen(true);
+    navigate(`/ItemFormPage?edit=${item.id}`);
   };
 
   const handleAddNew = () => {
-    setEditingItem(null);
-    setFormOpen(true);
+    navigate('/ItemFormPage');
   };
 
   const handleSave = () => {
@@ -445,14 +443,7 @@ export default function Items() {
         </div>
       )}
 
-      {/* Form Dialog */}
-      <ItemFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        item={editingItem}
-        onSave={handleSave}
-        vendors={vendors}
-      />
+      {/* ItemFormDialog removed — now handled by ItemFormPage */}
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteItem} onOpenChange={() => setDeleteItem(null)}>
@@ -538,7 +529,7 @@ export default function Items() {
         items={items}
         onClose={() => setViewingMaintenanceRecord(null)}
         onEdit={(record) => {
-          navigate(createPageUrl('Maintenance') + `?edit=${record.id}`);
+          navigate(`/MaintenanceRecordFormPage?edit=${record.id}`);
         }}
       />
 
@@ -548,7 +539,7 @@ export default function Items() {
         vehicles={vehicles}
         onClose={() => setViewingBill(null)}
         onEdit={() => {
-          navigate(createPageUrl('Bills') + `?edit=${viewingBill.id}`);
+          navigate(`/BillFormPage?edit=${viewingBill.id}`);
         }}
         onViewPhoto={(url) => {
           setViewingBill(null);
