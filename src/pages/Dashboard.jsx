@@ -34,12 +34,6 @@ export default function Dashboard() {
   const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
 
   const calculateStats = () => {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const recentBills = bills.filter(b => new Date(b.bill_date) >= thirtyDaysAgo);
-    const totalExpenses = recentBills.reduce((sum, b) => sum + (b.total_amount || 0), 0);
-
     const overdueIntervals = maintenanceIntervals.filter(
       interval => new Date(interval.next_due_date) < new Date()
     ).length;
