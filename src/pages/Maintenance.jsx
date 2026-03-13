@@ -270,6 +270,8 @@ export default function Maintenance() {
             record={viewingRecord}
             vehicles={vehicles}
             items={filteredItems}
+            bills={bills}
+            intervals={intervals}
             onClose={() => setViewingRecord(null)}
             onEdit={(record) => {
               setViewingRecord(null);
