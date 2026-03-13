@@ -464,22 +464,13 @@ export default function Calendar() {
           </div>
         </div>
 
-        {/* Sync Dialogs */}
-        <SyncDialog
-          open={showUserSyncDialog}
-          onOpenChange={setShowUserSyncDialog}
-          onSync={handleSyncUserCalendar}
-          isLoading={isSyncingUser}
-          syncType="user"
-        />
-
+        {/* Sync Dialog */}
         <SyncDialog
           open={showCompanySyncDialog}
           onOpenChange={setShowCompanySyncDialog}
           onSync={handleSyncCompanyCalendar}
           isLoading={isSyncingCompany}
           syncType="company"
-          availableCalendars={companyCalendars}
         />
 
         {/* Day View Dialog */}
