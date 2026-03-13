@@ -94,6 +94,10 @@ export default function Calendar() {
     ? appointments
     : appointments.filter(a => a.vehicle_id === selectedVehicle);
 
+  const filteredRecords = selectedVehicle === 'all'
+    ? records
+    : records.filter(r => r.vehicle_id === selectedVehicle);
+
   // Get all days in the current month plus padding for full weeks
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
