@@ -195,7 +195,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
               className="mt-2"
             />
             <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-              Set this to pin this item to the exact day the truck is going to the shop. Overrides the auto-calculated due date on the calendar.
+              Set this to pin this item to the exact day the vehicle is going to the shop. Overrides the auto-calculated due date on the calendar.
               {formData.scheduled_date && (
                 <button
                   type="button"
