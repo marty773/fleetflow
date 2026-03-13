@@ -36,6 +36,9 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
       setNewRecordVendor('');
       setNewRecordNotes('');
       setNewRecordCost('');
+      setAttachBill(false);
+      setBillAmount('');
+      setBillVendor('');
     }
   }, [interval?.id]);
 
