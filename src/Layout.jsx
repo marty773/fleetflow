@@ -103,6 +103,9 @@ function LayoutContent({ children, currentPageName }) {
         .dark input::placeholder, .dark textarea::placeholder {
           color: rgb(148, 163, 184);
         }
+        /* Ensure dialogs/modals appear above the sidebar */
+        [data-radix-dialog-overlay] { z-index: 799 !important; }
+        [data-radix-dialog-content] { z-index: 800 !important; }
         /* Prevent text selection on interactive elements for better mobile UX */
         button, a, [role="tab"], [role="button"], h1, h2, h3, h4, h5, h6, svg {
           user-select: none;
