@@ -5,6 +5,16 @@ import 'leaflet/dist/leaflet.css';
 import { Truck, Navigation } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
+function PanTo({ vehicle }) {
+  const map = useMap();
+  useEffect(() => {
+    if (vehicle?.lat && vehicle?.lon) {
+      map.flyTo([vehicle.lat, vehicle.lon], 14, { duration: 0.8 });
+    }
+  }, [vehicle?.motive_id]);
+  return null;
+}
+
 // Fix leaflet default marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
