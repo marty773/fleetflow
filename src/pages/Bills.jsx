@@ -58,7 +58,7 @@ export default function Bills() {
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
-    if (viewId && bills.length > 0) {
+    if (viewId && bills && bills.length > 0) {
       const bill = bills.find(b => b.id === viewId);
       if (bill) {
         setViewingBill(bill);
