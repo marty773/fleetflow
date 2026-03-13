@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { X, Plus, Trash2, Edit, Package, Check, ChevronsUpDown } from 'lucide-react';
+import { format } from 'date-fns';
 import {
    Table,
    TableBody,
@@ -548,6 +549,30 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               </div>
             )}
           </div>
+
+          {/* Link to Bill */}
+          {bills.length > 0 && (
+            <div>
+              <Label htmlFor="linked_bill_id">Link to Bill <span className="text-slate-400 font-normal">(optional)</span></Label>
+              <Select
+                value={formData.linked_bill_id || 'none'}
+                onValueChange={(val) => handleChange('linked_bill_id', val === 'none' ? '' : val)}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select a bill..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No bill</SelectItem>
+                  {bills.map(b => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.vendor} — {format(new Date(b.bill_date), 'MMM dd, yyyy')}
+                      {b.total_amount ? ` ($${b.total_amount.toFixed(2)})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="notes">Notes</Label>
