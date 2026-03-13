@@ -360,7 +360,7 @@ export default function VehicleCostReport() {
                                               )}
                                             </div>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                              {format(new Date(transaction.date), 'MMM dd, yyyy')} • {transaction.type === 'bill' ? 'Bill' : 'Maintenance'}
+                                              {format(new Date(transaction.date + 'T12:00:00'), 'MMM dd, yyyy')} • {transaction.type === 'bill' ? 'Bill' : 'Maintenance'}
                                             </p>
                                           </div>
                                           <p className="text-sm font-semibold text-slate-900 dark:text-white ml-3">${transaction.amount.toFixed(2)}</p>
@@ -378,7 +378,7 @@ export default function VehicleCostReport() {
                                                 <span className="text-xs bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">Maintenance Record</span>
                                               </div>
                                               <p className="text-xs text-slate-400 dark:text-slate-500">
-                                                {format(new Date(transaction.linkedMaintenance.performed_date), 'MMM dd, yyyy')} • Cost covered by bill above
+                                                {format(new Date(transaction.linkedMaintenance.performed_date + 'T12:00:00'), 'MMM dd, yyyy')} • Cost covered by bill above
                                               </p>
                                             </div>
                                             <p className="text-sm text-slate-400 dark:text-slate-500 ml-3 line-through">${(transaction.linkedMaintenance.total_cost || 0).toFixed(2)}</p>
