@@ -98,8 +98,8 @@ export default function FleetLivePreview({ vehicles = [] }) {
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              {/* Reuse the full FleetLiveSection but without its own outer wrapper */}
-              <div className="[&>div]:rounded-none [&>div]:border-0 [&>div]:mb-0">
+              {/* Reuse FleetLiveSection — suppress its own header */}
+              <div className="[&>div]:rounded-none [&>div]:border-0 [&>div]:mb-0 [&>div>div:first-child]:hidden">
                 <FleetLiveSection vehicles={vehicles} />
               </div>
             </div>
