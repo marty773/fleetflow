@@ -6,7 +6,6 @@ import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users,
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect, useCallback } from 'react';
 import GlobalSearch from '@/components/GlobalSearch';
-import CompanySelector from '@/components/CompanySelector';
 import BottomTabs from '@/components/mobile/BottomTabs';
 
 function LayoutContent({ children, currentPageName }) {
