@@ -19,6 +19,9 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
   const [newRecordVendor, setNewRecordVendor] = useState('');
   const [newRecordNotes, setNewRecordNotes] = useState('');
   const [newRecordCost, setNewRecordCost] = useState('');
+  const [attachBill, setAttachBill] = useState(false);
+  const [billAmount, setBillAmount] = useState('');
+  const [billVendor, setBillVendor] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Reset state when interval changes
