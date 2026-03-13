@@ -62,12 +62,12 @@ export default function Maintenance() {
     queryFn: () => base44.entities.Bill.list(),
   });
 
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
-  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
-  const records = allRecords.filter(r => r.company_id === selectedCompany);
-  const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
-  const filteredItems = items.filter(i => i.company_id === selectedCompany);
-  const bills = allBills.filter(b => b.company_id === selectedCompany);
+  const vehicles = allVehicles;
+  const vendors = allVendors;
+  const records = allRecords;
+  const intervals = allIntervals;
+  const filteredItems = items;
+  const bills = allBills;
 
   // Check for URL parameter to view a record or switch tabs
   React.useEffect(() => {
