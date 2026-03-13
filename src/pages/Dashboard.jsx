@@ -40,7 +40,6 @@ export default function Dashboard() {
 
     return {
       totalVehicles: vehicles.length,
-      totalExpenses,
       overdueServices: overdueIntervals,
       upcomingMaintenance: maintenanceIntervals.filter(
         interval => {
