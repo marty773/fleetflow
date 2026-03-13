@@ -24,13 +24,11 @@ import BillDetailDialog from '../components/dialogs/BillDetailDialog';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Bills() {
+  const navigate = useNavigate();
   const { selectedCompany } = useCompany();
-  const [showForm, setShowForm] = useState(false);
-  const [editingBill, setEditingBill] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
   const [deletingBill, setDeletingBill] = useState(null);
-  const [maintenancePromptBill, setMaintenancePromptBill] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
@@ -58,25 +56,11 @@ export default function Bills() {
   const bills = allBills.filter(b => b.company_id === selectedCompany);
   const filteredItems = items.filter(i => i.company_id === selectedCompany);
 
-  // Check for URL parameter to auto-open a specific bill
+  // Check for URL parameter to auto-open a specific bill for viewing
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
-    const editId = urlParams.get('edit');
-    const newParam = urlParams.get('new');
-    
-    if (newParam === 'true') {
-      setEditingBill(null);
-      setShowForm(true);
-      window.history.replaceState({}, '', window.location.pathname);
-    } else if (editId && bills.length > 0) {
-      const bill = bills.find(b => b.id === editId);
-      if (bill) {
-        setEditingBill(bill);
-        setShowForm(true);
-        window.history.replaceState({}, '', window.location.pathname);
-      }
-    } else if (viewId && bills.length > 0) {
+    if (viewId && bills.length > 0) {
       const bill = bills.find(b => b.id === viewId);
       if (bill) {
         setViewingBill(bill);
@@ -84,52 +68,6 @@ export default function Bills() {
       }
     }
   }, [bills]);
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Bill.create(data),
-    onMutate: async (newBill) => {
-      await queryClient.cancelQueries({ queryKey: ['bills'] });
-      const previousBills = queryClient.getQueryData(['bills']);
-      queryClient.setQueryData(['bills'], (old) => [
-        ...(old || []),
-        { ...newBill, id: `temp-${Date.now()}`, created_date: new Date().toISOString() }
-      ]);
-      return { previousBills };
-    },
-    onError: (err, newBill, context) => {
-      if (context?.previousBills) {
-        queryClient.setQueryData(['bills'], context.previousBills);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bills'] });
-      setShowForm(false);
-      setActiveTab('list');
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Bill.update(id, data),
-    onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: ['bills'] });
-      const previousBills = queryClient.getQueryData(['bills']);
-      queryClient.setQueryData(['bills'], (old) =>
-        old?.map((b) => (b.id === id ? { ...b, ...data } : b)) || []
-      );
-      return { previousBills };
-    },
-    onError: (err, variables, context) => {
-      if (context?.previousBills) {
-        queryClient.setQueryData(['bills'], context.previousBills);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bills'] });
-      setEditingBill(null);
-      setShowForm(false);
-      setActiveTab('list');
-    },
-  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
@@ -169,90 +107,6 @@ export default function Bills() {
     },
   });
 
-  const handleSubmit = async (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
-    
-    // If editing, first reverse the old inventory changes
-    if (editingBill) {
-      const oldItemQuantityMap = {};
-      (editingBill.line_items || [])
-        .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
-        .forEach(item => {
-          if (!oldItemQuantityMap[item.item_id]) {
-            oldItemQuantityMap[item.item_id] = 0;
-          }
-          oldItemQuantityMap[item.item_id] += item.item_quantity;
-        });
-
-      // Subtract old quantities
-      for (const [item_id, quantity_to_subtract] of Object.entries(oldItemQuantityMap)) {
-        const currentItem = filteredItems.find(i => i.id === item_id);
-        if (currentItem) {
-          const newQty = Math.max(0, (currentItem.quantity_on_hand || 0) - quantity_to_subtract);
-          await base44.entities.Item.update(item_id, { quantity_on_hand: newQty });
-        }
-      }
-    }
-    
-    // Group line items by item_id and sum quantities (only for items NOT assigned to vehicles)
-    const itemQuantityMap = {};
-    dataWithCompany.line_items
-      .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
-      .forEach(item => {
-        if (!itemQuantityMap[item.item_id]) {
-          itemQuantityMap[item.item_id] = 0;
-        }
-        itemQuantityMap[item.item_id] += item.item_quantity;
-      });
-
-    // Add new quantities
-    for (const [item_id, quantity_to_add] of Object.entries(itemQuantityMap)) {
-      const currentItem = filteredItems.find(i => i.id === item_id);
-      if (currentItem) {
-        const newQty = (currentItem.quantity_on_hand || 0) + quantity_to_add;
-        await base44.entities.Item.update(item_id, { quantity_on_hand: newQty });
-      }
-    }
-    
-    if (Object.keys(itemQuantityMap).length > 0 || editingBill) {
-      queryClient.invalidateQueries({ queryKey: ['items'] });
-    }
-
-    let createdBill;
-    if (editingBill) {
-      await updateMutation.mutateAsync({ id: editingBill.id, data: dataWithCompany });
-    } else {
-      createdBill = await createMutation.mutateAsync(dataWithCompany);
-    }
-
-    // Prompt to create maintenance record if bill has vehicle-linked line items
-    if (!editingBill && createdBill) {
-      const hasVehicleItems = (createdBill.line_items || dataWithCompany.line_items || []).some(i => i.vehicle_id);
-      if (hasVehicleItems) {
-        setMaintenancePromptBill({ ...dataWithCompany, id: createdBill.id });
-      }
-    }
-
-    // Send email notification if enabled for this company
-    if (!editingBill && createdBill) {
-      const notifResults = await base44.entities.CompanyNotificationSettings.filter({ company_id: selectedCompany });
-      const notifSettings = notifResults?.[0];
-      if (notifSettings?.bill_notification_enabled && notifSettings?.bill_notification_email) {
-        const billUrl = `${window.location.origin}${window.location.pathname}?view=${createdBill.id}`;
-        await base44.integrations.Core.SendEmail({
-          to: notifSettings.bill_notification_email,
-          subject: `New Bill from ${dataWithCompany.vendor}`,
-          body: `A new bill has been recorded.\n\nCompany: ${selectedCompany}\nVendor: ${dataWithCompany.vendor}\nDate: ${format(parseISO(dataWithCompany.bill_date + 'T00:00:00'), 'MMM dd, yyyy')}\nCategory: ${dataWithCompany.category?.replace('_', ' ')}\nTotal: $${dataWithCompany.total_amount?.toFixed(2)}\n\nView details: ${billUrl}`
-        });
-      }
-    }
-  };
-
-  const handleEdit = (bill) => {
-    setEditingBill(bill);
-    setShowForm(true);
-  };
-
   const billsWithPhotos = bills.filter(b => b.photo_url);
 
   const handleRefresh = async () => {
@@ -270,10 +124,7 @@ export default function Bills() {
              <p className="text-slate-600 dark:text-slate-300 mt-2">Scan and track all your fleet expenses</p>
           </div>
           <Button
-            onClick={() => {
-              setEditingBill(null);
-              setShowForm(!showForm);
-            }}
+            onClick={() => navigate('/BillFormPage')}
             className="w-full sm:w-auto"
             style={{ backgroundColor: 'var(--color-primary)' }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
@@ -282,21 +133,6 @@ export default function Bills() {
             <Plus className="w-4 h-4 mr-2" /> New Bill
           </Button>
         </div>
-
-        {showForm && (
-          <BillForm
-            bill={editingBill}
-            vehicles={vehicles}
-            items={filteredItems}
-            vendors={vendors}
-            onSubmit={handleSubmit}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingBill(null);
-            }}
-            isLoading={createMutation.isPending || updateMutation.isPending}
-          />
-        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
           <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
@@ -312,7 +148,7 @@ export default function Bills() {
               vehicles={vehicles}
               items={filteredItems}
               onView={setViewingBill}
-              onEdit={handleEdit}
+              onEdit={(bill) => navigate(`/BillFormPage?edit=${bill.id}`)}
               onDelete={(id) => deleteMutation.mutate(id)}
               isDeleting={deleteMutation.isPending}
             />
@@ -338,26 +174,13 @@ export default function Bills() {
           vehicles={vehicles}
           onClose={() => setViewingBill(null)}
           onEdit={(bill) => {
-            setEditingBill(bill);
             setViewingBill(null);
-            setShowForm(true);
+            navigate(`/BillFormPage?edit=${bill.id}`);
           }}
           onDelete={(id) => {
             setDeletingBill(allBills.find(b => b.id === id));
           }}
-          onViewPhoto={(url) => {
-            setViewingBill(null);
-            // Could add photo lightbox here if needed
-          }}
-        />
-
-        {/* Maintenance Record Prompt */}
-        <CreateMaintenanceFromBillDialog
-          bill={maintenancePromptBill}
-          vehicles={vehicles}
-          companyId={selectedCompany}
-          onClose={() => setMaintenancePromptBill(null)}
-          onCreated={() => queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] })}
+          onViewPhoto={() => setViewingBill(null)}
         />
 
         {/* Delete Confirmation Dialog */}
