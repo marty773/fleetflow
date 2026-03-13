@@ -413,30 +413,39 @@ export default function Calendar() {
                         </p>
                         <div className="space-y-1">
                           {events.slice(0, 2).map(event => {
-                            if (event.type === 'appointment') {
-                              return (
-                                <div
-                                  key={event.id}
-                                  className="text-xs px-1 py-0.5 rounded truncate bg-indigo-100 text-indigo-800"
-                                  title={event.title}
-                                >
-                                  📅 {event.title}
-                                </div>
-                              );
-                            } else {
-                              const status = getEventStatus(event);
-                              return (
-                                <div
-                                  key={event.id}
-                                  className={`text-xs px-1 py-0.5 rounded truncate ${
-                                    maintenanceColors[event.maintenance_type]
-                                  }`}
-                                  title={event.interval_name}
-                                >
-                                  {event.interval_name}
-                                </div>
-                              );
-                            }
+                           if (event.type === 'appointment') {
+                             return (
+                               <div
+                                 key={event.id}
+                                 className="text-xs px-1 py-0.5 rounded truncate bg-indigo-100 text-indigo-800"
+                                 title={event.title}
+                               >
+                                 📅 {event.title}
+                               </div>
+                             );
+                           } else if (event.type === 'record') {
+                             return (
+                               <div
+                                 key={event.id}
+                                 className="text-xs px-1 py-0.5 rounded truncate bg-slate-200 text-slate-700"
+                                 title={event.title}
+                               >
+                                 ✓ {event.title}
+                               </div>
+                             );
+                           } else {
+                             return (
+                               <div
+                                 key={event.id}
+                                 className={`text-xs px-1 py-0.5 rounded truncate ${
+                                   maintenanceColors[event.maintenance_type]
+                                 }`}
+                                 title={event.interval_name}
+                               >
+                                 {event.interval_name}
+                               </div>
+                             );
+                           }
                           })}
                           {events.length > 2 && (
                             <p className="text-xs text-slate-500 px-1">
