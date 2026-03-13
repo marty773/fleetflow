@@ -220,15 +220,6 @@ export default function Maintenance() {
 
           <TabsContent value="intervals" className="mt-6">
             <div className="flex flex-col lg:flex-row justify-end gap-2 mb-6">
-              {selectedCompany === "Fisher's Enterprise" && (
-                <Button
-                  onClick={handleFetchMotiveData}
-                  variant="outline"
-                  className="border-green-300 text-green-700 hover:bg-green-50"
-                >
-                  <Download className="w-4 h-4 mr-2" /> Import from Motive
-                </Button>
-              )}
               <Button
                 onClick={handleSyncAll}
                 variant="outline"
