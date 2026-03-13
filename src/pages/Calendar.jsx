@@ -325,15 +325,25 @@ export default function Calendar() {
                 <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Maintenance Calendar</h1>
                 <p className="text-slate-600 dark:text-slate-400 mt-2">Schedule and track upcoming maintenance</p>
               </div>
-            <Button
-              onClick={() => {
-                setEditingAppointment(null);
-                setShowAppointmentForm(true);
-              }}
-              className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
-            >
-              <Plus className="w-4 h-4 mr-2" /> New Appointment
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={handleOpenCompanySync}
+                className="w-full sm:w-auto"
+              >
+                <CalendarIcon className="w-4 h-4 mr-2" />
+                {companyCalendarConnected ? 'Sync Company Calendar' : 'Connect Company Calendar'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setEditingAppointment(null);
+                  setShowAppointmentForm(true);
+                }}
+                className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-2" /> New Appointment
+              </Button>
+            </div>
           </div>
           
           <div className="flex flex-col gap-3">
