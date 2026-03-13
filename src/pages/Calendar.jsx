@@ -211,7 +211,7 @@ export default function Calendar() {
 
   const handleOpenCompanySync = async () => {
     if (!companyCalendarConnected) {
-      toast.error('Please connect company calendar first');
+      handleConnectCompanyCalendar();
       return;
     }
     // Fetch available calendars
