@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Wrench, Download } from 'lucide-react';
+import { Plus, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -16,9 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import MaintenanceForm from '../components/maintenance/MaintenanceForm';
 import MaintenanceList from '../components/maintenance/MaintenanceList';
-import IntervalForm from '../components/maintenance/IntervalForm';
 import IntervalList from '../components/maintenance/IntervalList';
 import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
@@ -26,11 +24,8 @@ import { format } from 'date-fns';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Maintenance() {
+  const navigate = useNavigate();
   const { selectedCompany } = useCompany();
-  const [showRecordForm, setShowRecordForm] = useState(false);
-  const [showIntervalForm, setShowIntervalForm] = useState(false);
-  const [editingRecord, setEditingRecord] = useState(null);
-  const [editingInterval, setEditingInterval] = useState(null);
   const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('records');
 
@@ -75,85 +70,20 @@ export default function Maintenance() {
   const filteredItems = items.filter(i => i.company_id === selectedCompany);
   const bills = allBills.filter(b => b.company_id === selectedCompany);
 
-  // Check for URL parameter to auto-open a specific record or interval
+  // Check for URL parameter to view a record or switch tabs
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
-    const editId = urlParams.get('edit');
-    const editIntervalId = urlParams.get('editInterval');
-    const calendarConnectedParam = urlParams.get('calendar_connected');
-    const newParam = urlParams.get('new');
-    
-    if (newParam === 'true') {
-      setEditingRecord(null);
-      setShowRecordForm(true);
-      setActiveTab('records');
-      window.history.replaceState({}, '', window.location.pathname);
-    } else if (editId && records.length > 0) {
-      const record = records.find(r => r.id === editId);
-      if (record) {
-        setEditingRecord(record);
-        setShowRecordForm(true);
-        setActiveTab('records');
-      }
-    } else if (editIntervalId && intervals.length > 0) {
-      const interval = intervals.find(i => i.id === editIntervalId);
-      if (interval) {
-        setEditingInterval(interval);
-        setShowIntervalForm(true);
-        setActiveTab('intervals');
-      }
-    } else if (viewId && records.length > 0) {
-      const record = records.find(r => r.id === viewId);
-      if (record) {
-        setViewingRecord(record);
-      }
+    const tab = urlParams.get('tab');
+
+    if (tab === 'intervals') {
+      setActiveTab('intervals');
     }
-  }, [records, intervals]);
-
-  const createRecordMutation = useMutation({
-    mutationFn: (data) => base44.entities.MaintenanceRecord.create(data),
-    onMutate: async (newRecord) => {
-      await queryClient.cancelQueries({ queryKey: ['maintenanceRecords'] });
-      const previousRecords = queryClient.getQueryData(['maintenanceRecords']);
-      queryClient.setQueryData(['maintenanceRecords'], (old) => [
-        ...(old || []),
-        { ...newRecord, id: `temp-${Date.now()}`, created_date: new Date().toISOString() }
-      ]);
-      return { previousRecords };
-    },
-    onError: (err, newRecord, context) => {
-      if (context?.previousRecords) {
-        queryClient.setQueryData(['maintenanceRecords'], context.previousRecords);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
-      setShowRecordForm(false);
-    },
-  });
-
-  const updateRecordMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.MaintenanceRecord.update(id, data),
-    onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: ['maintenanceRecords'] });
-      const previousRecords = queryClient.getQueryData(['maintenanceRecords']);
-      queryClient.setQueryData(['maintenanceRecords'], (old) =>
-        old?.map((r) => (r.id === id ? { ...r, ...data } : r)) || []
-      );
-      return { previousRecords };
-    },
-    onError: (err, variables, context) => {
-      if (context?.previousRecords) {
-        queryClient.setQueryData(['maintenanceRecords'], context.previousRecords);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
-      setEditingRecord(null);
-      setShowRecordForm(false);
-    },
-  });
+    if (viewId && records.length > 0) {
+      const record = records.find(r => r.id === viewId);
+      if (record) setViewingRecord(record);
+    }
+  }, [records]);
 
   const deleteRecordMutation = useMutation({
     mutationFn: (id) => base44.entities.MaintenanceRecord.delete(id),
@@ -162,20 +92,9 @@ export default function Maintenance() {
     },
   });
 
-  const createIntervalMutation = useMutation({
-    mutationFn: (data) => base44.entities.MaintenanceInterval.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
-    },
-  });
-
   const updateIntervalMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.MaintenanceInterval.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
-      setEditingInterval(null);
-      setShowIntervalForm(false);
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] }),
   });
 
   const deleteIntervalMutation = useMutation({
@@ -187,104 +106,6 @@ export default function Maintenance() {
       queryClient.refetchQueries({ queryKey: ['maintenanceIntervals'] });
     },
   });
-
-  const handleSubmitRecord = async (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
-    
-    // Only deduct inventory when CREATING a new record, not when editing
-    if (!editingRecord && dataWithCompany.parts_used && dataWithCompany.parts_used.length > 0) {
-      // Group parts by item_id and sum quantities
-      const partQuantityMap = {};
-      data.parts_used.forEach(part => {
-        if (!partQuantityMap[part.item_id]) {
-          partQuantityMap[part.item_id] = 0;
-        }
-        partQuantityMap[part.item_id] += part.quantity_used;
-      });
-
-      // Deduct inventory using atomic operations
-      for (const [item_id, quantity_used] of Object.entries(partQuantityMap)) {
-        const currentItem = filteredItems.find(i => i.id === item_id);
-        if (currentItem) {
-          const newQty = (currentItem.quantity_on_hand || 0) - quantity_used;
-          await base44.entities.Item.update(item_id, { quantity_on_hand: Math.max(0, newQty) });
-        }
-      }
-      queryClient.invalidateQueries({ queryKey: ['items'] });
-    }
-
-    let createdRecord;
-    if (editingRecord) {
-      await updateRecordMutation.mutateAsync({ id: editingRecord.id, data: dataWithCompany });
-    } else {
-      createdRecord = await createRecordMutation.mutateAsync(dataWithCompany);
-    }
-
-    // Update related maintenance intervals
-    const relatedIntervals = allIntervals.filter(
-      interval => interval.vehicle_id === dataWithCompany.vehicle_id && interval.maintenance_type === dataWithCompany.maintenance_type
-    );
-
-    for (const interval of relatedIntervals) {
-      const updateData = {
-        last_performed_date: dataWithCompany.performed_date,
-      };
-
-      if (dataWithCompany.odometer_reading) {
-        updateData.last_performed_mileage = parseFloat(dataWithCompany.odometer_reading);
-        if (interval.interval_miles) {
-          updateData.next_due_mileage = parseFloat(dataWithCompany.odometer_reading) + parseFloat(interval.interval_miles);
-        }
-      }
-
-      if (interval.interval_months) {
-        const nextDate = new Date(dataWithCompany.performed_date);
-        nextDate.setMonth(nextDate.getMonth() + parseInt(interval.interval_months));
-        updateData.next_due_date = nextDate.toISOString().split('T')[0];
-      }
-
-      await base44.entities.MaintenanceInterval.update(interval.id, updateData);
-    }
-
-    queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
-
-    // Send email notification if maintenance involves JEM Trailer or JEM 2022 RAM
-    if (!editingRecord && createdRecord) {
-      const vehicle = allVehicles.find(v => v.id === dataWithCompany.vehicle_id);
-      if (vehicle && (vehicle.name === 'JEM Trailer' || vehicle.name === 'JEM 2022 RAM')) {
-        const recordUrl = `${window.location.origin}${window.location.pathname}?view=${createdRecord.id}`;
-        
-        await base44.integrations.Core.SendEmail({
-          to: 'manny@fishersbackyardstructures.com',
-          subject: `New Maintenance Record for ${vehicle.name}`,
-          body: `A new maintenance record has been logged for ${vehicle.name}.\n\nTitle: ${dataWithCompany.title}\nType: ${dataWithCompany.maintenance_type?.replace('_', ' ')}\nDate: ${format(new Date(dataWithCompany.performed_date), 'MMM dd, yyyy')}\nCost: $${dataWithCompany.total_cost?.toFixed(2) || '0.00'}\n\nView details: ${recordUrl}`
-        });
-      }
-    }
-  };
-
-  const handleSubmitInterval = async (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
-    let createdInterval;
-    if (editingInterval) {
-      await updateIntervalMutation.mutateAsync({ id: editingInterval.id, data: dataWithCompany });
-      setEditingInterval(null);
-      setShowIntervalForm(false);
-    } else {
-      createdInterval = await createIntervalMutation.mutateAsync(dataWithCompany);
-      setShowIntervalForm(false);
-    }
-
-    // Sync to Google Calendar if there's a next due date
-    if (data.next_due_date && createdInterval) {
-      try {
-        await base44.functions.invoke('syncMaintenanceToCalendar', { interval_id: createdInterval.id });
-        toast.success('Synced to Google Calendar');
-      } catch (error) {
-        toast.error('Failed to sync to calendar');
-      }
-    }
-  };
 
   const handleMarkComplete = async ({ performed_date, odometer, linked_record_id, linked_bill_id, create_record, new_record }) => {
     const interval = completingInterval;
@@ -379,47 +200,19 @@ export default function Maintenance() {
           <TabsContent value="records" className="mt-6">
             <div className="mb-6">
               <Button
-                onClick={() => {
-                  setEditingRecord(null);
-                  setShowRecordForm(!showRecordForm);
-                }}
+                onClick={() => navigate('/MaintenanceRecordFormPage')}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" /> Log Maintenance
               </Button>
             </div>
 
-            {showRecordForm && (
-              <MaintenanceForm
-                record={editingRecord}
-                vehicles={vehicles}
-                items={filteredItems}
-                vendors={vendors}
-                bills={bills}
-                onSubmit={handleSubmitRecord}
-                onCancel={() => {
-                  const urlParams = new URLSearchParams(window.location.search);
-                  const returnTo = urlParams.get('returnTo');
-                  if (returnTo) {
-                    window.location.href = `/${returnTo}`;
-                  } else {
-                    setShowRecordForm(false);
-                    setEditingRecord(null);
-                  }
-                }}
-                isLoading={createRecordMutation.isPending || updateRecordMutation.isPending}
-              />
-            )}
-
             <MaintenanceList
               records={records}
               vehicles={vehicles}
               items={filteredItems}
               onView={setViewingRecord}
-              onEdit={(record) => {
-                setEditingRecord(record);
-                setShowRecordForm(true);
-              }}
+              onEdit={(record) => navigate(`/MaintenanceRecordFormPage?edit=${record.id}`)}
               onDelete={(id) => deleteRecordMutation.mutate(id)}
               isDeleting={deleteRecordMutation.isPending}
             />
@@ -444,36 +237,17 @@ export default function Maintenance() {
                 Sync All to Google Calendar
               </Button>
               <Button
-                onClick={() => {
-                  setEditingInterval(null);
-                  setShowIntervalForm(!showIntervalForm);
-                }}
+                onClick={() => navigate('/MaintenanceIntervalFormPage')}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" /> Create Interval
               </Button>
             </div>
 
-            {showIntervalForm && (
-              <IntervalForm
-                interval={editingInterval}
-                vehicles={vehicles}
-                onSubmit={handleSubmitInterval}
-                onCancel={() => {
-                  setShowIntervalForm(false);
-                  setEditingInterval(null);
-                }}
-                isLoading={createIntervalMutation.isPending || updateIntervalMutation.isPending}
-              />
-            )}
-
             <IntervalList
               intervals={intervals}
               vehicles={vehicles}
-              onEdit={(interval) => {
-                setEditingInterval(interval);
-                setShowIntervalForm(true);
-              }}
+              onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
               onDelete={(id) => deleteIntervalMutation.mutate(id)}
               onMarkComplete={setCompletingInterval}
               isDeleting={deleteIntervalMutation.isPending}
@@ -498,9 +272,8 @@ export default function Maintenance() {
             items={filteredItems}
             onClose={() => setViewingRecord(null)}
             onEdit={(record) => {
-              setEditingRecord(record);
               setViewingRecord(null);
-              setShowRecordForm(true);
+              navigate(`/MaintenanceRecordFormPage?edit=${record.id}`);
             }}
           />
 
