@@ -157,70 +157,12 @@ export default function Calendar() {
 
 
 
-  const handleConnectUserCalendar = async () => {
-    try {
-      const result = await base44.functions.invoke('authorizeUserCalendar', {});
-      window.open(result.data.authUrl, '_blank', 'width=600,height=700');
-    } catch (error) {
-      toast.error('Failed to start authorization');
-    }
-  };
-
-  const handleConnectCompanyCalendar = async () => {
-    try {
-      const result = await base44.functions.invoke('authorizeCompanyCalendar', { company_id: selectedCompany });
-      window.open(result.data.authUrl, '_blank', 'width=600,height=700');
-    } catch (error) {
-      toast.error('Failed to start authorization');
-    }
-  };
-
-  const handleOpenUserSync = () => {
-    if (!userCalendarConnected) {
-      toast.error('Please connect your calendar first');
-      return;
-    }
-    setShowUserSyncDialog(true);
-  };
-
-  const handleOpenCompanySync = async () => {
-    if (!companyCalendarConnected) {
-      handleConnectCompanyCalendar();
-      return;
-    }
-    // Fetch available calendars
-    try {
-      const result = await base44.functions.invoke('listCompanyCalendars', { company_id: selectedCompany });
-      setCompanyCalendars(result.data.calendars || []);
-      setShowCompanySyncDialog(true);
-    } catch (error) {
-      toast.error('Failed to load calendars');
-    }
-  };
-
-  const handleSyncUserCalendar = async ({ futureOnly, calendarId }) => {
-    setIsSyncingUser(true);
-    try {
-      const result = await base44.functions.invoke('syncUserMaintenanceToCalendar', {
-        futureOnly,
-        calendarId
-      });
-      toast.success(result.data.message);
-      setShowUserSyncDialog(false);
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to sync');
-    } finally {
-      setIsSyncingUser(false);
-    }
-  };
-
-  const handleSyncCompanyCalendar = async ({ futureOnly, calendarId }) => {
+  const handleSyncCompanyCalendar = async ({ futureOnly }) => {
     setIsSyncingCompany(true);
     try {
-      const result = await base44.functions.invoke('syncCompanyCalendar', {
+      const result = await base44.functions.invoke('syncToGoogleCalendar', {
         company_id: selectedCompany,
         futureOnly,
-        calendarId
       });
       toast.success(result.data.message);
       setShowCompanySyncDialog(false);
