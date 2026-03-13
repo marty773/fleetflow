@@ -30,7 +30,6 @@ export default function Dashboard() {
   });
 
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
-  const bills = allBills.filter(b => b.company_id === selectedCompany);
   const maintenanceIntervals = allMaintenanceIntervals.filter(m => m.company_id === selectedCompany);
   const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
 
