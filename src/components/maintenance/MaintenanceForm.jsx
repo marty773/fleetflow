@@ -104,6 +104,9 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
     unit_price: 0,
     item_id: '',
   });
+  const [createRecurringInterval, setCreateRecurringInterval] = useState(false);
+  const [intervalMonths, setIntervalMonths] = useState('');
+  const [intervalMiles, setIntervalMiles] = useState('');
   const [vehicleSearchOpen, setVehicleSearchOpen] = useState(false);
   const [vendorSearchOpen, setVendorSearchOpen] = useState(false);
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
