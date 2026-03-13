@@ -4,12 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { Eye, Edit2, Trash2, Wrench } from 'lucide-react';
-import { useCompany } from '@/components/CompanyContext';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
 export default function MaintenanceList({ records, vehicles, items, onView, onEdit, onDelete, isDeleting }) {
-  const { selectedCompany } = useCompany();
-  const serviceTypes = useServiceTypes(selectedCompany, 'records');
+  const serviceTypes = useServiceTypes(null, 'records');
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;

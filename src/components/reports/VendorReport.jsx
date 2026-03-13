@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { useCompany } from '../CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function VendorReport() {
-  const { selectedCompany } = useCompany();
   const [expandedVendor, setExpandedVendor] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [viewingMaintenance, setViewingMaintenance] = useState(null);
@@ -51,11 +49,11 @@ export default function VendorReport() {
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
-  const bills = allBills.filter(b => b.company_id === selectedCompany);
-  const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
-  const items = allItems.filter(i => i.company_id === selectedCompany);
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const vendors = allVendors;
+  const bills = allBills;
+  const maintenanceRecords = allMaintenanceRecords;
+  const items = allItems;
+  const vehicles = allVehicles;
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;

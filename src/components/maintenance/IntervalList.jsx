@@ -4,12 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, FileText, Receipt } from 'lucide-react';
-import { useCompany } from '@/components/CompanyContext';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
 export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, isDeleting }) {
-  const { selectedCompany } = useCompany();
-  const serviceTypes = useServiceTypes(selectedCompany, 'records');
+  const serviceTypes = useServiceTypes(null, 'records');
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;

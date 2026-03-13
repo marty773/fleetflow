@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
-import { useCompany } from '@/components/CompanyContext';
 
 export default function GlobalSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +16,6 @@ export default function GlobalSearch() {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
 
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -63,7 +61,6 @@ export default function GlobalSearch() {
     };
 
     results.vehicles = vehicles.filter(v => 
-      v.company_id === selectedCompany &&
       (v.name?.toLowerCase().includes(term) ||
       v.license_plate?.toLowerCase().includes(term) ||
       v.vin?.toLowerCase().includes(term) ||
@@ -74,7 +71,6 @@ export default function GlobalSearch() {
     );
 
     results.bills = bills.filter(b =>
-      b.company_id === selectedCompany &&
       (b.vendor?.toLowerCase().includes(term) ||
       b.bill_number?.toLowerCase().includes(term) ||
       b.category?.toLowerCase().includes(term) ||
@@ -85,7 +81,6 @@ export default function GlobalSearch() {
     );
 
     results.maintenance = maintenanceRecords.filter(m =>
-      m.company_id === selectedCompany &&
       (m.title?.toLowerCase().includes(term) ||
       m.vendor?.toLowerCase().includes(term) ||
       m.maintenance_type?.toLowerCase().includes(term) ||
@@ -94,7 +89,6 @@ export default function GlobalSearch() {
     );
 
     results.items = items.filter(i =>
-      i.company_id === selectedCompany &&
       (i.name?.toLowerCase().includes(term) ||
       i.vendor?.toLowerCase().includes(term) ||
       i.item_number?.toLowerCase().includes(term) ||
@@ -102,7 +96,6 @@ export default function GlobalSearch() {
     );
 
     results.vendors = vendors.filter(v =>
-      v.company_id === selectedCompany &&
       (v.name?.toLowerCase().includes(term) ||
       v.contact_person?.toLowerCase().includes(term) ||
       v.email?.toLowerCase().includes(term) ||
@@ -113,7 +106,6 @@ export default function GlobalSearch() {
     );
 
     results.intervals = intervals.filter(i =>
-      i.company_id === selectedCompany &&
       (i.interval_name?.toLowerCase().includes(term) ||
       i.maintenance_type?.toLowerCase().includes(term) ||
       i.notes?.toLowerCase().includes(term))
