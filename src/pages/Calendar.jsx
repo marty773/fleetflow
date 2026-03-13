@@ -444,7 +444,7 @@ export default function Calendar() {
               <CardHeader className="border-b border-slate-200 dark:border-slate-700">
                 <CardTitle className="text-lg text-slate-900 dark:text-white">Upcoming Services</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-3 max-h-96 overflow-y-auto">
+              <CardContent className="p-6 space-y-3 max-h-[70vh] overflow-y-auto">
                 {(filteredIntervals.filter(i => i.next_due_date).length > 0 || filteredAppointments.length > 0) ? (
                   [
                     ...filteredIntervals.filter(i => i.next_due_date || i.scheduled_date).map(i => ({ ...i, type: 'interval', sortDate: new Date((i.scheduled_date || i.next_due_date) + 'T12:00:00') })),
