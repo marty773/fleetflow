@@ -230,7 +230,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !formData.vehicle_id || !formData.interval_name}
+              disabled={isLoading || !formData.vehicle_id || !formData.interval_name || (!formData.interval_months && !formData.interval_miles)}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {isLoading ? 'Saving...' : 'Save Interval'}
