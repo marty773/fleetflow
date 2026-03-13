@@ -28,6 +28,7 @@ import BillForm from '../components/bills/BillForm';
 import BillList from '../components/bills/BillList';
 import BillGallery from '../components/bills/BillGallery';
 import BillDetailDialog from '../components/dialogs/BillDetailDialog';
+import CreateMaintenanceFromBillDialog from '../components/bills/CreateMaintenanceFromBillDialog';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Bills() {
