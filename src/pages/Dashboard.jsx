@@ -19,11 +19,6 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const { data: allBills = [] } = useQuery({
-    queryKey: ['bills'],
-    queryFn: () => base44.entities.Bill.list(),
-  });
-
   const { data: allMaintenanceIntervals = [] } = useQuery({
     queryKey: ['maintenanceIntervals'],
     queryFn: () => base44.entities.MaintenanceInterval.list(),
