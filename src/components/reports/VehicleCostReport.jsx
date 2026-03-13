@@ -90,6 +90,12 @@ export default function VehicleCostReport() {
     }
   });
 
+  // Build a map of bill_id -> maintenance record for quick lookup
+  const maintenanceByBillId = filteredMaintenance.reduce((acc, m) => {
+    if (m.linked_bill_id) acc[m.linked_bill_id] = m;
+    return acc;
+  }, {});
+
   const costData = Object.keys(vehicleCosts)
     .map((vehicleId) => ({
       vehicle: vehicleMap[vehicleId],
@@ -97,16 +103,20 @@ export default function VehicleCostReport() {
       transactions: [
         ...filteredBills
           .filter((bill) => bill.line_items?.some((item) => item.vehicle_id === vehicleId))
-          .map((bill) => ({
-            type: 'bill',
-            id: bill.id,
-            date: bill.bill_date,
-            description: `${bill.vendor} - ${bill.category}`,
-            amount: bill.line_items
-              .filter((item) => item.vehicle_id === vehicleId)
-              .reduce((sum, item) => sum + (item.total || 0), 0),
-            fullData: bill,
-          })),
+          .map((bill) => {
+            const linkedMaintenance = maintenanceByBillId[bill.id];
+            return {
+              type: 'bill',
+              id: bill.id,
+              date: bill.bill_date,
+              description: `${bill.vendor} - ${bill.category}`,
+              amount: bill.line_items
+                .filter((item) => item.vehicle_id === vehicleId)
+                .reduce((sum, item) => sum + (item.total || 0), 0),
+              fullData: bill,
+              linkedMaintenance: linkedMaintenance || null,
+            };
+          }),
         ...filteredMaintenance
           .filter((m) => m.vehicle_id === vehicleId && !m.linked_bill_id)
           .map((m) => ({
@@ -116,6 +126,7 @@ export default function VehicleCostReport() {
             description: m.title,
             amount: m.total_cost || 0,
             fullData: m,
+            linkedMaintenance: null,
           })),
       ].sort((a, b) => new Date(b.date) - new Date(a.date)),
     }))
