@@ -2,9 +2,10 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Package } from 'lucide-react';
+import { Package, FileText, CalendarClock } from 'lucide-react';
+import { format } from 'date-fns';
 
-export default function MaintenanceRecordDetailDialog({ record, vehicles = [], items = [], onClose, onEdit }) {
+export default function MaintenanceRecordDetailDialog({ record, vehicles = [], items = [], bills = [], intervals = [], onClose, onEdit }) {
   if (!record) return null;
 
   const vehicle = vehicles.find(v => v.id === record.vehicle_id);
