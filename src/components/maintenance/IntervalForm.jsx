@@ -34,6 +34,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
         interval_miles: interval.interval_miles || '',
         last_performed_date: interval.last_performed_date || '',
         last_performed_mileage: interval.last_performed_mileage || '',
+        scheduled_date: interval.scheduled_date || '',
         notes: interval.notes || '',
       });
     }
