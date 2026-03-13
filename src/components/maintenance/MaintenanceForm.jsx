@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useCompany } from '@/components/CompanyContext';
 import { useServiceTypes } from '@/components/useServiceTypes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,8 +39,7 @@ import {
 import { cn } from '@/lib/utils';
 
 export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], bills = [], onSubmit, onCancel, isLoading }) {
-  const { selectedCompany } = useCompany();
-  const serviceTypes = useServiceTypes(selectedCompany, 'records');
+  const serviceTypes = useServiceTypes(null, 'records');
 
   // When editing, merge parts_used back into work_items so they show correctly
   const initializeFormData = () => {

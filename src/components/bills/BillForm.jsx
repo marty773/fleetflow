@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useCompany } from '@/components/CompanyContext';
 import { useServiceTypes } from '@/components/useServiceTypes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,8 +45,7 @@ import {
 import ResponsiveSelect from '@/components/ResponsiveSelect';
 
 export default function BillForm({ bill, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
-  const { selectedCompany } = useCompany();
-  const serviceTypes = useServiceTypes(selectedCompany, 'bills');
+  const serviceTypes = useServiceTypes(null, 'bills');
 
   const [formData, setFormData] = useState(bill || {
     vendor: '',

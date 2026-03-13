@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Settings, LogOut, Trash2, Bell, Save } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
-import { useCompany } from '@/components/CompanyContext';
 import ServiceTypesEditor from '@/components/settings/ServiceTypesEditor';
 
 export default function SettingsPage() {
@@ -19,7 +18,6 @@ export default function SettingsPage() {
   const [notifSettingsId, setNotifSettingsId] = useState(null);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifSaved, setNotifSaved] = useState(false);
-  const { selectedCompany } = useCompany();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -27,17 +25,16 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    if (!selectedCompany) return;
-    base44.entities.CompanyNotificationSettings.filter({ company_id: selectedCompany }).then(results => {
+    base44.entities.CompanyNotificationSettings.filter({}).then(results => {
       if (results.length > 0) {
         setNotifSettings(results[0]);
         setNotifSettingsId(results[0].id);
       } else {
-        setNotifSettings({ company_id: selectedCompany, bill_notification_enabled: false, bill_notification_email: '' });
+        setNotifSettings({ bill_notification_enabled: false, bill_notification_email: '' });
         setNotifSettingsId(null);
       }
     });
-  }, [selectedCompany]);
+  }, []);
 
   const handleSaveNotifications = async () => {
     setNotifSaving(true);
@@ -131,7 +128,7 @@ export default function SettingsPage() {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
-                <Bell className="w-5 h-5" /> Notifications — {selectedCompany}
+                <Bell className="w-5 h-5" /> Notifications
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -167,7 +164,7 @@ export default function SettingsPage() {
           </Card>
         )}
 
-        <ServiceTypesEditor selectedCompany={selectedCompany} />
+        <ServiceTypesEditor />
 
         <Card>
           <CardHeader>
