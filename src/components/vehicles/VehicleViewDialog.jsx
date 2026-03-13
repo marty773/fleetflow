@@ -14,12 +14,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import FleetMap from './FleetMap';
 import MotiveLivePanel from './MotiveLivePanel';
-import MaintenanceForm from '../maintenance/MaintenanceForm';
 
 export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit }) {
-  const [showAddMaintenance, setShowAddMaintenance] = useState(false);
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // Fetch motive live data for this vehicle
@@ -50,44 +50,12 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
   const { data: allItems = [] } = useQuery({
     queryKey: ['items'],
     queryFn: () => base44.entities.Item.list(),
-    enabled: open && showAddMaintenance,
-  });
-
-  const { data: allVendors = [] } = useQuery({
-    queryKey: ['vendors'],
-    queryFn: () => base44.entities.Vendor.list(),
-    enabled: open && showAddMaintenance,
+    enabled: open,
   });
 
   const maintenanceRecords = vehicle 
     ? allMaintenanceRecords.filter(r => r.vehicle_id === vehicle.id)
     : [];
-
-  const createMaintenanceMutation = useMutation({
-    mutationFn: (data) => base44.entities.MaintenanceRecord.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenance-records'] });
-      setShowAddMaintenance(false);
-      toast.success('Maintenance record added');
-    },
-  });
-
-  const handleMaintenanceSubmit = async (data) => {
-    // Deduct inventory for parts used
-    if (data.parts_used && data.parts_used.length > 0) {
-      for (const part of data.parts_used) {
-        const item = allItems.find(i => i.id === part.item_id);
-        if (item) {
-          const newQuantity = (item.quantity_on_hand || 0) - part.quantity_used;
-          await base44.entities.Item.update(part.item_id, {
-            quantity_on_hand: Math.max(0, newQuantity)
-          });
-        }
-      }
-    }
-    
-    createMaintenanceMutation.mutate({ ...data, vehicle_id: vehicle.id });
-  };
 
   if (!vehicle) return null;
 
@@ -287,39 +255,16 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
           </TabsContent>
 
           <TabsContent value="history" className="space-y-4 mt-4">
-            {/* Add Maintenance Form */}
-            {showAddMaintenance ? (
-              <div className="border dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Add Maintenance Record</h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setShowAddMaintenance(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-                <MaintenanceForm
-                  record={null}
-                  vehicles={[vehicle]}
-                  items={allItems}
-                  vendors={allVendors}
-                  onSubmit={handleMaintenanceSubmit}
-                  onCancel={() => setShowAddMaintenance(false)}
-                  isLoading={createMaintenanceMutation.isPending}
-                  hideVehicleSelector={true}
-                />
-              </div>
-            ) : (
-              <Button 
-                onClick={() => setShowAddMaintenance(true)}
-                className="w-full bg-slate-900 hover:bg-slate-800"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Maintenance Record
-              </Button>
-            )}
+            <Button 
+              onClick={() => {
+                onOpenChange(false);
+                navigate(`/MaintenanceRecordFormPage?vehicle=${vehicle.id}`);
+              }}
+              className="w-full bg-slate-900 hover:bg-slate-800"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Maintenance Record
+            </Button>
 
             {/* Maintenance History List */}
             {maintenanceRecords.length > 0 ? (
@@ -404,7 +349,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                   </div>
                 ))}
               </div>
-            ) : !showAddMaintenance && (
+            ) : (
               <div className="text-center py-12 border-2 border-dashed rounded-lg">
                 <History className="w-12 h-12 mx-auto text-slate-400 mb-3" />
                 <p className="text-slate-600 dark:text-slate-400 mb-4">No maintenance history yet</p>
