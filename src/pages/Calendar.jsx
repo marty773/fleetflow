@@ -116,25 +116,29 @@ export default function Calendar() {
     filteredIntervals.forEach(interval => {
       const calDate = interval.scheduled_date || interval.next_due_date;
       if (calDate) {
-        const dateKey = calDate;
-        if (!map[dateKey]) {
-          map[dateKey] = [];
-        }
-        map[dateKey].push({ ...interval, type: 'interval' });
+        if (!map[calDate]) map[calDate] = [];
+        map[calDate].push({ ...interval, type: 'interval' });
       }
     });
     
     // Add appointments
     filteredAppointments.forEach(appointment => {
       const dateKey = appointment.appointment_date;
-      if (!map[dateKey]) {
-        map[dateKey] = [];
-      }
+      if (!map[dateKey]) map[dateKey] = [];
       map[dateKey].push({ ...appointment, type: 'appointment' });
+    });
+
+    // Add completed maintenance records (past events)
+    filteredRecords.forEach(record => {
+      const dateKey = record.performed_date;
+      if (dateKey) {
+        if (!map[dateKey]) map[dateKey] = [];
+        map[dateKey].push({ ...record, type: 'record' });
+      }
     });
     
     return map;
-  }, [filteredIntervals, filteredAppointments]);
+  }, [filteredIntervals, filteredAppointments, filteredRecords]);
 
   const getDayEvents = (day) => {
     const dateKey = format(day, 'yyyy-MM-dd');
