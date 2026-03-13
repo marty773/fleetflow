@@ -16,7 +16,6 @@ function LayoutContent({ children, currentPageName }) {
     if (saved !== null) return saved === 'true';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
-  const [selectedCompany, setSelectedCompany] = useState("Fisher's Enterprise");
   const location = useLocation();
 
   const handleToggleSidebar = useCallback(() => {
