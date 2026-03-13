@@ -20,6 +20,7 @@ import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalList from '../components/maintenance/IntervalList';
 import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
+import BillDetailDialog from '../components/dialogs/BillDetailDialog';
 import { format } from 'date-fns';
 import { useCompany } from '../components/CompanyContext';
 
@@ -27,6 +28,7 @@ export default function Maintenance() {
   const navigate = useNavigate();
   const { selectedCompany } = useCompany();
   const [viewingRecord, setViewingRecord] = useState(null);
+  const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('records');
 
   const [deletingRecord, setDeletingRecord] = useState(null);
@@ -280,6 +282,13 @@ export default function Maintenance() {
               setViewingRecord(null);
               navigate(`/MaintenanceRecordFormPage?edit=${record.id}`);
             }}
+            onViewBill={(bill) => setViewingBill(bill)}
+          />
+
+          {/* View Bill Dialog */}
+          <BillDetailDialog
+            bill={viewingBill}
+            onClose={() => setViewingBill(null)}
           />
 
           {/* Delete Confirmation Dialog */}

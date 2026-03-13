@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Package, FileText, CalendarClock } from 'lucide-react';
 import { format } from 'date-fns';
 
-export default function MaintenanceRecordDetailDialog({ record, vehicles = [], items = [], bills = [], intervals = [], onClose, onEdit }) {
+export default function MaintenanceRecordDetailDialog({ record, vehicles = [], items = [], bills = [], intervals = [], onClose, onEdit, onViewBill }) {
   if (!record) return null;
 
   const vehicle = vehicles.find(v => v.id === record.vehicle_id);
@@ -126,8 +126,7 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
               <button
                 onClick={() => {
                   onClose();
-                  // Navigate to bill detail by setting it for the parent to handle
-                  setTimeout(() => window.dispatchEvent(new CustomEvent('openBillDetail', { detail: linkedBill })), 0);
+                  onViewBill?.(linkedBill);
                 }}
                 className="w-full text-left flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
               >
