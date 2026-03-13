@@ -481,7 +481,8 @@ export default function Calendar() {
                         return (
                           <div
                             key={item.id}
-                            className={`p-3 rounded-lg ${statusColors[status]}`}
+                            className={`p-3 rounded-lg ${statusColors[status]} cursor-pointer hover:opacity-80 transition-opacity`}
+                            onClick={() => setSelectedDay(item.sortDate)}
                           >
                             <p className="font-semibold text-sm text-slate-900 mb-1">
                               {item.interval_name}
