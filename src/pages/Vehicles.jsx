@@ -35,63 +35,10 @@ export default function Vehicles() {
       return (a.name || '').localeCompare(b.name || '');
     });
 
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Vehicle.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-      setShowForm(false);
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Vehicle.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-      setEditingVehicle(null);
-      setShowForm(false);
-    },
-  });
-
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Vehicle.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vehicles'] }),
   });
-
-  const handleSubmit = (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
-    if (editingVehicle) {
-      updateMutation.mutate({ id: editingVehicle.id, data: dataWithCompany });
-    } else {
-      createMutation.mutate(dataWithCompany);
-    }
-  };
-
-  const handleEdit = (vehicle) => {
-    setEditingVehicle(vehicle);
-    setShowForm(true);
-  };
-
-  // Check for URL parameter to auto-open edit form
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const editId = urlParams.get('edit');
-    
-    if (editId && vehicles.length > 0) {
-      const vehicle = vehicles.find(v => v.id === editId);
-      if (vehicle) {
-        setEditingVehicle(vehicle);
-        setShowForm(true);
-      }
-    }
-  }, [vehicles]);
-
-  useEffect(() => {
-    if (showForm && formRef.current) {
-      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [showForm]);
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['vehicles'] });
@@ -108,10 +55,7 @@ export default function Vehicles() {
             <p className="text-slate-600 dark:text-slate-400 mt-2">Manage your trucks and trailers</p>
           </div>
           <Button
-            onClick={() => {
-              setEditingVehicle(null);
-              setShowForm(!showForm);
-            }}
+            onClick={() => navigate('/VehicleForm')}
             className="bg-slate-900 hover:bg-slate-800 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Vehicle
@@ -155,20 +99,6 @@ export default function Vehicles() {
 
         <FleetLiveSection vehicles={vehicles} />
 
-        {showForm && (
-          <div ref={formRef}>
-            <VehicleForm
-              vehicle={editingVehicle}
-              onSubmit={handleSubmit}
-              onCancel={() => {
-                setShowForm(false);
-                setEditingVehicle(null);
-              }}
-              isLoading={createMutation.isPending || updateMutation.isPending}
-            />
-          </div>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {vehicles.length > 0 ? (
             vehicles.map((vehicle) => (
@@ -176,12 +106,12 @@ export default function Vehicles() {
                 key={vehicle.id}
                 vehicle={vehicle}
                 onView={() => setViewingVehicle(vehicle)}
-                onEdit={handleEdit}
+                onEdit={(v) => navigate(`/VehicleForm?edit=${v.id}`)}
                 onDelete={() => deleteMutation.mutate(vehicle.id)}
                 isDeleting={deleteMutation.isPending}
               />
             ))
-          ) : !showForm ? (
+          ) : (
             <div className="lg:col-span-3">
               <Card className="border-2 border-dashed">
                 <CardContent className="p-12 text-center">
@@ -189,7 +119,7 @@ export default function Vehicles() {
                 </CardContent>
               </Card>
             </div>
-          ) : null}
+          )}
         </div>
 
         <VehicleViewDialog
@@ -198,7 +128,7 @@ export default function Vehicles() {
           onOpenChange={(open) => !open && setViewingVehicle(null)}
           onEdit={(vehicle) => {
             setViewingVehicle(null);
-            handleEdit(vehicle);
+            navigate(`/VehicleForm?edit=${vehicle.id}`);
           }}
         />
           </div>
