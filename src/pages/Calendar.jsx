@@ -96,14 +96,17 @@ export default function Calendar() {
   const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   // Get events for each day (intervals + appointments)
+  // scheduled_date overrides next_due_date when set
+  const getIntervalCalendarDate = (interval) => interval.scheduled_date || interval.next_due_date;
+
   const eventsMap = useMemo(() => {
     const map = {};
     
-    // Add maintenance intervals
+    // Add maintenance intervals — use scheduled_date if set, else next_due_date
     filteredIntervals.forEach(interval => {
-      if (interval.next_due_date) {
-        const dueDate = new Date(interval.next_due_date);
-        const dateKey = dueDate.toISOString().split('T')[0];
+      const calDate = interval.scheduled_date || interval.next_due_date;
+      if (calDate) {
+        const dateKey = calDate;
         if (!map[dateKey]) {
           map[dateKey] = [];
         }
