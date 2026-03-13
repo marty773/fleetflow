@@ -92,48 +92,74 @@ export default function Dashboard() {
       {/* Interval Detail Dialog */}
       {selectedInterval && (
         <Dialog open={!!selectedInterval} onOpenChange={() => setSelectedInterval(null)}>
-          <DialogContent>
+          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedInterval.interval_name}</DialogTitle>
               <DialogDescription>{vehicles.find(v => v.id === selectedInterval.vehicle_id)?.name}</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Last Done</p>
-                  <p className="font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Last Done</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
                     {selectedInterval.last_performed_date ? format(new Date(selectedInterval.last_performed_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not set'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Next Due</p>
-                  <p className="font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Next Due</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
                     {selectedInterval.next_due_date ? format(new Date(selectedInterval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
                   </p>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Interval</p>
-                  <p className="font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Time Interval</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
                     {selectedInterval.interval_months ? `Every ${selectedInterval.interval_months} month${selectedInterval.interval_months > 1 ? 's' : ''}` : 'N/A'}
                   </p>
                 </div>
                 {selectedInterval.interval_miles && (
                   <div>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">Mileage</p>
-                    <p className="font-semibold text-slate-900 dark:text-white">{selectedInterval.interval_miles} mi</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Mileage Interval</p>
+                    <p className="font-semibold text-slate-900 dark:text-white mt-1">{selectedInterval.interval_miles} mi</p>
                   </div>
                 )}
               </div>
+
+              {selectedInterval.last_performed_mileage && (
+                <div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Last Mileage</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{selectedInterval.last_performed_mileage} mi</p>
+                </div>
+              )}
+
+              {selectedInterval.next_due_mileage && (
+                <div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Next Due Mileage</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{selectedInterval.next_due_mileage} mi</p>
+                </div>
+              )}
+
+              {selectedInterval.scheduled_date && (
+                <div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Scheduled Shop Date</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
+                    {format(new Date(selectedInterval.scheduled_date + 'T12:00:00'), 'MMM dd, yyyy')}
+                  </p>
+                </div>
+              )}
+
               {selectedInterval.notes && (
                 <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Notes</p>
-                  <p className="text-slate-900 dark:text-white">{selectedInterval.notes}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Notes</p>
+                  <p className="text-slate-900 dark:text-white mt-1 text-sm">{selectedInterval.notes}</p>
                 </div>
               )}
             </div>
             <div className="flex justify-end gap-2 pt-4 border-t">
               <Button variant="outline" onClick={() => setSelectedInterval(null)}>Close</Button>
-              <Button onClick={() => { setSelectedInterval(null); navigate(`/Maintenance?view=${selectedInterval.id}`); }}>View Full Details</Button>
             </div>
           </DialogContent>
         </Dialog>
