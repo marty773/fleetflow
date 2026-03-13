@@ -155,10 +155,13 @@ export default function Maintenance() {
 
   const handleSyncAll = async () => {
     try {
-      toast.loading('Syncing to Vehicle Maintenance calendar...');
-      const result = await base44.functions.invoke('syncMaintenanceToCalendar', {});
+      toast.loading('Syncing to Google Calendar...');
+      const result = await base44.functions.invoke('syncToGoogleCalendar', {
+        company_id: selectedCompany,
+        futureOnly: false,
+      });
       toast.dismiss();
-      toast.success(`Synced ${result.data.synced} interval(s) to Google Calendar`);
+      toast.success(result.data.message);
     } catch (error) {
       toast.dismiss();
       toast.error('Failed to sync to calendar');
