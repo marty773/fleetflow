@@ -117,6 +117,20 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
         notes: newRecordNotes,
         total_cost: newRecordCost ? parseFloat(newRecordCost) : null,
       } : null,
+      attach_bill: attachBill,
+      new_bill: attachBill ? {
+        vendor: billVendor || newRecordVendor || 'Service Provider',
+        bill_date: performedDate,
+        total_amount: billAmount ? parseFloat(billAmount) : 0,
+        category: 'maintenance',
+        line_items: [{
+          description: newRecordTitle || interval.interval_name,
+          quantity: 1,
+          unit_price: billAmount ? parseFloat(billAmount) : 0,
+          total: billAmount ? parseFloat(billAmount) : 0,
+          vehicle_id: interval.vehicle_id
+        }]
+      } : null,
     });
     setIsLoading(false);
   };
