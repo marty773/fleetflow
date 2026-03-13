@@ -71,6 +71,11 @@ export default function Calendar() {
     queryFn: () => base44.entities.CalendarAppointment.list(),
   });
 
+  const { data: allRecords = [] } = useQuery({
+    queryKey: ['maintenanceRecords'],
+    queryFn: () => base44.entities.MaintenanceRecord.list(),
+  });
+
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
   const appointments = allAppointments.filter(a => a.company_id === selectedCompany);
