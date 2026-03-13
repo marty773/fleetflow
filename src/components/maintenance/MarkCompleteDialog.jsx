@@ -270,23 +270,62 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
 
           <hr className="dark:border-slate-700" />
 
-          {/* Link to bill — always optional */}
-          <div className="space-y-1">
-            <Label>Link to Bill <span className="text-slate-400 font-normal">(optional)</span></Label>
-            <Select value={linkedBillId} onValueChange={handleBillSelect}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a bill..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No bill</SelectItem>
-                {vehicleBills.map(b => (
-                  <SelectItem key={b.id} value={b.id}>
-                    {b.vendor} — {format(new Date(b.bill_date), 'MMM dd, yyyy')}
-                    {b.total_amount ? ` ($${b.total_amount.toFixed(2)})` : ''}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Link to existing bill OR create new bill */}
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold">Billing</Label>
+
+            {/* Link existing bill */}
+            <div className="space-y-1">
+              <Label className="text-xs">Link to Existing Bill <span className="text-slate-400 font-normal">(optional)</span></Label>
+              <Select value={linkedBillId} onValueChange={handleBillSelect}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a bill..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No bill</SelectItem>
+                  {vehicleBills.map(b => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.vendor} — {format(new Date(b.bill_date), 'MMM dd, yyyy')}
+                      {b.total_amount ? ` ($${b.total_amount.toFixed(2)})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Or create new bill */}
+            <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-800 rounded">
+              <Checkbox 
+                id="attach_bill"
+                checked={attachBill}
+                onCheckedChange={setAttachBill}
+              />
+              <Label htmlFor="attach_bill" className="text-xs cursor-pointer mb-0">Create new bill for this completion</Label>
+            </div>
+
+            {attachBill && (
+              <div className="space-y-2 border-l-2 border-blue-200 dark:border-blue-900 pl-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Vendor</Label>
+                  <Input
+                    placeholder={newRecordVendor || "Service provider"}
+                    value={billVendor}
+                    onChange={(e) => setBillVendor(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Amount</Label>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={billAmount}
+                    onChange={(e) => setBillAmount(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
