@@ -182,11 +182,16 @@ function DetailCard({ icon, label, value, small = false }) {
 export default function FleetLiveSection({ vehicles = [] }) {
   const [selectedMotiveId, setSelectedMotiveId] = useState(null);
 
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, isLoading, refetch, isFetching, isError } = useQuery({
     queryKey: ['motive-vehicle-data'],
     queryFn: async () => {
-      const res = await base44.functions.invoke('fetchMotiveVehicleData', {});
-      return res.data;
+      try {
+        const res = await base44.functions.invoke('fetchMotiveVehicleData', {});
+        return res.data;
+      } catch (error) {
+        console.error('Failed to fetch Motive data:', error);
+        return { vehicles: [] };
+      }
     },
     refetchInterval: 60000,
   });
