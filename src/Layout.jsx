@@ -220,9 +220,5 @@ function LayoutContent({ children, currentPageName }) {
       }
 
 export default function Layout(props) {
-  return (
-    <CompanyProvider>
-      <LayoutContent {...props} />
-    </CompanyProvider>
-  );
+  return <LayoutContent {...props} />;
 }
