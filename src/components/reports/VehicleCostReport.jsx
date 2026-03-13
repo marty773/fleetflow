@@ -284,13 +284,7 @@ export default function VehicleCostReport() {
                     const isExpanded = expandedVehicles.has(item.vehicle.id);
                     return (
                       <React.Fragment key={item.vehicle.id}>
-                        <TableRow className="border-t border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900" onClick={(e) => {
-                          if (window.innerWidth < 768 && item.transactions.length > 0) {
-                            setViewingTransaction(item.transactions[0]);
-                          } else {
-                            toggleVehicle(item.vehicle.id);
-                          }
-                        }}>
+                        <TableRow className="border-t border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900" onClick={() => toggleVehicle(item.vehicle.id)}>
                           <TableCell onClick={(e) => {
                             e.stopPropagation();
                             toggleVehicle(item.vehicle.id);
