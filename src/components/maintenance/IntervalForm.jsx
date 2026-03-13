@@ -182,6 +182,32 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
           </div>
 
+          {/* Scheduled Date Override */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <Label htmlFor="scheduled_date" className="text-blue-800 dark:text-blue-300 font-semibold">
+              Scheduled Shop Date <span className="font-normal text-blue-600 dark:text-blue-400">(Optional Override)</span>
+            </Label>
+            <Input
+              id="scheduled_date"
+              type="date"
+              value={formData.scheduled_date}
+              onChange={(e) => handleChange('scheduled_date', e.target.value)}
+              className="mt-2"
+            />
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              Set this to pin this item to the exact day the truck is going to the shop. Overrides the auto-calculated due date on the calendar.
+              {formData.scheduled_date && (
+                <button
+                  type="button"
+                  onClick={() => handleChange('scheduled_date', '')}
+                  className="ml-2 underline text-blue-700 dark:text-blue-300"
+                >
+                  Clear override
+                </button>
+              )}
+            </p>
+          </div>
+
           <div>
             <Label htmlFor="notes">Notes</Label>
             <Input
