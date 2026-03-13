@@ -21,11 +21,8 @@ import {
 import BillList from '../components/bills/BillList';
 import BillGallery from '../components/bills/BillGallery';
 import BillDetailDialog from '../components/dialogs/BillDetailDialog';
-import { useCompany } from '../components/CompanyContext';
-
 export default function Bills() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const [viewingBill, setViewingBill] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
   const [deletingBill, setDeletingBill] = useState(null);
