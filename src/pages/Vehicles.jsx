@@ -10,23 +10,20 @@ import VehicleViewDialog from '../components/vehicles/VehicleViewDialog';
 import FleetLivePreview from '../components/vehicles/FleetLivePreview';
 import PullToRefresh from '../components/PullToRefresh';
 import PageTransition from '../components/PageTransition';
-import { useCompany } from '../components/CompanyContext';
-
 export default function Vehicles() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const [viewingVehicle, setViewingVehicle] = useState(null);
   const [sortBy, setSortBy] = useState('name');
   const [filterType, setFilterType] = useState('all');
   const queryClient = useQueryClient();
 
-  const { data: allVehicles = [] } = useQuery({
+  const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const vehicles = allVehicles
-    .filter(v => v.company_id === selectedCompany && (filterType === 'all' || v.type === filterType))
+  const filteredVehicles = vehicles
+    .filter(v => filterType === 'all' || v.type === filterType)
     .sort((a, b) => {
       if (sortBy === 'type') {
         if (a.type !== b.type) return a.type.localeCompare(b.type);
