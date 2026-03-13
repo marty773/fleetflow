@@ -100,13 +100,9 @@ export default function Dashboard() {
       <DashboardStats stats={stats} />
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <RecentExpenses bills={bills} vehicles={vehicles} />
-        </div>
-        <div>
-          <UpcomingMaintenance intervals={maintenanceIntervals} vehicles={vehicles} />
-        </div>
+      <FleetLiveSection vehicles={vehicles} />
+      <div className="grid grid-cols-1 gap-6">
+        <UpcomingMaintenance intervals={maintenanceIntervals} vehicles={vehicles} />
       </div>
 
       {/* Empty State */}
