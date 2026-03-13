@@ -79,6 +79,7 @@ export default function Calendar() {
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
   const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
   const appointments = allAppointments.filter(a => a.company_id === selectedCompany);
+  const records = allRecords.filter(r => r.company_id === selectedCompany);
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
