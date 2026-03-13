@@ -86,7 +86,7 @@ export default function FleetLivePreview({ vehicles = [] }) {
             onClick={() => setModalOpen(false)}
           />
           {/* Modal content */}
-          <div className="relative z-10 w-full max-w-4xl">
+          <div className="relative w-full max-w-4xl" style={{ zIndex: 1001 }}>
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
               {/* Modal header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
