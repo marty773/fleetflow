@@ -78,10 +78,11 @@ export default function FleetLivePreview({ vehicles = [] }) {
 
       {/* Full modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-8 overflow-y-auto">
+        <div className="fixed inset-0 flex items-start justify-center p-4 pt-8 overflow-y-auto" style={{ zIndex: 1000 }}>
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            style={{ zIndex: 1000 }}
             onClick={() => setModalOpen(false)}
           />
           {/* Modal content */}
