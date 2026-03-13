@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, AlertCircle, Wrench, DollarSign } from 'lucide-react';
+import { TrendingUp, AlertCircle, Wrench } from 'lucide-react';
 
 export default function DashboardStats({ stats }) {
   const statCards = [
