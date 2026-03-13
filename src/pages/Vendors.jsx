@@ -16,9 +16,8 @@ import { Label } from '@/components/ui/label';
 import VendorCard from '../components/vendors/VendorCard';
 
 export default function Vendors() {
+  const navigate = useNavigate();
   const { selectedCompany } = useCompany();
-  const [showForm, setShowForm] = useState(false);
-  const [editingVendor, setEditingVendor] = useState(null);
   const [viewingVendor, setViewingVendor] = useState(null);
   const queryClient = useQueryClient();
 

@@ -13,14 +13,12 @@ import PageTransition from '../components/PageTransition';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Vehicles() {
+  const navigate = useNavigate();
   const { selectedCompany } = useCompany();
-  const [showForm, setShowForm] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState(null);
   const [viewingVehicle, setViewingVehicle] = useState(null);
-  const [sortBy, setSortBy] = useState('name'); // 'name', 'type'
-  const [filterType, setFilterType] = useState('all'); // 'all', 'truck', 'trailer'
+  const [sortBy, setSortBy] = useState('name');
+  const [filterType, setFilterType] = useState('all');
   const queryClient = useQueryClient();
-  const formRef = useRef(null);
 
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
