@@ -120,6 +120,41 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
               </div>
             </div>
           )}
+          {record.linked_bill_id && (() => {
+            const linkedBill = bills.find(b => b.id === record.linked_bill_id);
+            return linkedBill ? (
+              <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <FileText className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <Label className="text-blue-700 dark:text-blue-300">Linked Bill</Label>
+                  <p className="font-medium text-blue-900 dark:text-blue-100">
+                    {linkedBill.vendor} — {format(new Date(linkedBill.bill_date), 'MMM dd, yyyy')}
+                    {linkedBill.total_amount ? ` ($${linkedBill.total_amount.toFixed(2)})` : ''}
+                  </p>
+                  {linkedBill.bill_number && <p className="text-xs text-blue-600 dark:text-blue-400">Invoice #{linkedBill.bill_number}</p>}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
+          {(() => {
+            const linkedInterval = intervals.find(i => i.linked_record_id === record.id);
+            return linkedInterval ? (
+              <div className="flex items-start gap-2 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+                <CalendarClock className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <Label className="text-green-700 dark:text-green-300">Completed Interval</Label>
+                  <p className="font-medium text-green-900 dark:text-green-100">{linkedInterval.interval_name}</p>
+                  {linkedInterval.next_due_date && (
+                    <p className="text-xs text-green-600 dark:text-green-400">
+                      Next due: {format(new Date(linkedInterval.next_due_date), 'MMM dd, yyyy')}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
           {record.notes && (
             <div>
               <Label className="text-slate-500">Notes</Label>
