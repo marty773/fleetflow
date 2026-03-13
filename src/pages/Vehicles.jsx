@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Plus, ArrowUpDown } from 'lucide-react';
 import VehicleCard from '../components/vehicles/VehicleCard';
 import VehicleViewDialog from '../components/vehicles/VehicleViewDialog';
-import FleetLiveSection from '../components/vehicles/FleetLiveSection';
+import FleetLivePreview from '../components/vehicles/FleetLivePreview';
 import PullToRefresh from '../components/PullToRefresh';
 import PageTransition from '../components/PageTransition';
 import { useCompany } from '../components/CompanyContext';
