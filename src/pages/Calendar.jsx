@@ -539,7 +539,7 @@ export default function Calendar() {
               <DialogHeader>
                 <DialogTitle className="text-slate-900 dark:text-white">Events for {format(selectedDay, 'MMMM d, yyyy')}</DialogTitle>
               </DialogHeader>
-              <div className="space-y-3">
+              <div className="space-y-3 px-1">
                 {getDayEvents(selectedDay).length > 0 ? (
                   getDayEvents(selectedDay).map(event => {
                     if (event.type === 'appointment') {
