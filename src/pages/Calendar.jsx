@@ -490,7 +490,12 @@ export default function Calendar() {
 
         {/* Day View Dialog */}
         {selectedDay && (
-          <Dialog open={!!selectedDay} onOpenChange={() => setSelectedDay(null)}>
+          <Dialog open={!!selectedDay} onOpenChange={() => {
+            setSelectedDay(null);
+            // Invalidate caches when modal closes to refresh data
+            queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
+            queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+          }}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700" style={{ zIndex: 900 }}>
               <DialogHeader>
                 <DialogTitle className="text-slate-900 dark:text-white">Events for {format(selectedDay, 'MMMM d, yyyy')}</DialogTitle>
