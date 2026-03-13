@@ -65,19 +65,16 @@ export default function Items() {
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const items = allItems.filter(i => i.company_id === selectedCompany);
-  const bills = allBills.filter(b => b.company_id === selectedCompany);
-  const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
-
-
-
   const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list(),
   });
 
-  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
+  const items = allItems;
+  const bills = allBills;
+  const maintenanceRecords = allMaintenanceRecords;
+  const vehicles = allVehicles;
+  const vendors = allVendors;
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
