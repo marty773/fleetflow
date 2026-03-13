@@ -2,14 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCompany } from '@/components/CompanyContext';
 import IntervalForm from '@/components/maintenance/IntervalForm';
 import PageTransition from '@/components/PageTransition';
 import { toast } from 'sonner';
 
 export default function MaintenanceIntervalFormPage() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -18,7 +16,7 @@ export default function MaintenanceIntervalFormPage() {
   const { data: allVehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list() });
   const { data: allIntervals = [] } = useQuery({ queryKey: ['maintenanceIntervals'], queryFn: () => base44.entities.MaintenanceInterval.list(), enabled: !!editId });
 
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const vehicles = allVehicles;
   const editingInterval = editId ? allIntervals.find(i => i.id === editId) || null : null;
 
   const createMutation = useMutation({
@@ -46,11 +44,10 @@ export default function MaintenanceIntervalFormPage() {
   });
 
   const handleSubmit = async (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
     if (editingInterval) {
-      updateMutation.mutate({ id: editingInterval.id, data: dataWithCompany });
+      updateMutation.mutate({ id: editingInterval.id, data });
     } else {
-      createMutation.mutate(dataWithCompany);
+      createMutation.mutate(data);
     }
   };
 

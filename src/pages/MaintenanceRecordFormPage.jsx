@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCompany } from '@/components/CompanyContext';
 import MaintenanceForm from '@/components/maintenance/MaintenanceForm';
 import PageTransition from '@/components/PageTransition';
 import { format } from 'date-fns';
@@ -10,7 +9,6 @@ import { toast } from 'sonner';
 
 export default function MaintenanceRecordFormPage() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,10 +22,10 @@ export default function MaintenanceRecordFormPage() {
   const { data: allRecords = [] } = useQuery({ queryKey: ['maintenanceRecords'], queryFn: () => base44.entities.MaintenanceRecord.list(), enabled: !!editId });
   const { data: allIntervals = [] } = useQuery({ queryKey: ['maintenanceIntervals'], queryFn: () => base44.entities.MaintenanceInterval.list() });
 
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
-  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
-  const filteredItems = allItems.filter(i => i.company_id === selectedCompany);
-  const bills = allBills.filter(b => b.company_id === selectedCompany);
+  const vehicles = allVehicles;
+  const vendors = allVendors;
+  const filteredItems = allItems;
+  const bills = allBills;
   const editingRecord = editId ? allRecords.find(r => r.id === editId) || null : null;
 
   const createMutation = useMutation({
@@ -41,10 +39,8 @@ export default function MaintenanceRecordFormPage() {
   });
 
   const handleSubmit = async (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
-
     // Deduct inventory only when creating
-    if (!editingRecord && dataWithCompany.parts_used?.length > 0) {
+    if (!editingRecord && data.parts_used?.length > 0) {
       const partMap = {};
       data.parts_used.forEach(part => { partMap[part.item_id] = (partMap[part.item_id] || 0) + part.quantity_used; });
       for (const [item_id, qty] of Object.entries(partMap)) {
@@ -56,41 +52,29 @@ export default function MaintenanceRecordFormPage() {
 
     let createdRecord;
     if (editingRecord) {
-      await updateMutation.mutateAsync({ id: editingRecord.id, data: dataWithCompany });
+      await updateMutation.mutateAsync({ id: editingRecord.id, data });
     } else {
-      createdRecord = await createMutation.mutateAsync(dataWithCompany);
+      createdRecord = await createMutation.mutateAsync(data);
     }
 
     // Update related intervals
     const relatedIntervals = allIntervals.filter(
-      i => i.vehicle_id === dataWithCompany.vehicle_id && i.maintenance_type === dataWithCompany.maintenance_type
+      i => i.vehicle_id === data.vehicle_id && i.maintenance_type === data.maintenance_type
     );
     for (const interval of relatedIntervals) {
-      const updateData = { last_performed_date: dataWithCompany.performed_date };
-      if (dataWithCompany.odometer_reading) {
-        updateData.last_performed_mileage = parseFloat(dataWithCompany.odometer_reading);
-        if (interval.interval_miles) updateData.next_due_mileage = parseFloat(dataWithCompany.odometer_reading) + parseFloat(interval.interval_miles);
+      const updateData = { last_performed_date: data.performed_date };
+      if (data.odometer_reading) {
+        updateData.last_performed_mileage = parseFloat(data.odometer_reading);
+        if (interval.interval_miles) updateData.next_due_mileage = parseFloat(data.odometer_reading) + parseFloat(interval.interval_miles);
       }
       if (interval.interval_months) {
-        const nextDate = new Date(dataWithCompany.performed_date);
+        const nextDate = new Date(data.performed_date);
         nextDate.setMonth(nextDate.getMonth() + parseInt(interval.interval_months));
         updateData.next_due_date = nextDate.toISOString().split('T')[0];
       }
       await base44.entities.MaintenanceInterval.update(interval.id, updateData);
     }
     queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
-
-    // Email notification for specific vehicles
-    if (!editingRecord && createdRecord) {
-      const vehicle = allVehicles.find(v => v.id === dataWithCompany.vehicle_id);
-      if (vehicle && (vehicle.name === 'JEM Trailer' || vehicle.name === 'JEM 2022 RAM')) {
-        await base44.integrations.Core.SendEmail({
-          to: 'manny@fishersbackyardstructures.com',
-          subject: `New Maintenance Record for ${vehicle.name}`,
-          body: `A new maintenance record has been logged for ${vehicle.name}.\n\nTitle: ${dataWithCompany.title}\nType: ${dataWithCompany.maintenance_type?.replace('_', ' ')}\nDate: ${format(new Date(dataWithCompany.performed_date), 'MMM dd, yyyy')}\nCost: $${dataWithCompany.total_cost?.toFixed(2) || '0.00'}`
-        });
-      }
-    }
 
     navigate('/Maintenance');
   };

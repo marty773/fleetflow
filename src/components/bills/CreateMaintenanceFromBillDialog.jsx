@@ -19,7 +19,7 @@ const MAINTENANCE_TYPES = [
   { value: 'other', label: 'Other' },
 ];
 
-export default function CreateMaintenanceFromBillDialog({ bill, vehicles, companyId, onClose, onCreated }) {
+export default function CreateMaintenanceFromBillDialog({ bill, vehicles, onClose, onCreated }) {
   if (!bill) return null;
 
   // Distinct vehicles from bill line items
@@ -50,8 +50,7 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, compan
     setSaving(true);
     try {
       await base44.entities.MaintenanceRecord.create({
-        company_id: companyId,
-        vehicle_id: selectedVehicleId,
+         vehicle_id: selectedVehicleId,
         title,
         maintenance_type: maintenanceType,
         performed_date: bill.bill_date,
