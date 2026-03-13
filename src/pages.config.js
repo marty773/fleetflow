@@ -47,29 +47,41 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import BillFormPage from './pages/BillFormPage';
 import Bills from './pages/Bills';
 import Calendar from './pages/Calendar';
 import Dashboard from './pages/Dashboard';
+import ItemFormPage from './pages/ItemFormPage';
 import Items from './pages/Items';
 import Maintenance from './pages/Maintenance';
+import MaintenanceIntervalFormPage from './pages/MaintenanceIntervalFormPage';
+import MaintenanceRecordFormPage from './pages/MaintenanceRecordFormPage';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import UserManagement from './pages/UserManagement';
+import VehicleForm from './pages/VehicleForm';
 import Vehicles from './pages/Vehicles';
+import VendorFormPage from './pages/VendorFormPage';
 import Vendors from './pages/Vendors';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "BillFormPage": BillFormPage,
     "Bills": Bills,
     "Calendar": Calendar,
     "Dashboard": Dashboard,
+    "ItemFormPage": ItemFormPage,
     "Items": Items,
     "Maintenance": Maintenance,
+    "MaintenanceIntervalFormPage": MaintenanceIntervalFormPage,
+    "MaintenanceRecordFormPage": MaintenanceRecordFormPage,
     "Reports": Reports,
     "Settings": Settings,
     "UserManagement": UserManagement,
+    "VehicleForm": VehicleForm,
     "Vehicles": Vehicles,
+    "VendorFormPage": VendorFormPage,
     "Vendors": Vendors,
 }
 

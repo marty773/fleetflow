@@ -57,6 +57,35 @@ export default function MaintenanceRecordFormPage() {
       createdRecord = await createMutation.mutateAsync(data);
     }
 
+    // Create recurring interval if requested
+    if (!editingRecord && data.create_recurring_interval) {
+      const vehicle = allVehicles.find(v => v.id === data.vehicle_id);
+      const intervalData = {
+        vehicle_id: data.vehicle_id,
+        maintenance_type: data.maintenance_type,
+        interval_name: data.title,
+        interval_months: data.interval_months,
+        interval_miles: data.interval_miles,
+        last_performed_date: data.performed_date,
+        last_performed_mileage: data.odometer_reading ? parseFloat(data.odometer_reading) : null,
+        company_id: vehicle?.company_id || 'Fisher\'s Enterprise',
+        linked_record_id: createdRecord.id
+      };
+
+      // Calculate next due
+      if (data.interval_months) {
+        const nextDate = new Date(data.performed_date);
+        nextDate.setMonth(nextDate.getMonth() + parseInt(data.interval_months));
+        intervalData.next_due_date = nextDate.toISOString().split('T')[0];
+      }
+      if (data.odometer_reading && data.interval_miles) {
+        intervalData.next_due_mileage = parseFloat(data.odometer_reading) + parseFloat(data.interval_miles);
+      }
+
+      await base44.entities.MaintenanceInterval.create(intervalData);
+      queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+    }
+
     // Update related intervals and link the record
     const relatedIntervals = allIntervals.filter(
       i => i.vehicle_id === data.vehicle_id && i.maintenance_type === data.maintenance_type
