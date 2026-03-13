@@ -127,12 +127,13 @@ export default function Calendar() {
   }, [filteredIntervals, filteredAppointments]);
 
   const getDayEvents = (day) => {
-    const dateKey = day.toISOString().split('T')[0];
+    const dateKey = format(day, 'yyyy-MM-dd');
     return eventsMap[dateKey] || [];
   };
 
   const getEventStatus = (interval) => {
-    const days = (new Date(interval.next_due_date) - new Date()) / (1000 * 60 * 60 * 24);
+    const calDate = interval.scheduled_date || interval.next_due_date;
+    const days = (new Date(calDate + 'T12:00:00') - new Date()) / (1000 * 60 * 60 * 24);
     if (days < 0) return 'overdue';
     if (days <= 7) return 'urgent';
     if (days <= 30) return 'dueSoon';
