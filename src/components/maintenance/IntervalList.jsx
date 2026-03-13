@@ -114,6 +114,17 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                         {interval.next_due_date ? format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
                       </p>
                     </div>
+                    {interval.scheduled_date && (
+                      <div>
+                        <p className="text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                          Shop Scheduled
+                          <span title="When the vehicle is scheduled for the shop" className="cursor-help">ℹ️</span>
+                        </p>
+                        <p className="font-semibold text-slate-900 dark:text-white">
+                          {format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM dd, yyyy')}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   {(interval.linked_record_id || interval.linked_bill_id) && (
                     <div className="flex gap-2 mt-3 flex-wrap">
