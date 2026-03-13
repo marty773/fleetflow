@@ -63,8 +63,16 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate at least one interval type is provided
+    if (!formData.interval_months && !formData.interval_miles) {
+      alert('Please enter either an interval in months or miles');
+      return;
+    }
+    
     const submissionData = calculateNextDue();
     // Convert empty strings to null for optional number fields
+    if (submissionData.interval_months === '') submissionData.interval_months = null;
     if (submissionData.interval_miles === '') submissionData.interval_miles = null;
     if (submissionData.last_performed_mileage === '') submissionData.last_performed_mileage = null;
     if (submissionData.next_due_mileage === '') submissionData.next_due_mileage = null;
