@@ -466,7 +466,7 @@ export default function Calendar() {
                               {vehicleMap[item.vehicle_id]?.name}
                             </p>
                             <p className="text-xs text-slate-700">
-                              {format(new Date(item.appointment_date), 'MMM dd, yyyy')}
+                              {format(new Date(item.appointment_date + 'T12:00:00'), 'MMM dd, yyyy')}
                               {item.appointment_time && ` at ${item.appointment_time}`}
                             </p>
                             {item.location && (
