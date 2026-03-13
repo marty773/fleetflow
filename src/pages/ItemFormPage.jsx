@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCompany } from '@/components/CompanyContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,7 +12,6 @@ import PageTransition from '@/components/PageTransition';
 
 export default function ItemFormPage() {
   const navigate = useNavigate();
-  const { selectedCompany } = useCompany();
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -30,7 +28,7 @@ export default function ItemFormPage() {
     queryFn: () => base44.entities.Vendor.list(),
   });
 
-  const vendors = allVendors.filter(v => v.company_id === selectedCompany);
+  const vendors = allVendors;
   const editingItem = editId ? allItems.find(i => i.id === editId) || null : null;
 
   const [formData, setFormData] = useState({
@@ -76,7 +74,6 @@ export default function ItemFormPage() {
       item_number: formData.item_number || null,
       description: formData.description || null,
       photo_url: formData.photo_url || null,
-      company_id: selectedCompany,
     };
     if (editingItem?.id) {
       await base44.entities.Item.update(editingItem.id, data);
