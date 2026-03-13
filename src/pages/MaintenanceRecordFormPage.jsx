@@ -15,6 +15,7 @@ export default function MaintenanceRecordFormPage() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const editId = urlParams.get('edit');
+  const presetVehicleId = urlParams.get('vehicle');
 
   const { data: allVehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list() });
   const { data: allItems = [] } = useQuery({ queryKey: ['items'], queryFn: () => base44.entities.Item.list() });
@@ -110,7 +111,7 @@ export default function MaintenanceRecordFormPage() {
             {editId ? 'Edit Maintenance Record' : 'Log Maintenance'}
           </h1>
           <MaintenanceForm
-            record={editingRecord}
+            record={editingRecord || (presetVehicleId ? { vehicle_id: presetVehicleId } : null)}
             vehicles={vehicles}
             items={filteredItems}
             vendors={vendors}
