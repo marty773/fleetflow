@@ -244,11 +244,11 @@ export default function Calendar() {
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
-                onClick={handleOpenCompanySync}
+                onClick={() => setShowCompanySyncDialog(true)}
                 className="w-full sm:w-auto"
               >
                 <CalendarIcon className="w-4 h-4 mr-2" />
-                {companyCalendarConnected ? 'Sync Company Calendar' : 'Connect Company Calendar'}
+                Sync to Google Calendar
               </Button>
               <Button
                 onClick={() => {
