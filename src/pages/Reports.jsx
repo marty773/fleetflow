@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import ResponsiveSelect from '@/components/ResponsiveSelect';
+import { SelectItem } from '@/components/ui/select';
 import PageTransition from '@/components/PageTransition';
 import PullToRefresh from '@/components/PullToRefresh';
 import VehicleCostReport from '../components/reports/VehicleCostReport';

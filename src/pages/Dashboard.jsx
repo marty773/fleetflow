@@ -12,6 +12,7 @@ import RecentExpenses from '../components/dashboard/RecentExpenses';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { selectedCompany } = useCompany();
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
@@ -76,7 +77,7 @@ export default function Dashboard() {
       
       <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
         <Button 
-          onClick={() => window.location.href = createPageUrl('Bills') + '?new=true'}
+          onClick={() => navigate('/BillFormPage')}
           className="flex-1 sm:flex-none" 
           style={{ backgroundColor: 'var(--color-primary)' }} 
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'} 
@@ -85,7 +86,7 @@ export default function Dashboard() {
           <Plus className="w-4 h-4 mr-2" /> New Bill
         </Button>
         <Button 
-          onClick={() => window.location.href = createPageUrl('Maintenance') + '?new=true'}
+          onClick={() => navigate('/MaintenanceRecordFormPage')}
           className="flex-1 sm:flex-none"
           style={{ backgroundColor: 'var(--color-primary)' }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
@@ -115,9 +116,7 @@ export default function Dashboard() {
             <Wrench className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No vehicles yet</h3>
             <p className="text-slate-600 dark:text-slate-400 mb-6">Add your first truck or trailer to get started</p>
-            <Link to={createPageUrl('Vehicles')}>
-              <Button className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600">Add Vehicle</Button>
-            </Link>
+            <Button onClick={() => navigate('/VehicleForm')} className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600">Add Vehicle</Button>
           </CardContent>
         </Card>
       )}
