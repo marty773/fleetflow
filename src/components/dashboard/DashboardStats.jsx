@@ -13,15 +13,6 @@ export default function DashboardStats({ stats }) {
       iconColor: 'text-slate-700 dark:text-slate-300',
     },
     {
-      label: 'Expenses (30 Days)',
-      value: `$${stats.totalExpenses.toFixed(2)}`,
-      icon: DollarSign,
-      color: 'green',
-      bgColor: 'bg-green-100 dark:bg-green-900/30',
-      iconColor: 'text-green-600 dark:text-green-400',
-      hideIcon: true,
-    },
-    {
       label: 'Upcoming Services',
       value: stats.upcomingMaintenance,
       icon: Wrench,
