@@ -14,26 +14,21 @@ import { format } from 'date-fns';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [selectedCompany] = useState("Fisher's Enterprise");
   const [selectedInterval, setSelectedInterval] = useState(null);
-  const { data: allVehicles = [] } = useQuery({
+  const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const { data: allMaintenanceIntervals = [] } = useQuery({
+  const { data: maintenanceIntervals = [] } = useQuery({
     queryKey: ['maintenanceIntervals'],
     queryFn: () => base44.entities.MaintenanceInterval.list(),
   });
 
-  const { data: allMaintenanceRecords = [] } = useQuery({
+  const { data: maintenanceRecords = [] } = useQuery({
     queryKey: ['maintenanceRecords'],
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
-
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
-  const maintenanceIntervals = allMaintenanceIntervals.filter(m => m.company_id === selectedCompany);
-  const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
 
   const calculateStats = () => {
     const overdueIntervals = maintenanceIntervals.filter(
