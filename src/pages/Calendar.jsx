@@ -535,7 +535,7 @@ export default function Calendar() {
         {/* Day View Dialog */}
         {selectedDay && (
           <Dialog open={!!selectedDay} onOpenChange={() => setSelectedDay(null)}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 overflow-x-visible">
               <DialogHeader>
                 <DialogTitle className="text-slate-900 dark:text-white">Events for {format(selectedDay, 'MMMM d, yyyy')}</DialogTitle>
               </DialogHeader>
