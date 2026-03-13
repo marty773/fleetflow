@@ -490,7 +490,8 @@ export default function Calendar() {
                               {vehicleMap[item.vehicle_id]?.name}
                             </p>
                             <p className="text-xs text-slate-700">
-                              {format(new Date(item.next_due_date), 'MMM dd, yyyy')}
+                              {format(new Date((item.scheduled_date || item.next_due_date) + 'T12:00:00'), 'MMM dd, yyyy')}
+                              {item.scheduled_date && <span className="ml-1 text-blue-600">📌</span>}
                             </p>
                             {status === 'overdue' && (
                               <div className="flex items-center gap-1 mt-1 text-red-600">
