@@ -10,10 +10,12 @@ export default function UpcomingMaintenance({ intervals, vehicles }) {
     return acc;
   }, {});
 
+  const now = new Date();
+  const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
   const sortedIntervals = intervals
-    .filter(i => i.is_active)
-    .sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date))
-    .slice(0, 5);
+    .filter(i => i.next_due_date && new Date(i.next_due_date) <= in30Days)
+    .sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date));
 
   const getUrgency = (dueDate) => {
     const days = (new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24);

@@ -1,17 +1,9 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, AlertCircle, Wrench } from 'lucide-react';
+import { AlertCircle, Wrench } from 'lucide-react';
 
 export default function DashboardStats({ stats }) {
   const statCards = [
-    {
-      label: 'Fleet Size',
-      value: stats.totalVehicles,
-      icon: TrendingUp,
-      color: 'slate',
-      bgColor: 'bg-slate-100 dark:bg-slate-700',
-      iconColor: 'text-slate-700 dark:text-slate-300',
-    },
     {
       label: 'Upcoming Services',
       value: stats.upcomingMaintenance,
@@ -30,7 +22,7 @@ export default function DashboardStats({ stats }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
       {statCards.map((stat, idx) => {
         const Icon = stat.icon;
         return (
