@@ -28,7 +28,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
         vehicle_id: interval.vehicle_id || '',
         interval_name: interval.interval_name || '',
         maintenance_type: interval.maintenance_type || 'oil_change',
-        interval_months: interval.interval_months || 3,
+        interval_months: interval.interval_months || '',
         interval_miles: interval.interval_miles || '',
         last_performed_date: interval.last_performed_date || '',
         last_performed_mileage: interval.last_performed_mileage || '',
