@@ -84,12 +84,18 @@ export default function Calendar() {
   const eventsMap = useMemo(() => {
     const map = {};
     
+    // Build a map of intervals linked to records for quick lookup
+    const linkedIntervalIds = new Set(filteredRecords.map(r => r.linked_interval_id).filter(Boolean));
+    
     // Add maintenance intervals — use scheduled_date if set, else next_due_date
+    // But skip if this interval is already completed (has a linked record)
     filteredIntervals.forEach(interval => {
-      const calDate = interval.scheduled_date || interval.next_due_date;
-      if (calDate) {
-        if (!map[calDate]) map[calDate] = [];
-        map[calDate].push({ ...interval, type: 'interval' });
+      if (!linkedIntervalIds.has(interval.id)) {
+        const calDate = interval.scheduled_date || interval.next_due_date;
+        if (calDate) {
+          if (!map[calDate]) map[calDate] = [];
+          map[calDate].push({ ...interval, type: 'interval' });
+        }
       }
     });
     
