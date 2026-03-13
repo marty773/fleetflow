@@ -87,6 +87,7 @@ export default function FleetMap({ motiveVehicles = [], selectedMotiveId = null,
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitBounds vehicles={located} />
+        {selectedVehicle && <PanTo vehicle={selectedVehicle} />}
         {located.map((v) => (
           <Marker
             key={v.motive_id}
