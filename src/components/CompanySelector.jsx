@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
 import { Building2 } from 'lucide-react';
-import { useCompany } from '@/components/CompanyContext';
 import { Button } from '@/components/ui/button';
 
 export default function CompanySelector({ value, onChange }) {
-  const { allowedCompanies, loading } = useCompany();
+  const allowedCompanies = ["Fisher's Enterprise", "Pencroft Structures"];
+  const loading = false;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
