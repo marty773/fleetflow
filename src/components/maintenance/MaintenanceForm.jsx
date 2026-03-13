@@ -38,7 +38,7 @@ import {
  } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], onSubmit, onCancel, isLoading }) {
+export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], bills = [], onSubmit, onCancel, isLoading }) {
   const { selectedCompany } = useCompany();
   const serviceTypes = useServiceTypes(selectedCompany, 'records');
 
@@ -56,6 +56,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
         total_cost: 0,
         odometer_reading: '',
         notes: '',
+        linked_bill_id: '',
       };
     }
     
@@ -123,6 +124,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
         total_cost: 0,
         odometer_reading: '',
         notes: '',
+        linked_bill_id: '',
       });
     }
   }, [record]);
