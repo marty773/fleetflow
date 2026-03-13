@@ -43,13 +43,12 @@ export default function Reports() {
                   value={selectedReport}
                   onValueChange={setSelectedReport}
                   placeholder="Select report"
-                  options={[
-                    { value: 'vehicle-costs', label: 'Vehicle Costs' },
-                    { value: 'inventory', label: 'Inventory' },
-                    { value: 'vendors', label: 'Vendors' }
-                  ]}
-                  className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                />
+                  label="Select Report"
+                >
+                  <SelectItem value="vehicle-costs">Vehicle Costs</SelectItem>
+                  <SelectItem value="inventory">Inventory</SelectItem>
+                  <SelectItem value="vendors">Vendors</SelectItem>
+                </ResponsiveSelect>
               </div>
             </div>
 
