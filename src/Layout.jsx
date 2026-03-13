@@ -138,12 +138,7 @@ function LayoutContent({ children, currentPageName }) {
             </button>
           )}
         </div>
-        <div 
-          className="flex-1 text-center text-base font-semibold pointer-events-none"
-          style={{ color: themeColors.primary }}
-        >
-          {selectedCompany}
-        </div>
+
 
       </div>
 
