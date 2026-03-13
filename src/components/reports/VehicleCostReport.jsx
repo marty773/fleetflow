@@ -82,8 +82,9 @@ export default function VehicleCostReport() {
     });
   });
 
+  // Only count maintenance records NOT already covered by a linked bill (to avoid double-counting)
   filteredMaintenance.forEach((record) => {
-    if (record.vehicle_id) {
+    if (record.vehicle_id && !record.linked_bill_id) {
       vehicleCosts[record.vehicle_id] =
         (vehicleCosts[record.vehicle_id] || 0) + (record.total_cost || 0);
     }
