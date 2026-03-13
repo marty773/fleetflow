@@ -10,10 +10,15 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
 import FleetLiveSection from '../components/vehicles/FleetLiveSection';
 import { useCompany } from '../components/CompanyContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { selectedCompany } = useCompany();
+  const [selectedInterval, setSelectedInterval] = useState(null);
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
@@ -89,8 +94,58 @@ export default function Dashboard() {
       {/* Main Content */}
       <FleetLiveSection vehicles={vehicles} />
       <div className="grid grid-cols-1 gap-6">
-        <UpcomingMaintenance intervals={maintenanceIntervals} vehicles={vehicles} />
+        <UpcomingMaintenance intervals={maintenanceIntervals} vehicles={vehicles} onSelectInterval={setSelectedInterval} />
       </div>
+
+      {/* Interval Detail Dialog */}
+      {selectedInterval && (
+        <Dialog open={!!selectedInterval} onOpenChange={() => setSelectedInterval(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedInterval.interval_name}</DialogTitle>
+              <DialogDescription>{vehicles.find(v => v.id === selectedInterval.vehicle_id)?.name}</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Last Done</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">
+                    {selectedInterval.last_performed_date ? format(new Date(selectedInterval.last_performed_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not set'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Next Due</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">
+                    {selectedInterval.next_due_date ? format(new Date(selectedInterval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Interval</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">
+                    {selectedInterval.interval_months ? `Every ${selectedInterval.interval_months} month${selectedInterval.interval_months > 1 ? 's' : ''}` : 'N/A'}
+                  </p>
+                </div>
+                {selectedInterval.interval_miles && (
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Mileage</p>
+                    <p className="font-semibold text-slate-900 dark:text-white">{selectedInterval.interval_miles} mi</p>
+                  </div>
+                )}
+              </div>
+              {selectedInterval.notes && (
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Notes</p>
+                  <p className="text-slate-900 dark:text-white">{selectedInterval.notes}</p>
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button variant="outline" onClick={() => setSelectedInterval(null)}>Close</Button>
+              <Button onClick={() => { setSelectedInterval(null); navigate(`/Maintenance?view=${selectedInterval.id}`); }}>View Full Details</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Empty State */}
       {vehicles.length === 0 && (
