@@ -582,8 +582,6 @@ export default function Calendar() {
                       );
                     } else {
                       const status = getEventStatus(event);
-                      const calDate = event.scheduled_date || event.next_due_date;
-                      const isRescheduling = reschedulingInterval === event.id;
                       return (
                        <div
                          key={event.id}
