@@ -37,8 +37,6 @@ export default function Items() {
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('itemsViewMode') || 'list';
   });
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [viewingItem, setViewingItem] = useState(null);
   const [photoLightbox, setPhotoLightbox] = useState(null);
@@ -74,19 +72,7 @@ export default function Items() {
   const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
   const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
 
-  // Check for URL parameter to auto-open edit form
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const editId = urlParams.get('edit');
-    
-    if (editId && items.length > 0) {
-      const item = items.find(i => i.id === editId);
-      if (item) {
-        setEditingItem(item);
-        setFormOpen(true);
-      }
-    }
-  }, [items]);
+
 
   const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors'],
@@ -201,10 +187,6 @@ export default function Items() {
 
   const handleAddNew = () => {
     navigate('/ItemFormPage');
-  };
-
-  const handleSave = () => {
-    queryClient.invalidateQueries({ queryKey: ['items'] });
   };
 
   const handleRefresh = async () => {
