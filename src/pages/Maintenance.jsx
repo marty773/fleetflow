@@ -395,6 +395,7 @@ export default function Maintenance() {
                 vehicles={vehicles}
                 items={filteredItems}
                 vendors={vendors}
+                bills={bills}
                 onSubmit={handleSubmitRecord}
                 onCancel={() => {
                   const urlParams = new URLSearchParams(window.location.search);
