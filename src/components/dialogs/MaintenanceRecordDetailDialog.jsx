@@ -123,7 +123,14 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
           {record.linked_bill_id && (() => {
             const linkedBill = bills.find(b => b.id === record.linked_bill_id);
             return linkedBill ? (
-              <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <button
+                onClick={() => {
+                  onClose();
+                  // Navigate to bill detail by setting it for the parent to handle
+                  setTimeout(() => window.dispatchEvent(new CustomEvent('openBillDetail', { detail: linkedBill })), 0);
+                }}
+                className="w-full text-left flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
+              >
                 <FileText className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div>
                   <Label className="text-blue-700 dark:text-blue-300">Linked Bill</Label>
@@ -133,7 +140,7 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
                   </p>
                   {linkedBill.bill_number && <p className="text-xs text-blue-600 dark:text-blue-400">Invoice #{linkedBill.bill_number}</p>}
                 </div>
-              </div>
+              </button>
             ) : null;
           })()}
 
