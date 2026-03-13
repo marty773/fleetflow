@@ -202,7 +202,10 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
       ...formData, 
       work_items: workItemsForSubmission,
       total_cost: total, 
-      parts_used: partsUsedForSubmission 
+      parts_used: partsUsedForSubmission,
+      create_recurring_interval: createRecurringInterval && (intervalMonths || intervalMiles),
+      interval_months: intervalMonths ? parseInt(intervalMonths) : null,
+      interval_miles: intervalMiles ? parseInt(intervalMiles) : null,
     });
   };
 
