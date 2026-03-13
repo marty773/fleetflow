@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCompany } from '../components/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,6 @@ import AppointmentForm from '../components/calendar/AppointmentForm';
 import SyncDialog from '../components/calendar/SyncDialog';
 
 export default function Calendar() {
-  const { selectedCompany } = useCompany();
   const queryClient = useQueryClient();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState('all');
@@ -50,10 +48,10 @@ export default function Calendar() {
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
-  const intervals = allIntervals.filter(i => i.company_id === selectedCompany);
-  const appointments = allAppointments.filter(a => a.company_id === selectedCompany);
-  const records = allRecords.filter(r => r.company_id === selectedCompany);
+  const vehicles = allVehicles;
+  const intervals = allIntervals;
+  const appointments = allAppointments;
+  const records = allRecords;
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
@@ -161,7 +159,6 @@ export default function Calendar() {
     setIsSyncingCompany(true);
     try {
       const result = await base44.functions.invoke('syncToGoogleCalendar', {
-        company_id: selectedCompany,
         futureOnly,
       });
       toast.success(result.data.message);
@@ -224,11 +221,10 @@ export default function Calendar() {
   });
 
   const handleSubmitAppointment = (data) => {
-    const dataWithCompany = { ...data, company_id: selectedCompany };
     if (editingAppointment) {
-      updateAppointmentMutation.mutate({ id: editingAppointment.id, data: dataWithCompany });
+      updateAppointmentMutation.mutate({ id: editingAppointment.id, data });
     } else {
-      createAppointmentMutation.mutate(dataWithCompany);
+      createAppointmentMutation.mutate(data);
     }
   };
 
