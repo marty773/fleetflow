@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, AlertCircle, Wrench, DollarSign, Calendar, Plus } from 'lucide-react';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
-import RecentExpenses from '../components/dashboard/RecentExpenses';
+import FleetLiveSection from '../components/vehicles/FleetLiveSection';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Dashboard() {
