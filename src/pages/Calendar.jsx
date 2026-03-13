@@ -566,7 +566,23 @@ export default function Calendar() {
               <div className="space-y-3">
                 {getDayEvents(selectedDay).length > 0 ? (
                   getDayEvents(selectedDay).map(event => {
-                    if (event.type === 'appointment') {
+                    if (event.type === 'record') {
+                      return (
+                        <div key={event.id} className="p-4 rounded-lg bg-slate-100 border-l-4 border-slate-400">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <h3 className="font-semibold text-slate-900">✓ {event.title}</h3>
+                              <p className="text-sm text-slate-600 mt-1">{vehicleMap[event.vehicle_id]?.name}</p>
+                            </div>
+                            <Badge className="bg-slate-200 text-slate-700">Completed</Badge>
+                          </div>
+                          {event.vendor && <p className="text-sm text-slate-600">🔧 {event.vendor}</p>}
+                          {event.odometer_reading && <p className="text-sm text-slate-600">📏 {event.odometer_reading} mi</p>}
+                          {event.total_cost != null && <p className="text-sm text-slate-700 font-medium mt-1">${Number(event.total_cost).toFixed(2)}</p>}
+                          {event.notes && <p className="text-xs text-slate-500 mt-1">{event.notes}</p>}
+                        </div>
+                      );
+                    } else if (event.type === 'appointment') {
                       return (
                         <div
                           key={event.id}
