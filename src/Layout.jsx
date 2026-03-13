@@ -160,9 +160,7 @@ function LayoutContent({ children, currentPageName }) {
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">FleetFlow</h1>
           </div>
 
-          <div className="mb-6">
-            <CompanySelector value={selectedCompany} onChange={setSelectedCompany} />
-          </div>
+
 
           <nav className="space-y-2">
                     {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), { name: 'Settings', path: 'Settings', icon: Settings }, ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].map(item => {
