@@ -330,27 +330,63 @@ export default function VehicleCostReport() {
                               <div className="p-4">
                                 <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-200 mb-3">Transaction Details</h4>
                                 <div className="space-y-2">
-                                  {item.transactions.map((transaction, idx) => (
-                                    <div
-                                      key={idx}
-                                      onClick={() => {
-                                        if (transaction.type === 'bill') {
-                                          setViewingBill(transaction.fullData);
-                                        } else {
-                                          setViewingMaintenance(transaction.fullData);
-                                        }
-                                      }}
-                                      className="flex justify-between items-center py-2 px-3 bg-white dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
-                                    >
-                                      <div className="flex-1">
-                                        <p className="text-sm font-medium text-slate-900 dark:text-white">{transaction.description}</p>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                                          {format(new Date(transaction.date), 'MMM dd, yyyy')} • {transaction.type === 'bill' ? 'Bill' : 'Maintenance'}
-                                        </p>
+                                  {item.transactions.map((transaction, idx) => {
+                                    const txKey = `${item.vehicle.id}-${idx}`;
+                                    const isLinkedExpanded = expandedTransactions.has(txKey);
+                                    const hasLinked = !!transaction.linkedMaintenance;
+                                    return (
+                                      <div key={idx} className="rounded border border-slate-200 dark:border-slate-700 overflow-hidden">
+                                        {/* Main transaction row */}
+                                        <div className="flex items-center py-2 px-3 bg-white dark:bg-slate-950 hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors">
+                                          {/* Expand linked toggle */}
+                                          <button
+                                            className={`mr-2 flex-shrink-0 ${hasLinked ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                                            onClick={(e) => { e.stopPropagation(); toggleTransaction(txKey); }}
+                                          >
+                                            {isLinkedExpanded
+                                              ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                                              : <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+                                          </button>
+                                          <div
+                                            className="flex-1 cursor-pointer"
+                                            onClick={() => transaction.type === 'bill' ? setViewingBill(transaction.fullData) : setViewingMaintenance(transaction.fullData)}
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              <p className="text-sm font-medium text-slate-900 dark:text-white">{transaction.description}</p>
+                                              {hasLinked && (
+                                                <span className="inline-flex items-center gap-1 text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded">
+                                                  <Link className="w-3 h-3" /> Linked
+                                                </span>
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                              {format(new Date(transaction.date), 'MMM dd, yyyy')} • {transaction.type === 'bill' ? 'Bill' : 'Maintenance'}
+                                            </p>
+                                          </div>
+                                          <p className="text-sm font-semibold text-slate-900 dark:text-white ml-3">${transaction.amount.toFixed(2)}</p>
+                                        </div>
+
+                                        {/* Linked maintenance sub-row */}
+                                        {hasLinked && isLinkedExpanded && (
+                                          <div
+                                            className="flex items-center py-2 px-3 pl-8 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                            onClick={() => setViewingMaintenance(transaction.linkedMaintenance)}
+                                          >
+                                            <div className="flex-1">
+                                              <div className="flex items-center gap-2">
+                                                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{transaction.linkedMaintenance.title}</p>
+                                                <span className="text-xs bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">Maintenance Record</span>
+                                              </div>
+                                              <p className="text-xs text-slate-400 dark:text-slate-500">
+                                                {format(new Date(transaction.linkedMaintenance.performed_date), 'MMM dd, yyyy')} • Cost covered by bill above
+                                              </p>
+                                            </div>
+                                            <p className="text-sm text-slate-400 dark:text-slate-500 ml-3 line-through">${(transaction.linkedMaintenance.total_cost || 0).toFixed(2)}</p>
+                                          </div>
+                                        )}
                                       </div>
-                                      <p className="text-sm font-semibold text-slate-900 dark:text-white">${transaction.amount.toFixed(2)}</p>
-                                    </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </TableCell>
