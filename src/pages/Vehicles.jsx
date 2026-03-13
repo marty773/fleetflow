@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Edit2, ArrowUpDown } from 'lucide-react';
-import VehicleForm from '../components/vehicles/VehicleForm';
+import { Card, CardContent } from '@/components/ui/card';
+import { Plus, ArrowUpDown } from 'lucide-react';
 import VehicleCard from '../components/vehicles/VehicleCard';
 import VehicleViewDialog from '../components/vehicles/VehicleViewDialog';
 import FleetLiveSection from '../components/vehicles/FleetLiveSection';

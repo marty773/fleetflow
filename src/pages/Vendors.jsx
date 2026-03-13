@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCompany } from '../components/CompanyContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Phone, Mail, MapPin, Trash2, Edit, X } from 'lucide-react';
+import { Plus, Phone, Mail, MapPin } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import VendorForm from '../components/vendors/VendorForm';
 import VendorCard from '../components/vendors/VendorCard';
 
 export default function Vendors() {

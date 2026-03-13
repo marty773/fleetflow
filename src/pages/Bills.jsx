@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Image as ImageIcon } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
 import PullToRefresh from '../components/PullToRefresh';
 import PageTransition from '../components/PageTransition';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,11 +18,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import BillForm from '../components/bills/BillForm';
 import BillList from '../components/bills/BillList';
 import BillGallery from '../components/bills/BillGallery';
 import BillDetailDialog from '../components/dialogs/BillDetailDialog';
-import CreateMaintenanceFromBillDialog from '../components/bills/CreateMaintenanceFromBillDialog';
 import { useCompany } from '../components/CompanyContext';
 
 export default function Bills() {
