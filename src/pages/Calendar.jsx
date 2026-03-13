@@ -18,6 +18,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSam
 import { toast } from 'sonner';
 import AppointmentForm from '../components/calendar/AppointmentForm';
 import SyncDialog from '../components/calendar/SyncDialog';
+// Note: Calendar sync uses the Google Calendar app connector (no custom OAuth needed)
 
 export default function Calendar() {
   const { selectedCompany } = useCompany();
