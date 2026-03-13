@@ -77,13 +77,13 @@ function VehicleRow({ motiveVehicle, localVehicle, isSelected, isExpanded, onCli
         </div>
 
         {/* Speed */}
-        <div className="hidden sm:flex flex-col items-center min-w-[52px]">
+        <div className="hidden sm:flex flex-col items-center flex-shrink-0" style={{minWidth:'52px'}}>
           <span className="text-base font-bold text-slate-900 dark:text-white">{speed != null ? speed : '—'}</span>
           <span className="text-xs text-slate-400">mph</span>
         </div>
 
         {/* Fuel */}
-        <div className="hidden md:flex flex-col items-center min-w-[48px]">
+        <div className="hidden md:flex flex-col items-center flex-shrink-0" style={{minWidth:'48px'}}>
           <span className="text-base font-bold text-slate-900 dark:text-white">
             {fuel_level != null ? `${Math.round(fuel_level)}%` : '—'}
           </span>
@@ -91,7 +91,7 @@ function VehicleRow({ motiveVehicle, localVehicle, isSelected, isExpanded, onCli
         </div>
 
         {/* Fault codes */}
-        <div className="hidden sm:block flex-shrink-0">
+        <div className="hidden sm:flex items-center justify-center flex-shrink-0" style={{width:'40px'}}>
           {fault_codes.length > 0 ? (
             <Badge variant="destructive" className="text-xs gap-1">
               <AlertTriangle className="w-3 h-3" />
@@ -103,7 +103,7 @@ function VehicleRow({ motiveVehicle, localVehicle, isSelected, isExpanded, onCli
         </div>
 
         {/* Last seen + chevron */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0" style={{width:'80px', justifyContent:'flex-end'}}>
           <div className="text-right">
             <p className="text-xs text-slate-500 dark:text-slate-400">{formatLastSeen(located_at) || '—'}</p>
             {hasLocation && (
