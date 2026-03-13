@@ -603,39 +603,71 @@ export default function Calendar() {
                       );
                     } else {
                       const status = getEventStatus(event);
+                      const calDate = event.scheduled_date || event.next_due_date;
+                      const isRescheduling = reschedulingInterval === event.id;
                       return (
-                        <div
-                          key={event.id}
-                          className={`p-4 rounded-lg ${statusColors[status]}`}
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h3 className="font-semibold text-slate-900">{event.interval_name}</h3>
-                              <p className="text-sm text-slate-600 mt-1">
-                                {vehicleMap[event.vehicle_id]?.name}
-                              </p>
-                            </div>
-                            <Badge className={maintenanceColors[event.maintenance_type]}>
-                              {event.maintenance_type?.replace('_', ' ')}
-                            </Badge>
-                          </div>
-                          {event.interval_months && (
-                            <p className="text-sm text-slate-600">
-                              Every {event.interval_months} months
-                            </p>
-                          )}
-                          {event.interval_miles && (
-                            <p className="text-sm text-slate-600">
-                              Every {event.interval_miles} miles
-                            </p>
-                          )}
-                          {status === 'overdue' && (
-                            <div className="flex items-center gap-1 mt-2 text-red-600">
-                              <AlertCircle className="w-4 h-4" />
-                              <span className="text-sm font-semibold">Overdue</span>
-                            </div>
-                          )}
-                        </div>
+                       <div
+                         key={event.id}
+                         className={`p-4 rounded-lg ${statusColors[status]}`}
+                       >
+                         <div className="flex items-start justify-between mb-2">
+                           <div>
+                             <h3 className="font-semibold text-slate-900">{event.interval_name}</h3>
+                             <p className="text-sm text-slate-600 mt-1">
+                               {vehicleMap[event.vehicle_id]?.name}
+                             </p>
+                           </div>
+                           <Badge className={maintenanceColors[event.maintenance_type]}>
+                             {event.maintenance_type?.replace('_', ' ')}
+                           </Badge>
+                         </div>
+                         {event.interval_months && (
+                           <p className="text-sm text-slate-600">
+                             Every {event.interval_months} months
+                           </p>
+                         )}
+                         {event.interval_miles && (
+                           <p className="text-sm text-slate-600">
+                             Every {event.interval_miles} miles
+                           </p>
+                         )}
+                         {event.scheduled_date && (
+                           <p className="text-xs text-blue-700 font-medium mt-1">📌 Pinned to {format(new Date(event.scheduled_date + 'T12:00:00'), 'MMM dd, yyyy')}</p>
+                         )}
+                         {status === 'overdue' && (
+                           <div className="flex items-center gap-1 mt-2 text-red-600">
+                             <AlertCircle className="w-4 h-4" />
+                             <span className="text-sm font-semibold">Overdue</span>
+                           </div>
+                         )}
+                         {/* Reschedule control */}
+                         {isRescheduling ? (
+                           <div className="mt-3 flex items-center gap-2">
+                             <input
+                               type="date"
+                               value={rescheduleDate}
+                               onChange={e => setRescheduleDate(e.target.value)}
+                               className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
+                             />
+                             <Button size="sm" onClick={() => handleSaveReschedule(event.id)} disabled={updateIntervalMutation.isPending}>
+                               Save
+                             </Button>
+                             <Button size="sm" variant="outline" onClick={() => setReschedulingInterval(null)}>
+                               Cancel
+                             </Button>
+                             {event.scheduled_date && (
+                               <Button size="sm" variant="ghost" className="text-slate-500 text-xs"
+                                 onClick={() => updateIntervalMutation.mutate({ id: event.id, data: { scheduled_date: null } })}>
+                                 Clear pin
+                               </Button>
+                             )}
+                           </div>
+                         ) : (
+                           <Button size="sm" variant="outline" className="mt-3 text-xs" onClick={() => handleReschedule(event)}>
+                             📌 {event.scheduled_date ? 'Change scheduled date' : 'Pin to a date'}
+                           </Button>
+                         )}
+                       </div>
                       );
                     }
                   })
