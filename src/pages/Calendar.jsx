@@ -120,7 +120,20 @@ export default function Calendar() {
 
   const getDayEvents = (day) => {
     const dateKey = format(day, 'yyyy-MM-dd');
-    return eventsMap[dateKey] || [];
+    const dayEvents = eventsMap[dateKey] || [];
+    
+    // Filter out overdue intervals that have completed records
+    return dayEvents.filter(event => {
+      if (event.type === 'interval') {
+        // Check if there's a completed record for this interval
+        const hasCompletedRecord = records.some(
+          r => r.linked_interval_id === event.id
+        );
+        // Hide the overdue interval if a completed record exists
+        return !hasCompletedRecord;
+      }
+      return true;
+    });
   };
 
   const getEventStatus = (interval) => {
