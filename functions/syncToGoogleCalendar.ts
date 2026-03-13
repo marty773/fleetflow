@@ -11,6 +11,9 @@ Deno.serve(async (req) => {
 
     // Get the app connector OAuth token
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('googlecalendar');
+    
+    // Use the Vehicle Maintenance calendar
+    const calendarId = 'c_10bb602c9c4c33dbbe38bebe8f98f2be393e13f7e1b183ce7f807347e799bc0d@group.calendar.google.com';
 
     const vehicles = await base44.asServiceRole.entities.Vehicle.filter({ company_id });
     const vehicleMap = Object.fromEntries(vehicles.map(v => [v.id, v]));
@@ -25,7 +28,7 @@ Deno.serve(async (req) => {
     let skipped = 0;
 
     const createEvent = async (eventData) => {
-      const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
