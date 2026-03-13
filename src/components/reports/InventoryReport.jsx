@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCompany } from '../CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -22,7 +21,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function InventoryReport({ highlightItemId }) {
-  const { selectedCompany } = useCompany();
   const [expandedItems, setExpandedItems] = useState({});
   const [viewingBill, setViewingBill] = useState(null);
   const [viewingMaintenance, setViewingMaintenance] = useState(null);
@@ -63,10 +61,10 @@ export default function InventoryReport({ highlightItemId }) {
     queryFn: () => base44.entities.Vehicle.list(),
   });
 
-  const items = allItems.filter(i => i.company_id === selectedCompany);
-  const bills = allBills.filter(b => b.company_id === selectedCompany);
-  const maintenanceRecords = allMaintenanceRecords.filter(m => m.company_id === selectedCompany);
-  const vehicles = allVehicles.filter(v => v.company_id === selectedCompany);
+  const items = allItems;
+  const bills = allBills;
+  const maintenanceRecords = allMaintenanceRecords;
+  const vehicles = allVehicles;
 
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
