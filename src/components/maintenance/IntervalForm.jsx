@@ -44,17 +44,22 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
 
   const calculateNextDue = () => {
     const data = { ...formData };
-    
-    // Calculate next due date
-    if (data.last_performed_date && data.interval_months) {
+    const hasMonths = data.interval_months && parseFloat(data.interval_months) > 0;
+    const hasMiles = data.interval_miles && parseFloat(data.interval_miles) > 0;
+
+    // If months is set, calculate next due date from date
+    if (hasMonths && data.last_performed_date) {
       const lastDate = new Date(data.last_performed_date + 'T12:00:00');
       const nextDate = new Date(lastDate);
       nextDate.setMonth(nextDate.getMonth() + parseInt(data.interval_months));
       data.next_due_date = nextDate.toISOString().split('T')[0];
+    } else if (!hasMonths) {
+      // Mileage-only: clear next_due_date so UI doesn't show stale date
+      data.next_due_date = null;
     }
 
     // Calculate next due mileage
-    if (data.last_performed_mileage && data.interval_miles) {
+    if (hasMiles && data.last_performed_mileage) {
       data.next_due_mileage = parseFloat(data.last_performed_mileage) + parseFloat(data.interval_miles);
     }
 
