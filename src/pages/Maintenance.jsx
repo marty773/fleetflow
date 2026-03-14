@@ -106,10 +106,11 @@ export default function Maintenance() {
     },
   });
 
-  const handleMarkComplete = async ({ performed_date, odometer, linked_record_id, linked_bill_id, create_record, new_record }) => {
+  const handleMarkComplete = async ({ performed_date, odometer, linked_record_id, linked_bill_id, create_record, new_record, attach_bill, new_bill }) => {
     const interval = completingInterval;
 
     let resolvedRecordId = linked_record_id || null;
+    let resolvedBillId = linked_bill_id || null;
 
     // Create a new maintenance record if requested
     if (create_record && new_record) {
@@ -127,10 +128,23 @@ export default function Maintenance() {
       queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
     }
 
+    // Create a new bill if requested
+    if (attach_bill && new_bill) {
+      const createdBill = await base44.entities.Bill.create({
+        vendor: new_bill.vendor,
+        bill_date: new_bill.bill_date,
+        total_amount: new_bill.total_amount,
+        category: new_bill.category,
+        line_items: new_bill.line_items,
+      });
+      resolvedBillId = createdBill.id;
+      queryClient.invalidateQueries({ queryKey: ['bills'] });
+    }
+
     const updateData = {
       last_performed_date: performed_date,
       linked_record_id: resolvedRecordId,
-      linked_bill_id: linked_bill_id || null,
+      linked_bill_id: resolvedBillId,
     };
 
     if (odometer) {
