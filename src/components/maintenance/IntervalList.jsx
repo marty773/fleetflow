@@ -42,10 +42,17 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
   }
 
   const getStatus = (interval) => {
+    const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
+
+    // For mileage-only intervals, status is just "Scheduled" (no date comparison possible)
+    if (isMileageOnly) {
+      return { label: 'Scheduled', icon: Check, color: 'text-green-600', bgColor: 'bg-green-50 dark:bg-green-950/20' };
+    }
+
     if (!interval.next_due_date) {
       return { label: 'Scheduled', icon: Clock, color: 'text-slate-600', bgColor: 'bg-slate-50' };
     }
-    
+
     const days = differenceInDays(new Date(interval.next_due_date), new Date());
     if (days < 0) {
       return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600', bgColor: 'bg-red-50' };
