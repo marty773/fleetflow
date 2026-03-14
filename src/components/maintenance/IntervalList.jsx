@@ -96,8 +96,18 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                     <div>
                       <p className="text-slate-600 dark:text-slate-400">Interval</p>
                       <p className="font-semibold text-slate-900 dark:text-white">
-                        Every {interval.interval_months} month{interval.interval_months > 1 ? 's' : ''}
-                        {interval.interval_miles ? ` / ${interval.interval_miles} mi` : ''}
+                        {(() => {
+                          const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+                          const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+                          if (hasMonths && hasMiles) {
+                            return `Every ${interval.interval_months} month${interval.interval_months > 1 ? 's' : ''} / ${Number(interval.interval_miles).toLocaleString()} mi`;
+                          } else if (hasMiles) {
+                            return `Every ${Number(interval.interval_miles).toLocaleString()} miles`;
+                          } else if (hasMonths) {
+                            return `Every ${interval.interval_months} month${interval.interval_months > 1 ? 's' : ''}`;
+                          }
+                          return '—';
+                        })()}
                       </p>
                     </div>
                     <div>
@@ -107,10 +117,22 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                       </p>
                     </div>
                     <div>
-                      <p className="text-slate-600 dark:text-slate-400">Next Due</p>
-                      <p className="font-semibold text-slate-900 dark:text-white">
-                        {interval.next_due_date ? format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
-                      </p>
+                      {/* Show mileage-based next due if no months interval */}
+                      {(!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.next_due_mileage ? (
+                        <>
+                          <p className="text-slate-600 dark:text-slate-400">Next Due (Miles)</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">
+                            {Number(interval.next_due_mileage).toLocaleString()} mi
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-slate-600 dark:text-slate-400">Next Due</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">
+                            {interval.next_due_date ? format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
+                          </p>
+                        </>
+                      )}
                     </div>
                     {interval.scheduled_date && (
                       <div>
