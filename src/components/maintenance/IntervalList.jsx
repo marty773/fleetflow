@@ -54,12 +54,32 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     const isMileageOnly = hasMiles && !hasMonths;
 
     // Mileage-based status
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
-      if (milesLeft <= reminderMiles * 0.25) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
-      if (milesLeft <= reminderMiles) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
-      return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+    if (hasMiles) {
+      const currentMiles = currentMileage[interval.vehicle_id];
+      const lastPerformedMiles = Number(interval.last_performed_mileage);
+      
+      // Calculate milesLeft using current mileage when available
+      let milesLeft;
+      if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
+        const intervalMiles = Number(interval.interval_miles);
+        const milesSinceService = currentMiles - lastPerformedMiles;
+        milesLeft = intervalMiles - milesSinceService;
+      } else if (interval.next_due_mileage && currentMiles !== undefined) {
+        milesLeft = Number(interval.next_due_mileage) - currentMiles;
+      } else if (interval.next_due_mileage && lastPerformedMiles) {
+        // Fallback: old calculation
+        milesLeft = Number(interval.next_due_mileage) - lastPerformedMiles;
+      } else {
+        // No mileage data, skip to time-based
+        milesLeft = undefined;
+      }
+      
+      if (milesLeft !== undefined) {
+        if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
+        if (milesLeft <= reminderMiles * 0.25) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
+        if (milesLeft <= reminderMiles) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
+        return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+      }
     }
     if (isMileageOnly) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
 
