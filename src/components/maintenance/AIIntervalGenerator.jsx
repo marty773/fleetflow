@@ -278,16 +278,17 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
               {vehicles.length > 0 && (
                 <div>
                   <Label className="text-slate-700 dark:text-slate-300">Link to Vehicle (optional)</Label>
-                  <ResponsiveSelect
-                    value={vehicleId}
-                    onValueChange={handleVehicleSelect}
-                    placeholder="Select a vehicle to pre-fill details"
-                    options={[
-                      { value: '', label: 'None — enter manually' },
-                      ...vehicles.map(v => ({ value: v.id, label: `${v.name} — ${v.year} ${v.make} ${v.model}` }))
-                    ]}
-                    className="mt-2"
-                  />
+                  <Select value={vehicleId} onValueChange={handleVehicleSelect}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select a vehicle to pre-fill details" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={null}>None — enter manually</SelectItem>
+                      {vehicles.map(v => (
+                        <SelectItem key={v.id} value={v.id}>{v.name} — {v.year} {v.make} {v.model}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
 
