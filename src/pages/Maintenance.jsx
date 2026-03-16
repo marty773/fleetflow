@@ -42,6 +42,30 @@ export default function Maintenance() {
     return () => window.removeEventListener('serviceReminderMilesChanged', handler);
   }, []);
 
+  // Fetch current vehicle mileage from Motive on mount
+  React.useEffect(() => {
+    const fetchMileage = async () => {
+      try {
+        const result = await base44.functions.invoke('fetchMotiveVehicleData', {});
+        if (result.data?.success && result.data?.vehicles) {
+          const map = {};
+          result.data.vehicles.forEach(v => {
+            // Match by VIN
+            const vehicle = allVehicles.find(av => av.vin && av.vin.toLowerCase() === (v.vin || '').toLowerCase());
+            if (vehicle && v.odometer) {
+              map[vehicle.id] = Number(v.odometer);
+            }
+          });
+          setMotiveVehicles(map);
+        }
+      } catch (err) {
+        // Silently fail on mileage fetch; app still works without it
+        console.debug('Could not fetch Motive vehicle data');
+      }
+    };
+    if (allVehicles.length > 0) fetchMileage();
+  }, [allVehicles]);
+
   const [deletingRecord, setDeletingRecord] = useState(null);
   const [completingInterval, setCompletingInterval] = useState(null);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
