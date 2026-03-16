@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import { Calendar, CheckCircle2 } from 'lucide-react';
 
 export default function DashboardServiceList({ title, intervals, vehicles, onClose, onSelectInterval, onMarkComplete }) {
@@ -11,13 +11,32 @@ export default function DashboardServiceList({ title, intervals, vehicles, onClo
     return acc;
   }, {});
 
-  const getUrgency = (dueDate) => {
-    if (!dueDate) return { label: 'Scheduled', color: 'bg-slate-100 text-slate-800' };
-    const days = (new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24);
-    if (days < 0) return { label: 'Overdue', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
-    if (days <= 7) return { label: 'Urgent', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300' };
-    if (days <= 30) return { label: 'Due Soon', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
-    return { label: 'Scheduled', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' };
+  const getRemainingBadge = (interval) => {
+    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+
+    // Mileage remaining
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const left = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      if (left <= 0) return { label: `${Math.abs(left).toLocaleString()} mi overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
+      return { label: `${left.toLocaleString()} mi left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+    }
+    if (hasMiles && interval.next_due_mileage) {
+      return { label: `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+    }
+
+    // Time remaining
+    if (interval.next_due_date) {
+      const days = differenceInDays(new Date(interval.next_due_date), new Date());
+      if (days < 0) return { label: `${Math.abs(days)}d overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
+      if (days === 0) return { label: 'Due today', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300' };
+      if (days <= 7) return { label: `${days}d left`, color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300' };
+      if (days < 30) return { label: `${days}d left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+      const months = Math.round(days / 30);
+      return { label: `~${months} mo left`, color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' };
+    }
+
+    return { label: 'Scheduled', color: 'bg-slate-100 text-slate-800' };
   };
 
   const sorted = [...intervals].sort((a, b) => {
