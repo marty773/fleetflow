@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Wrench, Plus } from 'lucide-react';
 import DashboardStats from '../components/dashboard/DashboardStats';
-import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
 import DashboardServiceList from '../components/dashboard/DashboardServiceList';
 import FleetLiveSection from '../components/vehicles/FleetLiveSection';
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
