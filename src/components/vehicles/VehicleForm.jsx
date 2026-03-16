@@ -10,9 +10,10 @@ import {
    SelectTrigger,
    SelectValue,
  } from '@/components/ui/select';
-import { X } from 'lucide-react';
+import { X, Search, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import ResponsiveSelect from '@/components/ResponsiveSelect';
+import { toast } from 'sonner';
 
 export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(vehicle || {
