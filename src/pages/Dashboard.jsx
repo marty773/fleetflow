@@ -12,7 +12,8 @@ import FleetLiveSection from '../components/vehicles/FleetLiveSection';
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
-import { differenceInCalendarMonths, addMonths } from 'date-fns';
+import { differenceInCalendarMonths, addMonths, differenceInDays } from 'date-fns';
+import { getServiceReminderMiles } from '../components/settings/ServiceReminderSettings';
 
 export default function Dashboard() {
   const navigate = useNavigate();
