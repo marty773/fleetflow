@@ -74,20 +74,32 @@ Deno.serve(async (req) => {
   }
 
   // --- Step 2: Generate AI schedule ---
+  const engineNote = engine_type === 'diesel'
+    ? 'DIESEL ENGINE: Use diesel-specific intervals — diesel oil changes typically occur at shorter mileage intervals under severe duty, diesel fuel filters require more frequent replacement, glow plugs instead of spark plugs, DEF/SCR system service if applicable (e.g. Powerstroke, Duramax, Cummins). Do NOT include gasoline-specific items like spark plugs.'
+    : engine_type === 'gas'
+    ? 'GASOLINE ENGINE: Use gasoline-specific intervals. Include spark plugs, ignition components as applicable. Do NOT include diesel-specific items like fuel water separator, glow plugs, or DEF system.'
+    : 'Engine type not specified — generate intervals appropriate for the most common engine option for this vehicle.';
+
+  const severeNote = severe_service
+    ? 'SEVERE DUTY schedule: Use the severe/heavy-duty service intervals. PRIORITIZE MILEAGE-BASED intervals over time-based — set interval_miles whenever possible, and only use interval_months as a secondary fallback for tasks that have no mileage trigger. Shorter mileage intervals are expected for severe service.'
+    : 'NORMAL service schedule: Use standard manufacturer intervals. Include both interval_months and interval_miles where the manufacturer specifies both.';
+
   let prompt = `You are a fleet maintenance expert. Generate a complete manufacturer-recommended maintenance schedule for a ${year} ${make} ${model}.
 
-Schedule type requested: ${severe_service ? 'Severe Duty (frequent stop/start, towing, dusty conditions) — use the SEVERE SERVICE schedule intervals from the owner\'s manual where applicable' : 'Normal/Standard — use normal driving condition intervals'}.
+ENGINE TYPE: ${engineNote}
+
+SERVICE SCHEDULE TYPE: ${severeNote}
 
 For EVERY distinct maintenance task, return a JSON object with these fields:
 - interval_name: descriptive name like "6-Month Oil Change" or "30k Mile Brake Inspection"
 - maintenance_type: must be one of exactly: oil_change, filter_change, tire_rotation, inspection, repair, cleaning, other
-- interval_months: number (months between service) or null if mileage-only
-- interval_miles: number (miles between service) or null if time-only
+- interval_months: number (months between service) or null — for severe service, only populate this when there is no applicable mileage trigger
+- interval_miles: number (miles between service) or null — for severe service, ALWAYS populate this when a mileage interval exists
 - notes: cite the specific section, page, or chapter this comes from in the owner's manual (e.g. "Owner's Manual, Maintenance Schedule, Section 8-3, Severe Service"). If sourced from general knowledge, note "Based on ${year} ${make} ${model} factory maintenance schedule."
 
 Do NOT include last_performed_date or last_performed_mileage in your output — those will be filled in separately from actual service history.
 
-Return a JSON array of ALL maintenance tasks. Be thorough — include oil changes, filters (air, cabin, fuel, oil), tire rotation, brake inspection, transmission service, coolant flush, spark plugs, belts, battery, wiper blades, differential service, etc. as applicable.`;
+Return a JSON array of ALL maintenance tasks. Be thorough — include oil changes, filters (air, cabin, fuel, oil), tire rotation, brake inspection, transmission service, coolant flush, belts, battery, wiper blades, differential service, etc. as applicable for the specified engine type.`;
 
   if (file_url) {
     prompt += `\n\nI am also providing the vehicle's owner's manual or maintenance guide as a file. Use it as the primary source and cite specific pages/sections in the notes field.`;
