@@ -324,6 +324,30 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                 </div>
               )}
 
+              {/* VIN Lookup */}
+              <div>
+                <Label className="text-slate-700 dark:text-slate-300">VIN Lookup (optional)</Label>
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    value={vin}
+                    onChange={e => setVin(e.target.value.toUpperCase())}
+                    placeholder="17-character VIN"
+                    className="select-text font-mono uppercase"
+                    maxLength={17}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={handleVinLookup}
+                    disabled={vinLoading || vin.trim().length !== 17}
+                    className="shrink-0 gap-2"
+                  >
+                    {vinLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    Look Up
+                  </Button>
+                </div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Auto-fills Make, Model & Year via NHTSA database.</p>
+              </div>
+
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <Label className="text-slate-700 dark:text-slate-300">Make *</Label>
@@ -337,6 +361,15 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                   <Label className="text-slate-700 dark:text-slate-300">Year *</Label>
                   <Input value={year} onChange={e => setYear(e.target.value)} placeholder="e.g. 2021" className="mt-2 select-text" />
                 </div>
+              </div>
+
+              {/* Severe Service Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                <div>
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Severe Service Intervals</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Shorter intervals for towing, stop-and-go, dusty conditions</p>
+                </div>
+                <Switch checked={severeService} onCheckedChange={setSevereService} />
               </div>
 
               <div className="p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg">
