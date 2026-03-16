@@ -5,13 +5,23 @@ import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Edit2, Clock, AlertCircle, Check, FileText, Receipt } from 'lucide-react';
 
-export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit }) {
+export default function IntervalDetailDialog({ interval, vehicle, currentOdometer, onClose, onEdit }) {
   if (!interval) return null;
 
   const getStatus = () => {
-    const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
-    if (isMileageOnly) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
-    if (!interval.next_due_date) return { label: 'Scheduled', icon: Clock, color: 'text-slate-500' };
+    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    if (hasMiles && interval.next_due_mileage) {
+      const base = currentOdometer ?? (interval.last_performed_mileage ? Number(interval.last_performed_mileage) : null);
+      if (base != null) {
+        const milesLeft = Number(interval.next_due_mileage) - base;
+        if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
+        if (milesLeft <= 500) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
+        if (milesLeft <= 1000) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
+        return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+      }
+    }
+    if (!hasMonths || !interval.next_due_date) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
     const days = differenceInDays(new Date(interval.next_due_date), new Date());
     if (days < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
     if (days <= 7) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
