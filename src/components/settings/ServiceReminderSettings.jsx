@@ -37,7 +37,7 @@ export default function ServiceReminderSettings() {
             Upcoming service alert threshold (miles)
           </Label>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Services due within this many miles will show as "Upcoming" and count toward the badge on the Maintenance tab.
+            Mileage-based services due within this many miles will show as upcoming/due soon across the app — including the Maintenance tab badge, dashboard stats, and service lists.
           </p>
           <div className="flex gap-2 items-center mt-2">
             <Input
