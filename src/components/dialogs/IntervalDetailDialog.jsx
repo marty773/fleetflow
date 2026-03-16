@@ -49,6 +49,16 @@ export default function IntervalDetailDialog({ interval, vehicle, currentOdomete
     interval.last_performed_mileage && { label: 'Last Mileage', value: `${Number(interval.last_performed_mileage).toLocaleString()} mi` },
     interval.next_due_date && { label: 'Next Due Date', value: format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy') },
     interval.next_due_mileage && { label: 'Next Due Mileage', value: `${Number(interval.next_due_mileage).toLocaleString()} mi` },
+    (interval.next_due_mileage && currentOdometer != null) && {
+      label: 'Miles Left',
+      value: (() => {
+        const left = Number(interval.next_due_mileage) - currentOdometer;
+        return left <= 0
+          ? <span className="text-red-600 font-semibold">{Math.abs(left).toLocaleString()} mi overdue</span>
+          : <span className="text-amber-600 font-semibold">{left.toLocaleString()} mi left</span>;
+      })()
+    },
+    (currentOdometer != null) && { label: 'Current Odometer', value: `${currentOdometer.toLocaleString()} mi` },
     interval.scheduled_date && { label: 'Shop Scheduled', value: format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy') },
   ].filter(Boolean);
 
