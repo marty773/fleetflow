@@ -96,19 +96,19 @@ export default function Maintenance() {
     }
   }, [records]);
 
-  // Count intervals due within reminderMiles (mileage-based) or within 30 days (time-based)
+  // Count intervals due within reminderMiles (mileage-based) or within threshold days (time-based)
   const upcomingCount = intervals.filter(interval => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-    if (hasMiles && interval.next_due_mileage) {
-      // We don't have current odometer here, but next_due_mileage is the target — flag as upcoming
-      // We treat it as "upcoming" (can't know exact miles left without live odometer), so include all mileage intervals
-      return true;
+    // Mileage-based: count if miles left is within reminderMiles threshold
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      return milesLeft <= reminderMiles;
     }
+    // Time-based: convert reminderMiles to days (200mi/day), minimum 30 days
     if (hasMonths && interval.next_due_date) {
+      const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
       const days = differenceInDays(new Date(interval.next_due_date), new Date());
-      // Convert reminderMiles to approximate days (assume ~200 miles/day fleet average → reminderMiles/200 days)
-      const thresholdDays = Math.round(reminderMiles / 200);
       return days <= thresholdDays;
     }
     return false;
