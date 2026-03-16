@@ -1,18 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { format, differenceInDays } from 'date-fns';
-import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, FileText, Receipt } from 'lucide-react';
+import { format, differenceInDays, addMonths } from 'date-fns';
+import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, FileText, Receipt, ChevronDown, ChevronUp, Truck } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
 export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, isDeleting }) {
   const serviceTypes = useServiceTypes(null, 'records');
+  const [expandedVehicles, setExpandedVehicles] = useState(new Set(vehicles.map(v => v.id)));
 
-  const vehicleMap = vehicles.reduce((acc, v) => {
-    acc[v.id] = v;
-    return acc;
-  }, {});
+  const vehicleMap = vehicles.reduce((acc, v) => { acc[v.id] = v; return acc; }, {});
 
   const getTypeLabel = (value) => {
     const found = serviceTypes.find(t => t.value === value);
@@ -30,6 +28,84 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
   };
   const getTypeColor = (value) => maintenanceColors[value] || 'bg-slate-100 text-slate-800';
 
+  const getStatus = (interval) => {
+    const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
+    if (isMileageOnly) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+    if (!interval.next_due_date) return { label: 'Scheduled', icon: Clock, color: 'text-slate-500' };
+    const days = differenceInDays(new Date(interval.next_due_date), new Date());
+    if (days < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600', days };
+    if (days <= 7) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600', days };
+    if (days <= 30) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600', days };
+    return { label: 'Scheduled', icon: Check, color: 'text-green-600', days };
+  };
+
+  // "X miles remaining" or "X days remaining" summary for the row
+  const getRemainingLabel = (interval) => {
+    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+
+    if (hasMiles && interval.next_due_mileage) {
+      return `${Number(interval.next_due_mileage).toLocaleString()} mi due`;
+    }
+
+    if (hasMonths && interval.next_due_date) {
+      const days = differenceInDays(new Date(interval.next_due_date), new Date());
+      if (days < 0) return `${Math.abs(days)}d overdue`;
+      if (days === 0) return 'Due today';
+      if (days < 30) return `${days}d left`;
+      const months = Math.round(days / 30);
+      return `~${months} mo left`;
+    }
+
+    if (hasMiles) return `Every ${Number(interval.interval_miles).toLocaleString()} mi`;
+    if (hasMonths) return `Every ${interval.interval_months} mo`;
+    return null;
+  };
+
+  // Badge color for remaining label based on status
+  const getRemainingColor = (interval) => {
+    const status = getStatus(interval);
+    if (status.label === 'Overdue') return 'bg-red-100 text-red-700 border-red-200';
+    if (status.label === 'Urgent') return 'bg-orange-100 text-orange-700 border-orange-200';
+    if (status.label === 'Due Soon') return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400';
+  };
+
+  // Group intervals by vehicle
+  const grouped = {};
+  for (const interval of intervals) {
+    const vid = interval.vehicle_id || '__none__';
+    if (!grouped[vid]) grouped[vid] = [];
+    grouped[vid].push(interval);
+  }
+
+  // Sort each group by urgency
+  const urgencyOrder = { Overdue: 0, Urgent: 1, 'Due Soon': 2, Scheduled: 3 };
+  for (const vid of Object.keys(grouped)) {
+    grouped[vid].sort((a, b) => {
+      const sa = urgencyOrder[getStatus(a).label] ?? 4;
+      const sb = urgencyOrder[getStatus(b).label] ?? 4;
+      if (sa !== sb) return sa - sb;
+      if (a.next_due_date && b.next_due_date) return new Date(a.next_due_date) - new Date(b.next_due_date);
+      return 0;
+    });
+  }
+
+  // Sort vehicle groups: vehicles with overdue/urgent first
+  const sortedVehicleIds = Object.keys(grouped).sort((a, b) => {
+    const aMin = Math.min(...grouped[a].map(i => urgencyOrder[getStatus(i).label] ?? 4));
+    const bMin = Math.min(...grouped[b].map(i => urgencyOrder[getStatus(i).label] ?? 4));
+    return aMin - bMin;
+  });
+
+  const toggleVehicle = (vid) => {
+    setExpandedVehicles(prev => {
+      const next = new Set(prev);
+      next.has(vid) ? next.delete(vid) : next.add(vid);
+      return next;
+    });
+  };
+
   if (intervals.length === 0) {
     return (
       <Card className="border-2 border-dashed">
@@ -41,167 +117,120 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     );
   }
 
-  const getStatus = (interval) => {
-    const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
-
-    // For mileage-only intervals, status is just "Scheduled" (no date comparison possible)
-    if (isMileageOnly) {
-      return { label: 'Scheduled', icon: Check, color: 'text-green-600', bgColor: 'bg-green-50 dark:bg-green-950/20' };
-    }
-
-    if (!interval.next_due_date) {
-      return { label: 'Scheduled', icon: Clock, color: 'text-slate-600', bgColor: 'bg-slate-50' };
-    }
-
-    const days = differenceInDays(new Date(interval.next_due_date), new Date());
-    if (days < 0) {
-      return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600', bgColor: 'bg-red-50' };
-    } else if (days <= 7) {
-      return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600', bgColor: 'bg-orange-50' };
-    } else if (days <= 30) {
-      return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600', bgColor: 'bg-yellow-50' };
-    } else {
-      return { label: 'Scheduled', icon: Check, color: 'text-green-600', bgColor: 'bg-green-50' };
-    }
-  };
-
-  const sortedIntervals = [...intervals].sort((a, b) => {
-    if (!a.next_due_date) return 1;
-    if (!b.next_due_date) return -1;
-    return new Date(a.next_due_date) - new Date(b.next_due_date);
-  });
-
   return (
-    <div className="space-y-4">
-      {sortedIntervals.map((interval) => {
-        const status = getStatus(interval);
-        const StatusIcon = status.icon;
+    <div className="space-y-3">
+      {sortedVehicleIds.map(vid => {
+        const vehicleIntervals = grouped[vid];
+        const vehicle = vehicleMap[vid];
+        const isExpanded = expandedVehicles.has(vid);
+
+        // Summary counts for the header
+        const overdue = vehicleIntervals.filter(i => getStatus(i).label === 'Overdue').length;
+        const urgent = vehicleIntervals.filter(i => getStatus(i).label === 'Urgent').length;
+        const dueSoon = vehicleIntervals.filter(i => getStatus(i).label === 'Due Soon').length;
+
         return (
-          <Card key={interval.id} className={`border-0 shadow-sm hover:shadow-md transition-shadow ${status.bgColor}`}>
-            <CardContent className="p-4 md:p-6">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                <div className="flex-1">
-                <div className="flex items-center gap-2 flex-wrap mb-2">
-                  <h3 className="text-base md:text-lg font-semibold text-slate-900 dark:text-white">{interval.interval_name}</h3>
-                    <Badge className={getTypeColor(interval.maintenance_type)}>
-                      {getTypeLabel(interval.maintenance_type)}
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <StatusIcon className={`w-4 h-4 ${status.color}`} />
-                      <Badge variant="secondary" className="text-sm">
-                        {status.label}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 md:gap-4 mt-3 text-sm">
-                    <div>
-                      <p className="text-slate-600 dark:text-slate-400">Vehicle</p>
-                      <p className="font-semibold text-slate-900 dark:text-white">
-                        {vehicleMap[interval.vehicle_id]?.name || 'Unknown'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-slate-600 dark:text-slate-400">Interval</p>
-                      <p className="font-semibold text-slate-900 dark:text-white">
-                        {(() => {
-                          const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-                          const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
-                          if (hasMonths && hasMiles) {
-                            return `Every ${interval.interval_months} month${interval.interval_months > 1 ? 's' : ''} / ${Number(interval.interval_miles).toLocaleString()} mi`;
-                          } else if (hasMiles) {
-                            return `Every ${Number(interval.interval_miles).toLocaleString()} miles`;
-                          } else if (hasMonths) {
-                            return `Every ${interval.interval_months} month${interval.interval_months > 1 ? 's' : ''}`;
-                          }
-                          return '—';
-                        })()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-slate-600 dark:text-slate-400">Last Done</p>
-                      <p className="font-semibold text-slate-900 dark:text-white">
-                        {interval.last_performed_date ? format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not set'}
-                      </p>
-                    </div>
-                    <div>
-                      {/* Show mileage-based next due if no months interval */}
-                      {(!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.next_due_mileage ? (
-                        <>
-                          <p className="text-slate-600 dark:text-slate-400">Next Due (Miles)</p>
-                          <p className="font-semibold text-slate-900 dark:text-white">
-                            {Number(interval.next_due_mileage).toLocaleString()} mi
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-slate-600 dark:text-slate-400">Next Due</p>
-                          <p className="font-semibold text-slate-900 dark:text-white">
-                            {interval.next_due_date ? format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
-                          </p>
-                        </>
-                      )}
-                    </div>
-                    {interval.scheduled_date && (
-                      <div>
-                        <p className="text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                          Shop Scheduled
-                          <span title="When the vehicle is scheduled for the shop" className="cursor-help">ℹ️</span>
-                        </p>
-                        <p className="font-semibold text-slate-900 dark:text-white">
-                          {format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM dd, yyyy')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  {(interval.linked_record_id || interval.linked_bill_id) && (
-                    <div className="flex gap-2 mt-3 flex-wrap">
-                      {interval.linked_record_id && (
-                        <Badge variant="outline" className="gap-1 text-blue-700 border-blue-300 bg-blue-50">
-                          <FileText className="w-3 h-3" /> Maintenance Record Linked
-                        </Badge>
-                      )}
-                      {interval.linked_bill_id && (
-                        <Badge variant="outline" className="gap-1 text-purple-700 border-purple-300 bg-purple-50">
-                          <Receipt className="w-3 h-3" /> Bill Linked
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-2 justify-end md:justify-start flex-wrap">
-                  {(status.label === 'Overdue' || status.label === 'Urgent' || status.label === 'Due Soon') && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onMarkComplete(interval)}
-                      className="border-green-400 text-green-700 hover:bg-green-50 gap-1"
-                    >
-                      <CheckCircle2 className="w-4 h-4" /> Mark Complete
-                    </Button>
-                  )}
-                   <Button
-                     variant="outline"
-                     onClick={() => onEdit(interval)}
-                     className="h-11 w-11 p-0 md:h-9 md:w-9"
-                   >
-                     <Edit2 className="w-4 h-4" />
-                   </Button>
-                   <Button
-                     variant="outline"
-                     onClick={() => {
-                       if (window.confirm('Delete this interval?')) {
-                         onDelete(interval.id);
-                       }
-                     }}
-                     disabled={isDeleting}
-                     className="h-11 w-11 p-0 md:h-9 md:w-9 text-red-600 hover:text-red-700"
-                   >
-                     <Trash2 className="w-4 h-4" />
-                   </Button>
-                 </div>
+          <div key={vid} className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+            {/* Vehicle Header */}
+            <button
+              onClick={() => toggleVehicle(vid)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
+            >
+              <div className="flex items-center gap-3">
+                <Truck className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
+                <span className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">
+                  {vehicle ? `${vehicle.name}` : 'Unassigned'}
+                </span>
+                {vehicle && (
+                  <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">
+                    {vehicle.year} {vehicle.make} {vehicle.model}
+                  </span>
+                )}
+                <span className="text-xs text-slate-400 dark:text-slate-500">
+                  {vehicleIntervals.length} interval{vehicleIntervals.length !== 1 ? 's' : ''}
+                </span>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center gap-2 shrink-0">
+                {overdue > 0 && <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">{overdue} overdue</Badge>}
+                {urgent > 0 && <Badge className="bg-orange-100 text-orange-700 border border-orange-200 text-xs">{urgent} urgent</Badge>}
+                {dueSoon > 0 && <Badge className="bg-yellow-100 text-yellow-700 border border-yellow-200 text-xs">{dueSoon} due soon</Badge>}
+                {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+              </div>
+            </button>
+
+            {/* Interval Rows */}
+            {isExpanded && (
+              <div className="divide-y divide-slate-100 dark:divide-slate-700/50">
+                {vehicleIntervals.map((interval) => {
+                  const status = getStatus(interval);
+                  const StatusIcon = status.icon;
+                  const remaining = getRemainingLabel(interval);
+                  const isActionable = ['Overdue', 'Urgent', 'Due Soon'].includes(status.label);
+
+                  return (
+                    <div key={interval.id} className="px-4 py-3 bg-white dark:bg-slate-900 flex items-center gap-3 flex-wrap md:flex-nowrap">
+                      {/* Status icon */}
+                      <StatusIcon className={`w-4 h-4 shrink-0 ${status.color}`} />
+
+                      {/* Name + type badge */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium text-sm text-slate-900 dark:text-white truncate">{interval.interval_name}</span>
+                          <Badge className={`text-xs ${getTypeColor(interval.maintenance_type)}`}>
+                            {getTypeLabel(interval.maintenance_type)}
+                          </Badge>
+                          {(interval.linked_record_id || interval.linked_bill_id) && (
+                            <span className="flex gap-1">
+                              {interval.linked_record_id && <FileText className="w-3 h-3 text-blue-400" title="Maintenance record linked" />}
+                              {interval.linked_bill_id && <Receipt className="w-3 h-3 text-purple-400" title="Bill linked" />}
+                            </span>
+                          )}
+                        </div>
+                        {interval.last_performed_date && (
+                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                            Last done: {format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy')}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Remaining pill */}
+                      {remaining && (
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 ${getRemainingColor(interval)}`}>
+                          {remaining}
+                        </span>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex gap-1 shrink-0 ml-auto">
+                        {isActionable && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onMarkComplete(interval)}
+                            className="border-green-400 text-green-700 hover:bg-green-50 gap-1 h-8 text-xs"
+                          >
+                            <CheckCircle2 className="w-3 h-3" /> Done
+                          </Button>
+                        )}
+                        <Button variant="outline" size="sm" onClick={() => onEdit(interval)} className="h-8 w-8 p-0">
+                          <Edit2 className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { if (window.confirm('Delete this interval?')) onDelete(interval.id); }}
+                          disabled={isDeleting}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         );
       })}
     </div>
