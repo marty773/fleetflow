@@ -75,7 +75,6 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
-  const [scheduleType, setScheduleType] = useState('normal');
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState(null);
