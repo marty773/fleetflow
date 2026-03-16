@@ -105,6 +105,9 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
         setModel(v.model || '');
         setYear(v.year ? String(v.year) : '');
         setVin(v.vin || '');
+        // Pull engine type from vehicle record (gas/diesel/etc.), strip 'unknown'
+        const savedEngine = v.engine_type && v.engine_type !== 'unknown' ? v.engine_type : '';
+        setEngineType(savedEngine);
         // Default severe service ON for trucks
         setSevereService(v.type === 'truck' ? true : false);
       }
