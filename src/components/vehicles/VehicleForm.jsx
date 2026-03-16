@@ -170,13 +170,54 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
               />
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <Label htmlFor="vin">VIN</Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  id="vin"
+                  placeholder="17-character VIN"
+                  value={formData.vin}
+                  onChange={(e) => handleChange('vin', e.target.value.toUpperCase())}
+                  className="font-mono uppercase"
+                  maxLength={17}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleVinLookup}
+                  disabled={vinLoading || (formData.vin || '').trim().length !== 17}
+                  className="shrink-0 gap-2"
+                >
+                  {vinLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  Look Up
+                </Button>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">Auto-fills Make, Model, Year & Engine via NHTSA.</p>
+            </div>
+
+            <div>
+              <Label>Engine Type</Label>
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {[{val:'gas',label:'Gas'},{val:'diesel',label:'Diesel'},{val:'electric',label:'Electric'},{val:'hybrid',label:'Hybrid'},{val:'unknown',label:'Unknown'}].map(opt => (
+                  <button
+                    key={opt.val}
+                    type="button"
+                    onClick={() => handleChange('engine_type', opt.val)}
+                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${formData.engine_type === opt.val ? 'bg-slate-900 border-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="engine_description">Engine Description</Label>
               <Input
-                id="vin"
-                placeholder="Vehicle Identification Number"
-                value={formData.vin}
-                onChange={(e) => handleChange('vin', e.target.value)}
+                id="engine_description"
+                placeholder="e.g. 6.7L I6 Cummins Diesel"
+                value={formData.engine_description || ''}
+                onChange={(e) => handleChange('engine_description', e.target.value)}
                 className="mt-2"
               />
             </div>
