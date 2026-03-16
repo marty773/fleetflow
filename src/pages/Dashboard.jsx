@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -8,13 +8,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Wrench, Plus } from 'lucide-react';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import UpcomingMaintenance from '../components/dashboard/UpcomingMaintenance';
+import DashboardServiceList from '../components/dashboard/DashboardServiceList';
 import FleetLiveSection from '../components/vehicles/FleetLiveSection';
+import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import { differenceInCalendarMonths, addMonths } from 'date-fns';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedInterval, setSelectedInterval] = useState(null);
+  const [serviceListFilter, setServiceListFilter] = useState(null); // 'upcoming' | 'overdue'
+  const [markCompleteInterval, setMarkCompleteInterval] = useState(null);
+
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
     queryFn: () => base44.entities.Vehicle.list(),
@@ -30,24 +37,109 @@ export default function Dashboard() {
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
+  const { data: bills = [] } = useQuery({
+    queryKey: ['bills'],
+    queryFn: () => base44.entities.Bill.list(),
+  });
+
+  const { data: vendors = [] } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => base44.entities.Vendor.list(),
+  });
+
   const calculateStats = () => {
     const overdueIntervals = maintenanceIntervals.filter(
-      interval => new Date(interval.next_due_date) < new Date()
+      interval => interval.next_due_date && new Date(interval.next_due_date) < new Date()
     ).length;
 
     return {
       totalVehicles: vehicles.length,
       overdueServices: overdueIntervals,
-      upcomingMaintenance: maintenanceIntervals.filter(
-        interval => {
-          const daysUntilDue = (new Date(interval.next_due_date) - new Date()) / (1000 * 60 * 60 * 24);
-          return daysUntilDue >= 0 && daysUntilDue <= 30;
-        }
-      ).length,
+      upcomingMaintenance: maintenanceIntervals.filter(interval => {
+        if (!interval.next_due_date) return false;
+        const daysUntilDue = (new Date(interval.next_due_date) - new Date()) / (1000 * 60 * 60 * 24);
+        return daysUntilDue >= 0 && daysUntilDue <= 30;
+      }).length,
     };
   };
 
   const stats = calculateStats();
+
+  const overdueIntervals = maintenanceIntervals.filter(
+    i => i.next_due_date && new Date(i.next_due_date) < new Date()
+  );
+  const upcomingIntervals = maintenanceIntervals.filter(i => {
+    if (!i.next_due_date) return false;
+    const days = (new Date(i.next_due_date) - new Date()) / (1000 * 60 * 60 * 24);
+    return days >= 0 && days <= 30;
+  });
+
+  const handleMarkComplete = async (data) => {
+    const interval = markCompleteInterval;
+    if (!interval) return;
+
+    let recordId = data.linked_record_id;
+    let billId = data.linked_bill_id;
+
+    // Create new maintenance record if requested
+    if (data.create_record) {
+      const newRecord = await base44.entities.MaintenanceRecord.create({
+        vehicle_id: interval.vehicle_id,
+        title: data.new_record.title || interval.interval_name,
+        maintenance_type: interval.maintenance_type || 'other',
+        performed_date: data.performed_date,
+        vendor: data.new_record.vendor || undefined,
+        odometer_reading: data.odometer ? String(data.odometer) : undefined,
+        total_cost: data.new_record.total_cost || undefined,
+        notes: data.new_record.notes || undefined,
+        company_id: interval.company_id,
+        linked_bill_id: billId || undefined,
+      });
+      recordId = newRecord.id;
+    }
+
+    // Create new bill if requested
+    if (data.attach_bill && data.new_bill) {
+      const newBill = await base44.entities.Bill.create({
+        ...data.new_bill,
+        company_id: interval.company_id,
+      });
+      billId = newBill.id;
+      // Update record with bill link if we just created a record
+      if (recordId) {
+        await base44.entities.MaintenanceRecord.update(recordId, { linked_bill_id: billId });
+      }
+    }
+
+    // Calculate next due date / mileage
+    const updatePayload = {
+      last_performed_date: data.performed_date,
+      last_performed_mileage: data.odometer || undefined,
+      linked_record_id: recordId || undefined,
+      linked_bill_id: billId || undefined,
+    };
+
+    if (interval.interval_months) {
+      const nextDate = addMonths(new Date(data.performed_date), parseInt(interval.interval_months));
+      updatePayload.next_due_date = nextDate.toISOString().split('T')[0];
+    }
+    if (interval.interval_miles && data.odometer) {
+      updatePayload.next_due_mileage = parseFloat(data.odometer) + parseFloat(interval.interval_miles);
+    }
+
+    await base44.entities.MaintenanceInterval.update(interval.id, updatePayload);
+
+    queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+    queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
+    queryClient.invalidateQueries({ queryKey: ['bills'] });
+
+    setMarkCompleteInterval(null);
+  };
+
+  const handleOpenMarkComplete = (interval) => {
+    setSelectedInterval(null);
+    setMarkCompleteInterval(interval);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -58,18 +150,18 @@ export default function Dashboard() {
           <p className="text-slate-600 dark:text-slate-400">Manage your truck and trailer fleet</p>
         </div>
       </div>
-      
+
       <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
-        <Button 
+        <Button
           onClick={() => navigate('/BillFormPage')}
-          className="flex-1 sm:flex-none" 
-          style={{ backgroundColor: 'var(--color-primary)' }} 
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'} 
+          className="flex-1 sm:flex-none"
+          style={{ backgroundColor: 'var(--color-primary)' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
         >
           <Plus className="w-4 h-4 mr-2" /> New Bill
         </Button>
-        <Button 
+        <Button
           onClick={() => navigate('/MaintenanceRecordFormPage')}
           className="flex-1 sm:flex-none"
           style={{ backgroundColor: 'var(--color-primary)' }}
@@ -80,14 +172,35 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Stats */}
-      <DashboardStats stats={stats} />
+      {/* Stats — clickable */}
+      <DashboardStats
+        stats={stats}
+        onUpcomingClick={() => setServiceListFilter('upcoming')}
+        onOverdueClick={() => setServiceListFilter('overdue')}
+      />
 
       {/* Main Content */}
       <FleetLiveSection vehicles={vehicles} />
       <div className="grid grid-cols-1 gap-6">
-        <UpcomingMaintenance intervals={maintenanceIntervals} vehicles={vehicles} onSelectInterval={setSelectedInterval} />
+        <UpcomingMaintenance
+          intervals={maintenanceIntervals}
+          vehicles={vehicles}
+          onSelectInterval={setSelectedInterval}
+          onMarkComplete={handleOpenMarkComplete}
+        />
       </div>
+
+      {/* Service List Drilldown Modal */}
+      {serviceListFilter && (
+        <DashboardServiceList
+          title={serviceListFilter === 'overdue' ? 'Overdue Services' : 'Upcoming Services (Next 30 Days)'}
+          intervals={serviceListFilter === 'overdue' ? overdueIntervals : upcomingIntervals}
+          vehicles={vehicles}
+          onClose={() => setServiceListFilter(null)}
+          onSelectInterval={setSelectedInterval}
+          onMarkComplete={handleOpenMarkComplete}
+        />
+      )}
 
       {/* Interval Detail Dialog */}
       {selectedInterval && (
@@ -108,7 +221,11 @@ export default function Dashboard() {
                 <div>
                   <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Next Due</p>
                   <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {selectedInterval.next_due_date ? format(new Date(selectedInterval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not calculated'}
+                    {selectedInterval.next_due_date
+                      ? format(new Date(selectedInterval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy')
+                      : selectedInterval.next_due_mileage
+                        ? `${Number(selectedInterval.next_due_mileage).toLocaleString()} mi`
+                        : 'Not calculated'}
                   </p>
                 </div>
               </div>
@@ -123,7 +240,7 @@ export default function Dashboard() {
                 {selectedInterval.interval_miles && (
                   <div>
                     <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Mileage Interval</p>
-                    <p className="font-semibold text-slate-900 dark:text-white mt-1">{selectedInterval.interval_miles} mi</p>
+                    <p className="font-semibold text-slate-900 dark:text-white mt-1">{Number(selectedInterval.interval_miles).toLocaleString()} mi</p>
                   </div>
                 )}
               </div>
@@ -131,14 +248,14 @@ export default function Dashboard() {
               {selectedInterval.last_performed_mileage && (
                 <div>
                   <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Last Mileage</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{selectedInterval.last_performed_mileage} mi</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{Number(selectedInterval.last_performed_mileage).toLocaleString()} mi</p>
                 </div>
               )}
 
               {selectedInterval.next_due_mileage && (
                 <div>
                   <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Next Due Mileage</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{selectedInterval.next_due_mileage} mi</p>
+                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{Number(selectedInterval.next_due_mileage).toLocaleString()} mi</p>
                 </div>
               )}
 
@@ -160,10 +277,26 @@ export default function Dashboard() {
             </div>
             <div className="flex justify-end gap-2 pt-4 border-t">
               <Button variant="outline" onClick={() => setSelectedInterval(null)}>Close</Button>
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-white gap-1"
+                onClick={() => handleOpenMarkComplete(selectedInterval)}
+              >
+                ✓ Mark Complete
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Mark Complete Dialog */}
+      <MarkCompleteDialog
+        interval={markCompleteInterval}
+        records={maintenanceRecords}
+        bills={bills}
+        vendors={vendors}
+        onConfirm={handleMarkComplete}
+        onClose={() => setMarkCompleteInterval(null)}
+      />
 
       {/* Empty State */}
       {vehicles.length === 0 && (
