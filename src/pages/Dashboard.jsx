@@ -50,14 +50,55 @@ export default function Dashboard() {
 
   const reminderMiles = getServiceReminderMiles();
 
+  // Fetch current vehicle mileage from Motive on mount
+  React.useEffect(() => {
+    const fetchMileage = async () => {
+      try {
+        const result = await base44.functions.invoke('fetchMotiveVehicleData', {});
+        if (result.data?.success && result.data?.vehicles) {
+          const map = {};
+          result.data.vehicles.forEach(v => {
+            // Match by VIN
+            const vehicle = vehicles.find(av => av.vin && av.vin.toLowerCase() === (v.vin || '').toLowerCase());
+            if (vehicle && v.odometer) {
+              map[vehicle.id] = Number(v.odometer);
+            }
+          });
+          setMotiveVehicles(map);
+        }
+      } catch (err) {
+        // Silently fail on mileage fetch; app still works without it
+        console.debug('Could not fetch Motive vehicle data');
+      }
+    };
+    if (vehicles.length > 0) fetchMileage();
+  }, [vehicles]);
+
   const isIntervalUpcoming = (interval) => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    
     // Mileage-based: upcoming if miles left <= reminderMiles
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      return milesLeft >= 0 && milesLeft <= reminderMiles;
+    if (hasMiles) {
+      const currentMiles = motiveVehicles[interval.vehicle_id];
+      const lastPerformedMiles = Number(interval.last_performed_mileage);
+      
+      let milesLeft;
+      if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
+        const intervalMiles = Number(interval.interval_miles);
+        const milesSinceService = currentMiles - lastPerformedMiles;
+        milesLeft = intervalMiles - milesSinceService;
+      } else if (interval.next_due_mileage && currentMiles !== undefined) {
+        milesLeft = Number(interval.next_due_mileage) - currentMiles;
+      } else if (interval.next_due_mileage && lastPerformedMiles) {
+        milesLeft = Number(interval.next_due_mileage) - lastPerformedMiles;
+      }
+      
+      if (milesLeft !== undefined) {
+        return milesLeft >= 0 && milesLeft <= reminderMiles;
+      }
     }
+    
     // Time-based: upcoming if due within reminderMiles-equivalent days (200mi/day assumption) or 30 days min
     if (hasMonths && interval.next_due_date) {
       const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
