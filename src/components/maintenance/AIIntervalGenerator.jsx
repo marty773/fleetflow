@@ -582,6 +582,11 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                               {item.maintenance_type.replace(/_/g, ' ')}
                             </Badge>
                             {statusLabel(item._status)}
+                            {item._flagged_as_milestone && (
+                              <Badge className="text-xs bg-yellow-100 text-yellow-700 border border-yellow-300" title="This might be a one-time milestone service. Verify it's recurring.">
+                                ⚠ Potential milestone
+                              </Badge>
+                            )}
                             <button
                               onClick={(e) => handleStartEdit(e, i)}
                               className="ml-auto text-slate-400 hover:text-blue-600 transition-colors"
