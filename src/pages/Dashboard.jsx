@@ -181,14 +181,6 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <FleetLiveSection vehicles={vehicles} />
-      <div className="grid grid-cols-1 gap-6">
-        <UpcomingMaintenance
-          intervals={maintenanceIntervals}
-          vehicles={vehicles}
-          onSelectInterval={setSelectedInterval}
-          onMarkComplete={handleOpenMarkComplete}
-        />
-      </div>
 
       {/* Service List Drilldown Modal */}
       {serviceListFilter && (
