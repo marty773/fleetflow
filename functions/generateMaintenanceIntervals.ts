@@ -183,36 +183,28 @@ Deno.serve(async (req) => {
 
   const result = await base44.integrations.Core.InvokeLLM(llmParams);
 
-  // --- Step 3: Filter out milestone services and match existing records ---
-  const intervals = (result.intervals || [])
-    .filter(item => {
-      // Exclude services detected as milestones
-      const isMilestone = isMilestoneService(
-        item.interval_name,
-        item.interval_miles,
-        item.interval_months,
-        item.maintenance_type
-      );
-      
-      if (isMilestone) {
-        console.log(`[AI] Filtered out milestone service: "${item.interval_name}" (${item.interval_miles}mi / ${item.interval_months}mo)`);
-      }
-      
-      return !isMilestone;
-    })
-    .map(item => {
-      const sanitized = {
-        ...item,
-        vehicle_id: vehicle_id || null,
-        maintenance_type: validTypes.includes(item.maintenance_type) ? item.maintenance_type : 'other',
-        interval_months: item.interval_months ? Number(item.interval_months) : null,
-        interval_miles: item.interval_miles ? Number(item.interval_miles) : null,
-        // Always start blank — will be filled only if a confident match is found
-        last_performed_date: null,
-        last_performed_mileage: null,
-        _matched_record_id: null,
-        _matched_record_title: null,
-      };
+  // --- Step 3: Flag potential milestone services and match existing records ---
+  const intervals = (result.intervals || []).map(item => {
+    const isMilestone = isMilestoneService(
+      item.interval_name,
+      item.interval_miles,
+      item.interval_months,
+      item.maintenance_type
+    );
+    
+    const sanitized = {
+      ...item,
+      vehicle_id: vehicle_id || null,
+      maintenance_type: validTypes.includes(item.maintenance_type) ? item.maintenance_type : 'other',
+      interval_months: item.interval_months ? Number(item.interval_months) : null,
+      interval_miles: item.interval_miles ? Number(item.interval_miles) : null,
+      // Always start blank — will be filled only if a confident match is found
+      last_performed_date: null,
+      last_performed_mileage: null,
+      _matched_record_id: null,
+      _matched_record_title: null,
+      _flagged_as_milestone: isMilestone,
+    };
 
       if (existingRecords.length > 0) {
         // Score every existing record against this AI interval
