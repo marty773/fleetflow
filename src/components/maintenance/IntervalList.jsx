@@ -283,11 +283,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                             {getTypeLabel(interval.maintenance_type)}
                           </Badge>
                         </div>
-                        {interval.last_performed_date && (
-                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                            Last done: {format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy')}
-                          </p>
-                        )}
+
                       </div>
 
                       {/* Remaining pill */}
