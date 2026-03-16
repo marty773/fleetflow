@@ -243,7 +243,6 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
     setStep('input');
     setVehicleId('');
     setMake(''); setModel(''); setYear('');
-    setScheduleType('normal');
     setUploadedFile(null); setFileUrl(null);
     setIntervals([]);
     setSelected(new Set());
