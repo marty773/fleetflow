@@ -83,20 +83,36 @@ export default function Maintenance() {
   const filteredItems = items;
   const bills = allBills;
 
-  // Check for URL parameter to view a record or switch tabs
+  // Check for URL parameter
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
     const tab = urlParams.get('tab');
-
-    if (tab === 'intervals') {
-      setActiveTab('intervals');
-    }
+    if (tab === 'history') setActiveTab('history');
+    if (tab === 'upcoming') setActiveTab('upcoming');
     if (viewId && records.length > 0) {
       const record = records.find(r => r.id === viewId);
       if (record) setViewingRecord(record);
     }
   }, [records]);
+
+  // Count intervals due within reminderMiles (mileage-based) or within 30 days (time-based)
+  const upcomingCount = intervals.filter(interval => {
+    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    if (hasMiles && interval.next_due_mileage) {
+      // We don't have current odometer here, but next_due_mileage is the target — flag as upcoming
+      // We treat it as "upcoming" (can't know exact miles left without live odometer), so include all mileage intervals
+      return true;
+    }
+    if (hasMonths && interval.next_due_date) {
+      const days = differenceInDays(new Date(interval.next_due_date), new Date());
+      // Convert reminderMiles to approximate days (assume ~200 miles/day fleet average → reminderMiles/200 days)
+      const thresholdDays = Math.round(reminderMiles / 200);
+      return days <= thresholdDays;
+    }
+    return false;
+  }).length;
 
   const deleteRecordMutation = useMutation({
     mutationFn: (id) => base44.entities.MaintenanceRecord.delete(id),
