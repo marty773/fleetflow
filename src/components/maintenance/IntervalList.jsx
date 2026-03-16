@@ -174,7 +174,11 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                   const isActionable = ['Overdue', 'Urgent', 'Due Soon'].includes(status.label);
 
                   return (
-                    <div key={interval.id} className="px-4 py-3 bg-white dark:bg-slate-900 flex items-center gap-3 flex-wrap md:flex-nowrap">
+                    <div
+                      key={interval.id}
+                      className="px-4 py-3 bg-white dark:bg-slate-900 flex items-center gap-3 flex-wrap md:flex-nowrap cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                      onClick={() => onView && onView(interval)}
+                    >
                       {/* Status icon */}
                       <StatusIcon className={`w-4 h-4 shrink-0 ${status.color}`} />
 
