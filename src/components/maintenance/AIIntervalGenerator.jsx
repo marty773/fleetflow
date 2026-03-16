@@ -100,8 +100,34 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
         setMake(v.make || '');
         setModel(v.model || '');
         setYear(v.year ? String(v.year) : '');
+        setVin(v.vin || '');
+        // Default severe service ON for trucks
+        setSevereService(v.type === 'truck' ? true : false);
       }
+    } else {
+      setSevereService(true);
     }
+  };
+
+  const handleVinLookup = async () => {
+    const cleanVin = vin.trim().toUpperCase();
+    if (cleanVin.length !== 17) {
+      toast.error('VIN must be 17 characters');
+      return;
+    }
+    setVinLoading(true);
+    const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${cleanVin}?format=json`);
+    const data = await res.json();
+    const r = data?.Results?.[0];
+    if (r) {
+      if (r.Make) setMake(r.Make);
+      if (r.Model) setModel(r.Model);
+      if (r.ModelYear) setYear(r.ModelYear);
+      toast.success(`Found: ${r.ModelYear} ${r.Make} ${r.Model}`);
+    } else {
+      toast.error('No vehicle found for that VIN');
+    }
+    setVinLoading(false);
   };
 
   const handleFileUpload = async (e) => {
