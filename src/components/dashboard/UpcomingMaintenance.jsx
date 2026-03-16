@@ -1,10 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { AlertCircle, Calendar } from 'lucide-react';
+import { Calendar, CheckCircle2 } from 'lucide-react';
 
-export default function UpcomingMaintenance({ intervals, vehicles, onSelectInterval }) {
+export default function UpcomingMaintenance({ intervals, vehicles, onSelectInterval, onMarkComplete }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
