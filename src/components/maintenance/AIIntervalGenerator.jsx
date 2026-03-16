@@ -151,6 +151,7 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
       vehicle_id: vehicleId || null,
       make, model, year,
       severe_service: severeService,
+      engine_type: engineType || null,
       file_url: fileUrl || null,
     });
     const generated = result.data?.intervals || [];
