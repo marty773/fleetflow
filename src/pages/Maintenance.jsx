@@ -244,6 +244,13 @@ export default function Maintenance() {
                 Sync All to Google Calendar
               </Button>
               <Button
+                onClick={() => setShowAIGenerator(true)}
+                variant="outline"
+                className="border-amber-400 text-amber-700 hover:bg-amber-50 gap-2"
+              >
+                <Sparkles className="w-4 h-4" /> AI Generate Schedule
+              </Button>
+              <Button
                 onClick={() => navigate('/MaintenanceIntervalFormPage')}
                 className="bg-blue-600 hover:bg-blue-700"
               >
