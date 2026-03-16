@@ -256,68 +256,77 @@ export default function Dashboard() {
               <DialogTitle>{selectedInterval.interval_name}</DialogTitle>
               <DialogDescription>{vehicles.find(v => v.id === selectedInterval.vehicle_id)?.name}</DialogDescription>
             </DialogHeader>
-            <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Last Done</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {selectedInterval.last_performed_date ? format(new Date(selectedInterval.last_performed_date + 'T12:00:00'), 'MMM dd, yyyy') : 'Not set'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Next Due</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {selectedInterval.next_due_date
-                      ? format(new Date(selectedInterval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy')
-                      : selectedInterval.next_due_mileage
-                        ? `${Number(selectedInterval.next_due_mileage).toLocaleString()} mi`
-                        : 'Not calculated'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Time Interval</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {selectedInterval.interval_months ? `Every ${selectedInterval.interval_months} month${selectedInterval.interval_months > 1 ? 's' : ''}` : 'N/A'}
-                  </p>
-                </div>
-                {selectedInterval.interval_miles && (
-                  <div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Mileage Interval</p>
-                    <p className="font-semibold text-slate-900 dark:text-white mt-1">{Number(selectedInterval.interval_miles).toLocaleString()} mi</p>
-                  </div>
-                )}
-              </div>
-
-              {selectedInterval.last_performed_mileage && (
-                <div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Last Mileage</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{Number(selectedInterval.last_performed_mileage).toLocaleString()} mi</p>
+            <div className="space-y-3">
+              {selectedInterval.last_performed_date && (
+                <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="text-slate-500 dark:text-slate-400">Last Performed</span>
+                  <span className="font-medium text-slate-900 dark:text-white text-right">{format(new Date(selectedInterval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy')}</span>
                 </div>
               )}
 
-              {selectedInterval.next_due_mileage && (
-                <div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Next Due Mileage</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">{Number(selectedInterval.next_due_mileage).toLocaleString()} mi</p>
+              {motiveVehicles[selectedInterval.vehicle_id] !== undefined && (
+                <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="text-slate-500 dark:text-slate-400">Current Mileage</span>
+                  <span className="font-medium text-slate-900 dark:text-white text-right">{Math.round(motiveVehicles[selectedInterval.vehicle_id]).toLocaleString()} mi</span>
+                </div>
+              )}
+
+              {selectedInterval.interval_miles && (
+                (() => {
+                  const currentMiles = motiveVehicles[selectedInterval.vehicle_id];
+                  const lastPerformedMiles = Number(selectedInterval.last_performed_mileage);
+                  let milesRemaining;
+
+                  if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
+                    const intervalMiles = Number(selectedInterval.interval_miles);
+                    const milesSinceService = currentMiles - lastPerformedMiles;
+                    milesRemaining = Math.round(intervalMiles - milesSinceService);
+                  } else if (currentMiles !== undefined && selectedInterval.next_due_mileage) {
+                    milesRemaining = Math.round(Number(selectedInterval.next_due_mileage) - currentMiles);
+                  }
+
+                  return milesRemaining !== undefined ? (
+                    <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                      <span className="text-slate-500 dark:text-slate-400">Miles Remaining</span>
+                      <span className={`font-medium text-right ${milesRemaining <= 0 ? 'text-red-600 font-semibold' : 'text-slate-900 dark:text-white'}`}>
+                        {Math.abs(milesRemaining).toLocaleString()} mi {milesRemaining <= 0 ? 'overdue' : 'left'}
+                      </span>
+                    </div>
+                  ) : null;
+                })()
+              )}
+
+              <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                <span className="text-slate-500 dark:text-slate-400">Interval</span>
+                <span className="font-medium text-slate-900 dark:text-white text-right">
+                  {selectedInterval.interval_months && selectedInterval.interval_miles
+                    ? `Every ${selectedInterval.interval_months} mo / ${Number(selectedInterval.interval_miles).toLocaleString()} mi`
+                    : selectedInterval.interval_miles
+                      ? `Every ${Number(selectedInterval.interval_miles).toLocaleString()} mi`
+                      : selectedInterval.interval_months
+                        ? `Every ${selectedInterval.interval_months} mo`
+                        : '—'}
+                </span>
+              </div>
+
+              {selectedInterval.next_due_date && (
+                <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="text-slate-500 dark:text-slate-400">Next Due Date</span>
+                  <span className="font-medium text-slate-900 dark:text-white text-right">{format(new Date(selectedInterval.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}</span>
                 </div>
               )}
 
               {selectedInterval.scheduled_date && (
-                <div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Scheduled Shop Date</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {format(new Date(selectedInterval.scheduled_date + 'T12:00:00'), 'MMM dd, yyyy')}
-                  </p>
+                <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="text-slate-500 dark:text-slate-400">Shop Scheduled</span>
+                  <span className="font-medium text-slate-900 dark:text-white text-right">{format(new Date(selectedInterval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy')}</span>
                 </div>
               )}
 
               {selectedInterval.notes && (
-                <div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase">Notes</p>
-                  <p className="text-slate-900 dark:text-white mt-1 text-sm">{selectedInterval.notes}</p>
+                <div className="text-sm">
+                  <p className="text-slate-500 dark:text-slate-400 mb-1">Notes</p>
+                  <p className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg p-3">{selectedInterval.notes}</p>
                 </div>
               )}
             </div>
