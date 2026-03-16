@@ -164,6 +164,8 @@ export default function SettingsPage() {
           </Card>
         )}
 
+        <ServiceReminderSettings />
+
         <ServiceTypesEditor />
 
         <Card>
