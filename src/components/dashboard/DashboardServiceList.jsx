@@ -24,11 +24,11 @@ export default function DashboardServiceList({ title, intervals, vehicles, curre
       if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
         const intervalMiles = Number(interval.interval_miles);
         const milesSinceService = currentMiles - lastPerformedMiles;
-        left = intervalMiles - milesSinceService;
+        left = Math.round(intervalMiles - milesSinceService);
       } else if (interval.next_due_mileage && currentMiles !== undefined) {
-        left = Number(interval.next_due_mileage) - currentMiles;
+        left = Math.round(Number(interval.next_due_mileage) - currentMiles);
       } else if (interval.next_due_mileage && lastPerformedMiles) {
-        left = Number(interval.next_due_mileage) - lastPerformedMiles;
+        left = Math.round(Number(interval.next_due_mileage) - lastPerformedMiles);
       }
       
       if (left !== undefined) {
@@ -36,9 +36,7 @@ export default function DashboardServiceList({ title, intervals, vehicles, curre
         return { label: `${left.toLocaleString()} mi left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
       }
       
-      if (interval.next_due_mileage) {
-        return { label: `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
-      }
+      return { label: `Every ${Number(interval.interval_miles).toLocaleString()} mi`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
     }
 
     // Time remaining
