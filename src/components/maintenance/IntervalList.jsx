@@ -78,12 +78,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
 
-    // Prefer mileage display when available
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      if (milesLeft <= 0) return `${Number(Math.abs(milesLeft)).toLocaleString()} mi overdue`;
-      return `${Number(milesLeft).toLocaleString()} mi left`;
-    }
+    // Prefer mileage display when available — show absolute odometer target
     if (hasMiles && interval.next_due_mileage) {
       return `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`;
     }
