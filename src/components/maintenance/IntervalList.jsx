@@ -29,13 +29,27 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
   const getTypeColor = (value) => maintenanceColors[value] || 'bg-slate-100 text-slate-800';
 
   const getStatus = (interval) => {
-    const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
+    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    const isMileageOnly = hasMiles && !hasMonths;
+
+    // Mileage-based status
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
+      if (milesLeft <= reminderMiles * 0.25) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
+      if (milesLeft <= reminderMiles) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
+      return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+    }
     if (isMileageOnly) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+
+    // Time-based status
     if (!interval.next_due_date) return { label: 'Scheduled', icon: Clock, color: 'text-slate-500' };
     const days = differenceInDays(new Date(interval.next_due_date), new Date());
+    const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
     if (days < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600', days };
     if (days <= 7) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600', days };
-    if (days <= 30) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600', days };
+    if (days <= thresholdDays) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600', days };
     return { label: 'Scheduled', icon: Check, color: 'text-green-600', days };
   };
 
