@@ -16,10 +16,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
       const vid = interval.vehicle_id || '__none__';
       const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
       const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-      if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-        const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-        if (milesLeft <= reminderMiles) expanded.add(vid);
-      } else if (hasMonths && interval.next_due_date) {
+      if (hasMonths && interval.next_due_date) {
         const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
         const days = Math.ceil((new Date(interval.next_due_date) - new Date()) / (1000 * 60 * 60 * 24));
         if (days <= thresholdDays) expanded.add(vid);
