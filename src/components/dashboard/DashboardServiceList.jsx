@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Calendar, CheckCircle2 } from 'lucide-react';
 
-export default function DashboardServiceList({ title, intervals, vehicles, onClose, onSelectInterval, onMarkComplete }) {
+export default function DashboardServiceList({ title, intervals, vehicles, vehicleOdometers = {}, onClose, onSelectInterval, onMarkComplete }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
@@ -14,14 +14,20 @@ export default function DashboardServiceList({ title, intervals, vehicles, onClo
   const getRemainingBadge = (interval) => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    const currentOdometer = vehicleOdometers[interval.vehicle_id];
 
-    // Mileage remaining
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const left = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      if (left <= 0) return { label: `${Math.abs(left).toLocaleString()} mi overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
-      return { label: `${left.toLocaleString()} mi left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
-    }
+    // Mileage remaining — prefer live odometer, fall back to last_performed_mileage
     if (hasMiles && interval.next_due_mileage) {
+      if (currentOdometer != null) {
+        const left = Number(interval.next_due_mileage) - currentOdometer;
+        if (left <= 0) return { label: `${Math.abs(left).toLocaleString()} mi overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
+        return { label: `${left.toLocaleString()} mi left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+      }
+      if (interval.last_performed_mileage) {
+        const left = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+        if (left <= 0) return { label: `${Math.abs(left).toLocaleString()} mi overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
+        return { label: `~${left.toLocaleString()} mi left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+      }
       return { label: `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
     }
 
