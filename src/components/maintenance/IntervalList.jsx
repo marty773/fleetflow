@@ -39,13 +39,19 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     return { label: 'Scheduled', icon: Check, color: 'text-green-600', days };
   };
 
-  // "X miles remaining" or "X days remaining" summary for the row
+  // "X miles left" or "X days/months left" summary for the row
   const getRemainingLabel = (interval) => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
 
+    // Prefer mileage display when available
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      if (milesLeft <= 0) return `${Number(Math.abs(milesLeft)).toLocaleString()} mi overdue`;
+      return `${Number(milesLeft).toLocaleString()} mi left`;
+    }
     if (hasMiles && interval.next_due_mileage) {
-      return `${Number(interval.next_due_mileage).toLocaleString()} mi due`;
+      return `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`;
     }
 
     if (hasMonths && interval.next_due_date) {
