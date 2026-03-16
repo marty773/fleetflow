@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Settings, LogOut, Trash2, Bell, Save } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
 import ServiceTypesEditor from '@/components/settings/ServiceTypesEditor';
+import ServiceReminderSettings from '@/components/settings/ServiceReminderSettings';
 
 export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
