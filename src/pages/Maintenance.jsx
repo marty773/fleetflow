@@ -314,6 +314,14 @@ export default function Maintenance() {
             onCreated={() => queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] })}
           />
 
+          {/* Interval Detail Dialog */}
+          <IntervalDetailDialog
+            interval={viewingInterval}
+            vehicle={viewingInterval ? allVehicles.find(v => v.id === viewingInterval.vehicle_id) : null}
+            onClose={() => setViewingInterval(null)}
+            onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
+          />
+
           {/* Mark Complete Dialog */}
           <MarkCompleteDialog
             interval={completingInterval}
