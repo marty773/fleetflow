@@ -85,14 +85,20 @@ export default function IntervalList({ intervals, vehicles, vehicleOdometers = {
   const getRemainingLabel = (interval) => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    const currentOdometer = vehicleOdometers[interval.vehicle_id];
 
-    // Prefer mileage display when available
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      if (milesLeft <= 0) return `${Number(Math.abs(milesLeft)).toLocaleString()} mi overdue`;
-      return `${Number(milesLeft).toLocaleString()} mi left`;
-    }
+    // Prefer mileage display: use live odometer if available, else last_performed_mileage
     if (hasMiles && interval.next_due_mileage) {
+      if (currentOdometer != null) {
+        const milesLeft = Number(interval.next_due_mileage) - currentOdometer;
+        if (milesLeft <= 0) return `${Math.abs(milesLeft).toLocaleString()} mi overdue`;
+        return `${milesLeft.toLocaleString()} mi left`;
+      }
+      if (interval.last_performed_mileage) {
+        const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+        if (milesLeft <= 0) return `${Math.abs(milesLeft).toLocaleString()} mi overdue`;
+        return `~${milesLeft.toLocaleString()} mi left`;
+      }
       return `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`;
     }
 
