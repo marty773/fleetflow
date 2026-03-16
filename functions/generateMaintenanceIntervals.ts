@@ -15,12 +15,55 @@ const TYPE_KEYWORDS = {
   cleaning: ['clean', 'wash', 'detai'],
 };
 
+// Keywords that indicate a service is a one-time milestone rather than recurring
+const MILESTONE_KEYWORDS = [
+  'inspection', 'major', 'complete', 'overhaul', 'initial', 'first',
+  'warranty', 'recall', 'campaign', 'modification'
+];
+
+// Common recurring service frequencies (used to detect anomalies)
+const TYPICAL_FREQUENCIES = {
+  oil_change: [3, 5, 7, 10, 15, 20, 30],
+  filter_change: [10, 15, 20, 25, 30, 45, 60],
+  tire_rotation: [5, 7, 10, 15, 20, 25],
+  inspection: [6, 12, 24, 36],
+  transmission: [30, 50, 60, 100],
+};
+
 function guessType(name) {
   const norm = normalizeName(name);
   for (const [type, keywords] of Object.entries(TYPE_KEYWORDS)) {
     if (keywords.some(kw => norm.includes(kw))) return type;
   }
   return null;
+}
+
+// Detect if a service is likely a one-time milestone (e.g., "100,000 mile inspection")
+function isMilestoneService(name, intervalMiles, intervalMonths, maintenance_type) {
+  const norm = normalizeName(name);
+  
+  // Check for milestone keywords
+  const hasMilestoneKeyword = MILESTONE_KEYWORDS.some(kw => norm.includes(kw));
+  
+  // Check for unusually large mileage intervals
+  const isUnusuallyLarge = intervalMiles && (() => {
+    const typical = TYPICAL_FREQUENCIES[maintenance_type] || [30, 60, 100];
+    const isAnomalous = intervalMiles > Math.max(...typical) * 2;
+    return isAnomalous;
+  })();
+  
+  // If it has both a huge mileage AND is marked as an inspection/major service, it's likely a milestone
+  if (hasMilestoneKeyword && isUnusuallyLarge) {
+    return true;
+  }
+  
+  // Services with only a mileage interval (no time-based) that are very large
+  // (e.g., "100,000 mile engine inspection" with no interval_months)
+  if (!intervalMonths && isUnusuallyLarge && hasMilestoneKeyword) {
+    return true;
+  }
+  
+  return false;
 }
 
 // Score how well a maintenance record title matches an AI interval name
