@@ -38,23 +38,38 @@ export default function UpcomingMaintenance({ intervals, vehicles, onSelectInter
               const urgency = getUrgency(interval.next_due_date);
               const vehicle = vehicleMap[interval.vehicle_id];
               return (
-                <button
+                <div
                   key={interval.id}
-                  onClick={() => onSelectInterval?.(interval)}
-                  className="w-full text-left p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition cursor-pointer"
+                  className="flex items-start gap-2 p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition"
                 >
-                   <div className="flex items-start justify-between mb-2">
+                  <button
+                    className="flex-1 text-left"
+                    onClick={() => onSelectInterval?.(interval)}
+                  >
+                    <div className="flex items-start justify-between mb-1">
                       <div className="flex-1">
                         <p className="font-medium text-sm text-slate-900 dark:text-white">{interval.interval_name}</p>
                         <p className="text-sm text-slate-600 dark:text-slate-400">{vehicle?.name}</p>
                       </div>
-                      <Badge className={urgency.color}>{urgency.label}</Badge>
+                      <Badge className={`ml-2 shrink-0 ${urgency.color}`}>{urgency.label}</Badge>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
                       <Calendar className="w-3 h-3" />
                       {format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM dd, yyyy')}
                     </div>
                   </button>
+                  {onMarkComplete && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="shrink-0 border-green-400 text-green-700 hover:bg-green-50 gap-1 mt-0.5"
+                      onClick={() => onMarkComplete(interval)}
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span className="hidden sm:inline">Complete</span>
+                    </Button>
+                  )}
+                </div>
               );
             })}
           </div>
