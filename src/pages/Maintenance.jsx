@@ -301,6 +301,7 @@ export default function Maintenance() {
               intervals={intervals}
               vehicles={vehicles}
               reminderMiles={reminderMiles}
+              currentMileage={motiveVehicles}
               onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
               onDelete={(id) => deleteIntervalMutation.mutate(id)}
               onMarkComplete={setCompletingInterval}
