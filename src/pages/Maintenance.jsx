@@ -33,6 +33,7 @@ export default function Maintenance() {
   const [viewingInterval, setViewingInterval] = useState(null);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [reminderMiles, setReminderMiles] = useState(() => getServiceReminderMiles());
+  const [motiveVehicles, setMotiveVehicles] = useState({});
 
   // Re-read reminder miles if user changes it in Settings
   React.useEffect(() => {
