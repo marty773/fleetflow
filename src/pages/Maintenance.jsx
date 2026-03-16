@@ -100,11 +100,6 @@ export default function Maintenance() {
   const upcomingCount = intervals.filter(interval => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-    // Mileage-based: count if miles left is within reminderMiles threshold
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      return milesLeft <= reminderMiles;
-    }
     // Time-based: convert reminderMiles to days (200mi/day), minimum 30 days
     if (hasMonths && interval.next_due_date) {
       const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
