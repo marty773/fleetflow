@@ -22,12 +22,24 @@ import AIIntervalGenerator from '../components/maintenance/AIIntervalGenerator';
 import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 import BillDetailDialog from '../components/dialogs/BillDetailDialog';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
+import IntervalDetailDialog from '../components/dialogs/IntervalDetailDialog';
+import { getServiceReminderMiles } from '../components/settings/ServiceReminderSettings';
+
 export default function Maintenance() {
   const navigate = useNavigate();
   const [viewingRecord, setViewingRecord] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
-  const [activeTab, setActiveTab] = useState('records');
+  const [viewingInterval, setViewingInterval] = useState(null);
+  const [activeTab, setActiveTab] = useState('upcoming');
+  const [reminderMiles, setReminderMiles] = useState(() => getServiceReminderMiles());
+
+  // Re-read reminder miles if user changes it in Settings
+  React.useEffect(() => {
+    const handler = () => setReminderMiles(getServiceReminderMiles());
+    window.addEventListener('serviceReminderMilesChanged', handler);
+    return () => window.removeEventListener('serviceReminderMilesChanged', handler);
+  }, []);
 
   const [deletingRecord, setDeletingRecord] = useState(null);
   const [completingInterval, setCompletingInterval] = useState(null);
