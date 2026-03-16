@@ -307,19 +307,6 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                 </div>
               </div>
 
-              <div>
-                <Label className="text-slate-700 dark:text-slate-300">Schedule Type</Label>
-                <ResponsiveSelect
-                  value={scheduleType}
-                  onValueChange={setScheduleType}
-                  options={[
-                    { value: 'normal', label: 'Normal — Standard driving conditions' },
-                    { value: 'severe', label: 'Severe — Towing, stop-and-go, dusty conditions' },
-                  ]}
-                  className="mt-2"
-                />
-              </div>
-
               <div className="p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg">
                 <Label className="text-slate-700 dark:text-slate-300 block mb-2">Upload Owner's Manual (optional but recommended)</Label>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">PDF, image, or document. The AI will cite exact pages/sections in the notes.</p>
