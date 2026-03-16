@@ -467,6 +467,14 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                           {item.interval_months && <span>Every {item.interval_months} mo</span>}
                           {item.interval_miles && <span>Every {item.interval_miles.toLocaleString()} mi</span>}
                         </div>
+                        {/* Show matched service record */}
+                        {item._matched_record_title && (
+                          <div className="mt-1 text-xs text-green-700 dark:text-green-400 flex items-center gap-1">
+                            <Check className="w-3 h-3 shrink-0" />
+                            Seeded from: <span className="font-medium">{item._matched_record_title}</span>
+                            {item.last_performed_date && <span className="text-slate-400 ml-1">({item.last_performed_date}{item.last_performed_mileage ? ` · ${Number(item.last_performed_mileage).toLocaleString()} mi` : ''})</span>}
+                          </div>
+                        )}
                         {/* Show diff details for update items */}
                         {item._status === 'update' && item._existing && (
                           <div className="mt-1 text-xs text-orange-600 dark:text-orange-400 space-y-0.5">
