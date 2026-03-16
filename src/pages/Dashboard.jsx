@@ -241,6 +241,7 @@ export default function Dashboard() {
           title={serviceListFilter === 'overdue' ? 'Overdue Services' : 'Upcoming Services'}
           intervals={serviceListFilter === 'overdue' ? overdueIntervals : upcomingIntervals}
           vehicles={vehicles}
+          currentMileage={motiveVehicles}
           onClose={() => setServiceListFilter(null)}
           onSelectInterval={setSelectedInterval}
           onMarkComplete={handleOpenMarkComplete}
