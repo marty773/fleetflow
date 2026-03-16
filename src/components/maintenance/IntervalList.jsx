@@ -160,7 +160,6 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
       return `~${months} mo left`;
     }
 
-    if (hasMonths) return `Every ${interval.interval_months} mo`;
     return null;
   };
 
