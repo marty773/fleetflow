@@ -6,7 +6,7 @@ import { format, differenceInDays, addMonths } from 'date-fns';
 import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, FileText, Receipt, ChevronDown, ChevronUp, Truck } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
-export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, isDeleting }) {
+export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, onView, isDeleting, reminderMiles = 1000 }) {
   const serviceTypes = useServiceTypes(null, 'records');
   const [expandedVehicles, setExpandedVehicles] = useState(new Set(vehicles.map(v => v.id)));
 
