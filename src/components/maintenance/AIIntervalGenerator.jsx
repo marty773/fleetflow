@@ -515,67 +515,117 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
               </div>
 
               <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
-                {intervals.map((item, i) => (
-                  <div
-                    key={i}
-                    onClick={() => handleToggleSelect(i)}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      selected.has(i)
-                        ? item._status === 'update'
-                          ? 'border-orange-400 bg-orange-50 dark:bg-orange-900/20'
-                          : 'border-amber-400 bg-amber-50 dark:bg-amber-900/20'
-                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 opacity-60'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center shrink-0 border ${selected.has(i) ? 'bg-amber-500 border-amber-500' : 'border-slate-300 dark:border-slate-600'}`}>
-                        {selected.has(i) && <Check className="w-3 h-3 text-white" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <span className="font-medium text-sm text-slate-900 dark:text-white">{item.interval_name}</span>
-                          <Badge className={`text-xs ${TYPE_COLORS[item.maintenance_type] || TYPE_COLORS.other}`}>
-                            {item.maintenance_type.replace(/_/g, ' ')}
-                          </Badge>
-                          {statusLabel(item._status)}
-                        </div>
-                        <div className="flex gap-3 text-xs text-slate-500 dark:text-slate-400">
-                          {item.interval_months && <span>Every {item.interval_months} mo</span>}
-                          {item.interval_miles && <span>Every {item.interval_miles.toLocaleString()} mi</span>}
-                        </div>
-                        {/* Show matched service record */}
-                        {item._matched_record_title && (
-                          <div className="mt-1 text-xs text-green-700 dark:text-green-400 flex items-center gap-1">
-                            <Check className="w-3 h-3 shrink-0" />
-                            Seeded from: <span className="font-medium">{item._matched_record_title}</span>
-                            {item.last_performed_date && <span className="text-slate-400 ml-1">({item.last_performed_date}{item.last_performed_mileage ? ` · ${Number(item.last_performed_mileage).toLocaleString()} mi` : ''})</span>}
+              {intervals.map((item, i) => (
+                <div
+                  key={i}
+                  onClick={() => editingIndex !== i && handleToggleSelect(i)}
+                  className={`p-3 rounded-lg border transition-colors ${
+                    editingIndex === i ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 cursor-default' :
+                    selected.has(i)
+                      ? item._status === 'update'
+                        ? 'border-orange-400 bg-orange-50 dark:bg-orange-900/20 cursor-pointer'
+                        : 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 cursor-pointer'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 opacity-60 cursor-pointer'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center shrink-0 border ${selected.has(i) ? 'bg-amber-500 border-amber-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                      {selected.has(i) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {editingIndex === i && editDraft ? (
+                        /* Inline Edit Form */
+                        <div className="space-y-2" onClick={e => e.stopPropagation()}>
+                          <Input
+                            value={editDraft.interval_name}
+                            onChange={e => setEditDraft(d => ({ ...d, interval_name: e.target.value }))}
+                            placeholder="Interval name"
+                            className="text-sm h-8"
+                          />
+                          <div className="flex gap-2">
+                            <div className="flex-1">
+                              <Label className="text-xs text-slate-500">Months</Label>
+                              <Input type="number" value={editDraft.interval_months} onChange={e => setEditDraft(d => ({ ...d, interval_months: e.target.value }))} className="h-8 text-sm mt-0.5" placeholder="e.g. 6" />
+                            </div>
+                            <div className="flex-1">
+                              <Label className="text-xs text-slate-500">Miles</Label>
+                              <Input type="number" value={editDraft.interval_miles} onChange={e => setEditDraft(d => ({ ...d, interval_miles: e.target.value }))} className="h-8 text-sm mt-0.5" placeholder="e.g. 5000" />
+                            </div>
+                            <div className="flex-1">
+                              <Label className="text-xs text-slate-500">Type</Label>
+                              <Select value={editDraft.maintenance_type} onValueChange={v => setEditDraft(d => ({ ...d, maintenance_type: v }))}>
+                                <SelectTrigger className="h-8 text-sm mt-0.5"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  {['oil_change','filter_change','tire_rotation','inspection','repair','cleaning','other'].map(t => (
+                                    <SelectItem key={t} value={t}>{t.replace(/_/g,' ')}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
-                        )}
-                        {/* Show diff details for update items */}
-                        {item._status === 'update' && item._existing && (
-                          <div className="mt-1 text-xs text-orange-600 dark:text-orange-400 space-y-0.5">
-                            {diffSummary(item, item._existing).map((line, li) => (
-                              <div key={li}>↳ {line}</div>
-                            ))}
+                          <div>
+                            <Label className="text-xs text-slate-500">Notes</Label>
+                            <Textarea value={editDraft.notes} onChange={e => setEditDraft(d => ({ ...d, notes: e.target.value }))} className="text-xs mt-0.5 min-h-[60px]" placeholder="Notes (manufacturer note will be removed on save)" />
                           </div>
-                        )}
-                        {item.notes && (
-                          <div className="mt-1">
+                          <div className="flex gap-2 pt-1">
+                            <Button size="sm" className="h-7 text-xs bg-blue-600 hover:bg-blue-700" onClick={(e) => handleSaveEdit(e, i)}>Save</Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleCancelEdit}>Cancel</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Normal display row */
+                        <>
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="font-medium text-sm text-slate-900 dark:text-white">{item.interval_name}</span>
+                            <Badge className={`text-xs ${TYPE_COLORS[item.maintenance_type] || TYPE_COLORS.other}`}>
+                              {item.maintenance_type.replace(/_/g, ' ')}
+                            </Badge>
+                            {statusLabel(item._status)}
                             <button
-                              onClick={(e) => { e.stopPropagation(); handleToggleNotes(i); }}
-                              className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
+                              onClick={(e) => handleStartEdit(e, i)}
+                              className="ml-auto text-slate-400 hover:text-blue-600 transition-colors"
+                              title="Edit interval"
                             >
-                              Source {expandedNotes.has(i) ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                              <Pencil className="w-3 h-3" />
                             </button>
-                            {expandedNotes.has(i) && (
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">{item.notes}</p>
-                            )}
                           </div>
-                        )}
-                      </div>
+                          <div className="flex gap-3 text-xs text-slate-500 dark:text-slate-400">
+                            {item.interval_months && <span>Every {item.interval_months} mo</span>}
+                            {item.interval_miles && <span>Every {Number(item.interval_miles).toLocaleString()} mi</span>}
+                          </div>
+                          {item._matched_record_title && (
+                            <div className="mt-1 text-xs text-green-700 dark:text-green-400 flex items-center gap-1">
+                              <Check className="w-3 h-3 shrink-0" />
+                              Seeded from: <span className="font-medium">{item._matched_record_title}</span>
+                              {item.last_performed_date && <span className="text-slate-400 ml-1">({item.last_performed_date}{item.last_performed_mileage ? ` · ${Number(item.last_performed_mileage).toLocaleString()} mi` : ''})</span>}
+                            </div>
+                          )}
+                          {item._status === 'update' && item._existing && (
+                            <div className="mt-1 text-xs text-orange-600 dark:text-orange-400 space-y-0.5">
+                              {diffSummary(item, item._existing).map((line, li) => (
+                                <div key={li}>↳ {line}</div>
+                              ))}
+                            </div>
+                          )}
+                          {item.notes && (
+                            <div className="mt-1">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleToggleNotes(i); }}
+                                className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
+                              >
+                                Source {expandedNotes.has(i) ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                              </button>
+                              {expandedNotes.has(i) && (
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">{item.notes}</p>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
               </div>
 
               <div className="flex justify-between items-center pt-2 border-t dark:border-slate-700">
