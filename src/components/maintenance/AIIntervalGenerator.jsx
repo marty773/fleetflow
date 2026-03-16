@@ -78,6 +78,7 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
   const [year, setYear] = useState('');
   const [vin, setVin] = useState('');
   const [vinLoading, setVinLoading] = useState(false);
+  const [engineType, setEngineType] = useState('');
   const [severeService, setSevereService] = useState(true);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
