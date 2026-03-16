@@ -24,6 +24,8 @@ For EVERY distinct maintenance task, return a JSON object with these fields:
 - interval_miles: number (miles between service) or null if time-only
 - notes: cite the specific section, page, or chapter this comes from in the owner's manual (e.g. "Owner's Manual, Maintenance Schedule, Section 8-3, Severe Service"). If sourced from general knowledge, note "Based on ${year} ${make} ${model} factory maintenance schedule."
 
+Do NOT include last_performed_date or last_performed_mileage — those fields should always be omitted and left blank.
+
 Return a JSON array of ALL maintenance tasks. Be thorough — include oil changes, filters (air, cabin, fuel, oil), tire rotation, brake inspection, transmission service, coolant flush, spark plugs, belts, battery, wiper blades, differential service, etc. as applicable.`;
 
   if (file_url) {
