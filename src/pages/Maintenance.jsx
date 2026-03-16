@@ -125,11 +125,26 @@ export default function Maintenance() {
   const upcomingCount = intervals.filter(interval => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    
     // Mileage-based: count if miles left is within reminderMiles threshold
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      return milesLeft <= reminderMiles;
+    if (hasMiles) {
+      const currentMiles = motiveVehicles[interval.vehicle_id];
+      const lastPerformedMiles = Number(interval.last_performed_mileage);
+      
+      let milesLeft;
+      if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
+        const intervalMiles = Number(interval.interval_miles);
+        const milesSinceService = currentMiles - lastPerformedMiles;
+        milesLeft = intervalMiles - milesSinceService;
+      } else if (interval.next_due_mileage && currentMiles !== undefined) {
+        milesLeft = Number(interval.next_due_mileage) - currentMiles;
+      } else if (interval.next_due_mileage && lastPerformedMiles) {
+        milesLeft = Number(interval.next_due_mileage) - lastPerformedMiles;
+      }
+      
+      if (milesLeft !== undefined && milesLeft <= reminderMiles) return true;
     }
+    
     // Time-based: convert reminderMiles to days (200mi/day), minimum 30 days
     if (hasMonths && interval.next_due_date) {
       const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
