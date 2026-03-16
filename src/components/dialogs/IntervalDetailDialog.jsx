@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Edit2, Clock, AlertCircle, Check, FileText, Receipt } from 'lucide-react';
 
-export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit }) {
+export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, currentMileage = {} }) {
   if (!interval) return null;
 
   const getStatus = () => {
@@ -25,6 +25,18 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
   const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
   const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
 
+  const currentMiles = currentMileage[interval.vehicle_id];
+  const lastPerformedMiles = Number(interval.last_performed_mileage);
+  
+  let milesRemaining;
+  if (hasMiles && currentMiles !== undefined && lastPerformedMiles !== undefined) {
+    const intervalMiles = Number(interval.interval_miles);
+    const milesSinceService = currentMiles - lastPerformedMiles;
+    milesRemaining = Math.round(intervalMiles - milesSinceService);
+  } else if (hasMiles && currentMiles !== undefined && interval.next_due_mileage) {
+    milesRemaining = Math.round(Number(interval.next_due_mileage) - currentMiles);
+  }
+
   const rows = [
     vehicle && { label: 'Vehicle', value: `${vehicle.name}${vehicle.year ? ` — ${vehicle.year} ${vehicle.make} ${vehicle.model}` : ''}` },
     { label: 'Status', value: <span className={`font-semibold flex items-center gap-1 ${status.color}`}><StatusIcon className="w-4 h-4" />{status.label}</span> },
@@ -36,9 +48,12 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
         : '—'
     },
     interval.last_performed_date && { label: 'Last Performed', value: format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy') },
-    interval.last_performed_mileage && { label: 'Last Mileage', value: `${Number(interval.last_performed_mileage).toLocaleString()} mi` },
+    hasMiles && currentMiles !== undefined && { label: 'Current Mileage', value: `${Math.round(currentMiles).toLocaleString()} mi` },
+    milesRemaining !== undefined && { 
+      label: 'Miles Remaining', 
+      value: <span className={milesRemaining <= 0 ? 'text-red-600 font-semibold' : ''}>{Math.abs(milesRemaining).toLocaleString()} mi ${milesRemaining <= 0 ? 'overdue' : 'left'}</span>
+    },
     interval.next_due_date && { label: 'Next Due Date', value: format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy') },
-    interval.next_due_mileage && { label: 'Next Due Mileage', value: `${Number(interval.next_due_mileage).toLocaleString()} mi` },
     interval.scheduled_date && { label: 'Shop Scheduled', value: format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy') },
   ].filter(Boolean);
 
