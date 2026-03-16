@@ -24,6 +24,8 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
     year: new Date().getFullYear(),
     license_plate: '',
     vin: '',
+    engine_type: 'unknown',
+    engine_description: '',
     gvw: '',
     purchase_date: '',
     is_active: true,
@@ -33,6 +35,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
     three_tie_down_bars: false,
     front_load_extension: false,
   });
+  const [vinLoading, setVinLoading] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -41,6 +44,42 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+  };
+
+  const handleVinLookup = async () => {
+    const cleanVin = (formData.vin || '').trim().toUpperCase();
+    if (cleanVin.length !== 17) {
+      toast.error('VIN must be 17 characters');
+      return;
+    }
+    setVinLoading(true);
+    try {
+      const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${cleanVin}?format=json`);
+      const data = await res.json();
+      const r = data?.Results?.[0];
+      if (r && r.Make) {
+        const updates = {};
+        if (r.Make) updates.make = r.Make;
+        if (r.Model) updates.model = r.Model;
+        if (r.ModelYear) updates.year = parseInt(r.ModelYear);
+        // Engine info from NHTSA
+        const engineDesc = [r.DisplacementL ? `${parseFloat(r.DisplacementL).toFixed(1)}L` : '', r.EngineCylinders ? `${r.EngineCylinders}-cyl` : '', r.EngineModel || ''].filter(Boolean).join(' ').trim();
+        if (engineDesc) updates.engine_description = engineDesc;
+        // Fuel type → engine_type
+        const fuel = (r.FuelTypePrimary || '').toLowerCase();
+        if (fuel.includes('diesel')) updates.engine_type = 'diesel';
+        else if (fuel.includes('electric')) updates.engine_type = 'electric';
+        else if (fuel.includes('hybrid')) updates.engine_type = 'hybrid';
+        else if (fuel.includes('gas') || fuel.includes('gasoline') || fuel.includes('petrol')) updates.engine_type = 'gas';
+        setFormData(prev => ({ ...prev, ...updates }));
+        toast.success(`Found: ${r.ModelYear} ${r.Make} ${r.Model}`);
+      } else {
+        toast.error('No vehicle found for that VIN');
+      }
+    } catch {
+      toast.error('VIN lookup failed');
+    }
+    setVinLoading(false);
   };
 
   return (
