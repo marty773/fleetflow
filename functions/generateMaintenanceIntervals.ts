@@ -183,53 +183,69 @@ Deno.serve(async (req) => {
 
   const result = await base44.integrations.Core.InvokeLLM(llmParams);
 
-  // --- Step 3: For each AI interval, find the best matching maintenance record ---
-  const intervals = (result.intervals || []).map(item => {
-    const sanitized = {
-      ...item,
-      vehicle_id: vehicle_id || null,
-      maintenance_type: validTypes.includes(item.maintenance_type) ? item.maintenance_type : 'other',
-      interval_months: item.interval_months ? Number(item.interval_months) : null,
-      interval_miles: item.interval_miles ? Number(item.interval_miles) : null,
-      // Always start blank — will be filled only if a confident match is found
-      last_performed_date: null,
-      last_performed_mileage: null,
-      _matched_record_id: null,
-      _matched_record_title: null,
-    };
+  // --- Step 3: Filter out milestone services and match existing records ---
+  const intervals = (result.intervals || [])
+    .filter(item => {
+      // Exclude services detected as milestones
+      const isMilestone = isMilestoneService(
+        item.interval_name,
+        item.interval_miles,
+        item.interval_months,
+        item.maintenance_type
+      );
+      
+      if (isMilestone) {
+        console.log(`[AI] Filtered out milestone service: "${item.interval_name}" (${item.interval_miles}mi / ${item.interval_months}mo)`);
+      }
+      
+      return !isMilestone;
+    })
+    .map(item => {
+      const sanitized = {
+        ...item,
+        vehicle_id: vehicle_id || null,
+        maintenance_type: validTypes.includes(item.maintenance_type) ? item.maintenance_type : 'other',
+        interval_months: item.interval_months ? Number(item.interval_months) : null,
+        interval_miles: item.interval_miles ? Number(item.interval_miles) : null,
+        // Always start blank — will be filled only if a confident match is found
+        last_performed_date: null,
+        last_performed_mileage: null,
+        _matched_record_id: null,
+        _matched_record_title: null,
+      };
 
-    if (existingRecords.length > 0) {
-      // Score every existing record against this AI interval
-      let bestScore = 0;
-      let bestRecord = null;
+      if (existingRecords.length > 0) {
+        // Score every existing record against this AI interval
+        let bestScore = 0;
+        let bestRecord = null;
 
-      for (const record of existingRecords) {
-        const score = matchScore(
-          sanitized.interval_name,
-          sanitized.maintenance_type,
-          record.title,
-          record.maintenance_type
-        );
-        if (score > bestScore) {
-          bestScore = score;
-          bestRecord = record;
+        for (const record of existingRecords) {
+          const score = matchScore(
+            sanitized.interval_name,
+            sanitized.maintenance_type,
+            record.title,
+            record.maintenance_type
+          );
+          if (score > bestScore) {
+            bestScore = score;
+            bestRecord = record;
+          }
+        }
+
+        // Only apply the match if confidence is high enough (score >= 40)
+        if (bestScore >= 40 && bestRecord) {
+          sanitized.last_performed_date = bestRecord.performed_date || null;
+          sanitized.last_performed_mileage = bestRecord.odometer_reading
+            ? Number(bestRecord.odometer_reading) || null
+            : null;
+          sanitized._matched_record_id = bestRecord.id;
+          sanitized._matched_record_title = bestRecord.title;
+          sanitized._match_score = bestScore;
         }
       }
 
-      // Only apply the match if confidence is high enough (score >= 40)
-      if (bestScore >= 40 && bestRecord) {
-        sanitized.last_performed_date = bestRecord.performed_date || null;
-        sanitized.last_performed_mileage = bestRecord.odometer_reading
-          ? Number(bestRecord.odometer_reading) || null
-          : null;
-        sanitized._matched_record_id = bestRecord.id;
-        sanitized._matched_record_title = bestRecord.title;
-        sanitized._match_score = bestScore;
-      }
-    }
-
-    return sanitized;
-  });
+      return sanitized;
+    });
 
   return Response.json({ intervals });
 });
