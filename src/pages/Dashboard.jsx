@@ -14,7 +14,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { format } from 'date-fns';
 import { differenceInCalendarMonths, addMonths, differenceInDays } from 'date-fns';
 import { getServiceReminderMiles } from '../components/settings/ServiceReminderSettings';
-import { useVehicleOdometers } from '../hooks/useVehicleOdometers';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -49,21 +48,16 @@ export default function Dashboard() {
   });
 
   const reminderMiles = getServiceReminderMiles();
-  const vehicleOdometers = useVehicleOdometers(vehicles);
 
   const isIntervalUpcoming = (interval) => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-    const currentOdometer = vehicleOdometers[interval.vehicle_id];
-    // Mileage-based: use live odometer, fall back to last_performed_mileage
-    if (hasMiles && interval.next_due_mileage) {
-      const base = currentOdometer ?? (interval.last_performed_mileage ? Number(interval.last_performed_mileage) : null);
-      if (base != null) {
-        const milesLeft = Number(interval.next_due_mileage) - base;
-        return milesLeft >= 0 && milesLeft <= reminderMiles;
-      }
+    // Mileage-based: upcoming if miles left <= reminderMiles
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      return milesLeft >= 0 && milesLeft <= reminderMiles;
     }
-    // Time-based
+    // Time-based: upcoming if due within reminderMiles-equivalent days (200mi/day assumption) or 30 days min
     if (hasMonths && interval.next_due_date) {
       const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
       const days = differenceInDays(new Date(interval.next_due_date), new Date());
@@ -205,7 +199,6 @@ export default function Dashboard() {
           title={serviceListFilter === 'overdue' ? 'Overdue Services' : 'Upcoming Services'}
           intervals={serviceListFilter === 'overdue' ? overdueIntervals : upcomingIntervals}
           vehicles={vehicles}
-          vehicleOdometers={vehicleOdometers}
           onClose={() => setServiceListFilter(null)}
           onSelectInterval={setSelectedInterval}
           onMarkComplete={handleOpenMarkComplete}

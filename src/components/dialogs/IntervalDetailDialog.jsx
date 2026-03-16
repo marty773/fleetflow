@@ -5,23 +5,13 @@ import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Edit2, Clock, AlertCircle, Check, FileText, Receipt } from 'lucide-react';
 
-export default function IntervalDetailDialog({ interval, vehicle, currentOdometer, onClose, onEdit }) {
+export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit }) {
   if (!interval) return null;
 
   const getStatus = () => {
-    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
-    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-    if (hasMiles && interval.next_due_mileage) {
-      const base = currentOdometer ?? (interval.last_performed_mileage ? Number(interval.last_performed_mileage) : null);
-      if (base != null) {
-        const milesLeft = Number(interval.next_due_mileage) - base;
-        if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
-        if (milesLeft <= 500) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
-        if (milesLeft <= 1000) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
-        return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
-      }
-    }
-    if (!hasMonths || !interval.next_due_date) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+    const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
+    if (isMileageOnly) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+    if (!interval.next_due_date) return { label: 'Scheduled', icon: Clock, color: 'text-slate-500' };
     const days = differenceInDays(new Date(interval.next_due_date), new Date());
     if (days < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
     if (days <= 7) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
@@ -49,16 +39,6 @@ export default function IntervalDetailDialog({ interval, vehicle, currentOdomete
     interval.last_performed_mileage && { label: 'Last Mileage', value: `${Number(interval.last_performed_mileage).toLocaleString()} mi` },
     interval.next_due_date && { label: 'Next Due Date', value: format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy') },
     interval.next_due_mileage && { label: 'Next Due Mileage', value: `${Number(interval.next_due_mileage).toLocaleString()} mi` },
-    (interval.next_due_mileage && currentOdometer != null) && {
-      label: 'Miles Left',
-      value: (() => {
-        const left = Number(interval.next_due_mileage) - currentOdometer;
-        return left <= 0
-          ? <span className="text-red-600 font-semibold">{Math.abs(left).toLocaleString()} mi overdue</span>
-          : <span className="text-amber-600 font-semibold">{left.toLocaleString()} mi left</span>;
-      })()
-    },
-    (currentOdometer != null) && { label: 'Current Odometer', value: `${currentOdometer.toLocaleString()} mi` },
     interval.scheduled_date && { label: 'Shop Scheduled', value: format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy') },
   ].filter(Boolean);
 

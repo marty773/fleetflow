@@ -25,7 +25,6 @@ import BillDetailDialog from '../components/dialogs/BillDetailDialog';
 import { format, differenceInDays } from 'date-fns';
 import IntervalDetailDialog from '../components/dialogs/IntervalDetailDialog';
 import { getServiceReminderMiles } from '../components/settings/ServiceReminderSettings';
-import { useVehicleOdometers } from '../hooks/useVehicleOdometers';
 
 export default function Maintenance() {
   const navigate = useNavigate();
@@ -78,7 +77,6 @@ export default function Maintenance() {
   });
 
   const vehicles = allVehicles;
-  const vehicleOdometers = useVehicleOdometers(vehicles);
   const vendors = allVendors;
   const records = allRecords;
   const intervals = allIntervals;
@@ -102,13 +100,12 @@ export default function Maintenance() {
   const upcomingCount = intervals.filter(interval => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-    const currentOdometer = vehicleOdometers[interval.vehicle_id];
-    // Mileage-based: use live odometer if available, else fall back to last_performed_mileage
-    if (hasMiles && interval.next_due_mileage) {
-      const base = currentOdometer ?? (interval.last_performed_mileage ? Number(interval.last_performed_mileage) : null);
-      if (base != null) return (Number(interval.next_due_mileage) - base) <= reminderMiles;
+    // Mileage-based: count if miles left is within reminderMiles threshold
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      return milesLeft <= reminderMiles;
     }
-    // Time-based
+    // Time-based: convert reminderMiles to days (200mi/day), minimum 30 days
     if (hasMonths && interval.next_due_date) {
       const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
       const days = differenceInDays(new Date(interval.next_due_date), new Date());
@@ -278,7 +275,6 @@ export default function Maintenance() {
             <IntervalList
               intervals={intervals}
               vehicles={vehicles}
-              vehicleOdometers={vehicleOdometers}
               reminderMiles={reminderMiles}
               onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
               onDelete={(id) => deleteIntervalMutation.mutate(id)}

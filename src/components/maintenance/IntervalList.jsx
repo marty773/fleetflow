@@ -6,7 +6,7 @@ import { format, differenceInDays, addMonths } from 'date-fns';
 import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, FileText, Receipt, ChevronDown, ChevronUp, Truck } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
-export default function IntervalList({ intervals, vehicles, vehicleOdometers = {}, onEdit, onDelete, onMarkComplete, onView, isDeleting, reminderMiles = 1000 }) {
+export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, onView, isDeleting, reminderMiles = 1000 }) {
   const serviceTypes = useServiceTypes(null, 'records');
 
   // Only expand vehicles that have at least one interval due/overdue/urgent within the reminder threshold
@@ -16,13 +16,9 @@ export default function IntervalList({ intervals, vehicles, vehicleOdometers = {
       const vid = interval.vehicle_id || '__none__';
       const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
       const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-      const currentOdometer = vehicleOdometers[interval.vehicle_id];
-      if (hasMiles && interval.next_due_mileage) {
-        const base = currentOdometer ?? (interval.last_performed_mileage ? Number(interval.last_performed_mileage) : null);
-        if (base != null) {
-          const milesLeft = Number(interval.next_due_mileage) - base;
-          if (milesLeft <= reminderMiles) expanded.add(vid);
-        }
+      if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+        const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+        if (milesLeft <= reminderMiles) expanded.add(vid);
       } else if (hasMonths && interval.next_due_date) {
         const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
         const days = Math.ceil((new Date(interval.next_due_date) - new Date()) / (1000 * 60 * 60 * 24));
@@ -56,18 +52,14 @@ export default function IntervalList({ intervals, vehicles, vehicleOdometers = {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
     const isMileageOnly = hasMiles && !hasMonths;
-    const currentOdometer = vehicleOdometers[interval.vehicle_id];
 
-    // Mileage-based status — prefer live odometer, fall back to last_performed_mileage
-    if (hasMiles && interval.next_due_mileage) {
-      const base = currentOdometer ?? (interval.last_performed_mileage ? Number(interval.last_performed_mileage) : null);
-      if (base != null) {
-        const milesLeft = Number(interval.next_due_mileage) - base;
-        if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
-        if (milesLeft <= reminderMiles * 0.25) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
-        if (milesLeft <= reminderMiles) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
-        return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
-      }
+    // Mileage-based status
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
+      if (milesLeft <= reminderMiles * 0.25) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
+      if (milesLeft <= reminderMiles) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
+      return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
     }
     if (isMileageOnly) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
 
@@ -85,20 +77,14 @@ export default function IntervalList({ intervals, vehicles, vehicleOdometers = {
   const getRemainingLabel = (interval) => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
-    const currentOdometer = vehicleOdometers[interval.vehicle_id];
 
-    // Prefer mileage display: use live odometer if available, else last_performed_mileage
+    // Prefer mileage display when available
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      if (milesLeft <= 0) return `${Number(Math.abs(milesLeft)).toLocaleString()} mi overdue`;
+      return `${Number(milesLeft).toLocaleString()} mi left`;
+    }
     if (hasMiles && interval.next_due_mileage) {
-      if (currentOdometer != null) {
-        const milesLeft = Number(interval.next_due_mileage) - currentOdometer;
-        if (milesLeft <= 0) return `${Math.abs(milesLeft).toLocaleString()} mi overdue`;
-        return `${milesLeft.toLocaleString()} mi left`;
-      }
-      if (interval.last_performed_mileage) {
-        const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-        if (milesLeft <= 0) return `${Math.abs(milesLeft).toLocaleString()} mi overdue`;
-        return `~${milesLeft.toLocaleString()} mi left`;
-      }
       return `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`;
     }
 
