@@ -78,6 +78,7 @@ export default function Maintenance() {
   });
 
   const vehicles = allVehicles;
+  const vehicleOdometers = useVehicleOdometers(vehicles);
   const vendors = allVendors;
   const records = allRecords;
   const intervals = allIntervals;
