@@ -56,14 +56,18 @@ export default function IntervalList({ intervals, vehicles, vehicleOdometers = {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
     const isMileageOnly = hasMiles && !hasMonths;
+    const currentOdometer = vehicleOdometers[interval.vehicle_id];
 
-    // Mileage-based status
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
-      if (milesLeft <= reminderMiles * 0.25) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
-      if (milesLeft <= reminderMiles) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
-      return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+    // Mileage-based status — prefer live odometer, fall back to last_performed_mileage
+    if (hasMiles && interval.next_due_mileage) {
+      const base = currentOdometer ?? (interval.last_performed_mileage ? Number(interval.last_performed_mileage) : null);
+      if (base != null) {
+        const milesLeft = Number(interval.next_due_mileage) - base;
+        if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
+        if (milesLeft <= reminderMiles * 0.25) return { label: 'Urgent', icon: AlertCircle, color: 'text-orange-600' };
+        if (milesLeft <= reminderMiles) return { label: 'Due Soon', icon: Clock, color: 'text-yellow-600' };
+        return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
+      }
     }
     if (isMileageOnly) return { label: 'Scheduled', icon: Check, color: 'text-green-600' };
 
