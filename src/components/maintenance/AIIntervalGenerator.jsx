@@ -301,7 +301,45 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
     setExpandedNotes(new Set());
     setUpdateQueue([]);
     setCurrentConfirm(null);
+    setEditingIndex(null);
+    setEditDraft(null);
     onClose();
+  };
+
+  const handleStartEdit = (e, i) => {
+    e.stopPropagation();
+    setEditingIndex(i);
+    setEditDraft({
+      interval_name: intervals[i].interval_name,
+      interval_months: intervals[i].interval_months ?? '',
+      interval_miles: intervals[i].interval_miles ?? '',
+      maintenance_type: intervals[i].maintenance_type,
+      notes: intervals[i].notes || '',
+    });
+  };
+
+  const handleSaveEdit = (e, i) => {
+    e.stopPropagation();
+    // Strip manufacturer recommendation note since user manually edited
+    const cleanedNotes = (editDraft.notes || '').replace(/manufacturer recommendation[^\n]*/gi, '').trim();
+    setIntervals(prev => prev.map((item, idx) =>
+      idx === i ? {
+        ...item,
+        interval_name: editDraft.interval_name,
+        interval_months: editDraft.interval_months !== '' ? Number(editDraft.interval_months) : null,
+        interval_miles: editDraft.interval_miles !== '' ? Number(editDraft.interval_miles) : null,
+        maintenance_type: editDraft.maintenance_type,
+        notes: cleanedNotes || null,
+      } : item
+    ));
+    setEditingIndex(null);
+    setEditDraft(null);
+  };
+
+  const handleCancelEdit = (e) => {
+    e.stopPropagation();
+    setEditingIndex(null);
+    setEditDraft(null);
   };
 
   const statusLabel = (status) => {
