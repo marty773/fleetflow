@@ -237,32 +237,18 @@ export default function Maintenance() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
-            <TabsTrigger value="records">Maintenance Records</TabsTrigger>
-            <TabsTrigger value="intervals">Scheduled Intervals</TabsTrigger>
+            <TabsTrigger value="upcoming" className="flex items-center gap-2">
+              Upcoming
+              {upcomingCount > 0 && (
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold">
+                  {upcomingCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="records" className="mt-6">
-            <div className="mb-6">
-              <Button
-                onClick={() => navigate('/MaintenanceRecordFormPage')}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Log Maintenance
-              </Button>
-            </div>
-
-            <MaintenanceList
-              records={records}
-              vehicles={vehicles}
-              items={filteredItems}
-              onView={setViewingRecord}
-              onEdit={(record) => navigate(`/MaintenanceRecordFormPage?edit=${record.id}`)}
-              onDelete={(id) => deleteRecordMutation.mutate(id)}
-              isDeleting={deleteRecordMutation.isPending}
-            />
-          </TabsContent>
-
-          <TabsContent value="intervals" className="mt-6">
+          <TabsContent value="upcoming" className="mt-6">
             <div className="flex flex-col lg:flex-row justify-end gap-2 mb-6">
               <Button
                 onClick={handleSyncAll}
@@ -289,10 +275,33 @@ export default function Maintenance() {
             <IntervalList
               intervals={intervals}
               vehicles={vehicles}
+              reminderMiles={reminderMiles}
               onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
               onDelete={(id) => deleteIntervalMutation.mutate(id)}
               onMarkComplete={setCompletingInterval}
+              onView={setViewingInterval}
               isDeleting={deleteIntervalMutation.isPending}
+            />
+          </TabsContent>
+
+          <TabsContent value="history" className="mt-6">
+            <div className="mb-6">
+              <Button
+                onClick={() => navigate('/MaintenanceRecordFormPage')}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Plus className="w-4 h-4 mr-2" /> Log Maintenance
+              </Button>
+            </div>
+
+            <MaintenanceList
+              records={records}
+              vehicles={vehicles}
+              items={filteredItems}
+              onView={setViewingRecord}
+              onEdit={(record) => navigate(`/MaintenanceRecordFormPage?edit=${record.id}`)}
+              onDelete={(id) => deleteRecordMutation.mutate(id)}
+              isDeleting={deleteRecordMutation.isPending}
             />
           </TabsContent>
           </Tabs>
