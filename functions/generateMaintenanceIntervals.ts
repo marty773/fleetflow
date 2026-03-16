@@ -127,14 +127,16 @@ Deno.serve(async (req) => {
     ? 'SEVERE DUTY schedule: Use the severe/heavy-duty service intervals. PRIORITIZE MILEAGE-BASED intervals over time-based — set interval_miles whenever possible, and only use interval_months as a secondary fallback for tasks that have no mileage trigger. Shorter mileage intervals are expected for severe service.'
     : 'NORMAL service schedule: Use standard manufacturer intervals. Include both interval_months and interval_miles where the manufacturer specifies both.';
 
-  let prompt = `You are a fleet maintenance expert. Generate a complete manufacturer-recommended maintenance schedule for a ${year} ${make} ${model}.
+  let prompt = `You are a fleet maintenance expert. Generate a complete manufacturer-recommended RECURRING maintenance schedule for a ${year} ${make} ${model}.
 
   ENGINE TYPE: ${engineNote}
 
   SERVICE SCHEDULE TYPE: ${severeNote}
 
-  For EVERY distinct maintenance task, return a JSON object with these fields:
-  - interval_name: descriptive name like "6-Month Oil Change" or "30k Mile Brake Inspection"
+  IMPORTANT: Generate ONLY recurring maintenance tasks — NOT one-time milestones like "100,000 mile major inspection" or "first 1,000 mile break-in service". Focus on tasks that repeat regularly (oil changes, filter replacements, tire rotations, periodic inspections, etc.).
+
+  For EVERY distinct recurring maintenance task, return a JSON object with these fields:
+  - interval_name: descriptive name like "Oil Change" or "Air Filter Replacement" or "Every 10,000 Miles"
   - maintenance_type: must be one of exactly: oil_change, filter_change, tire_rotation, inspection, repair, cleaning, other
   - interval_months: number (months between service) or null — for severe service, only populate this when there is no applicable mileage trigger
   - interval_miles: number (miles between service) or null — for severe service, ALWAYS populate this when a mileage interval exists
@@ -145,7 +147,7 @@ Deno.serve(async (req) => {
 
   Do NOT include last_performed_date or last_performed_mileage in your output — those will be filled in separately from actual service history.
 
-  Return a JSON array of ALL maintenance tasks. Be thorough — include oil changes, filters (air, cabin, fuel, oil), tire rotation, brake inspection, transmission service, coolant flush, belts, battery, wiper blades, differential service, DEF system service (if diesel), etc. as applicable for the specified engine type.`;
+  Return a JSON array of recurring maintenance tasks. Be thorough — include oil changes, filters (air, cabin, fuel, oil), tire rotation, brake inspection, transmission service, coolant flush, belts, battery, wiper blades, differential service, DEF system service (if diesel), etc. as applicable for the specified engine type.`;
 
   if (file_url) {
     prompt += `\n\nI am also providing the vehicle's owner's manual or maintenance guide as a file. Use it as the primary source and cite specific pages/sections in the notes field.`;
