@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Sparkles, Upload, X, Check, Loader2, ChevronDown, ChevronUp, FileText, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import ResponsiveSelect from '@/components/ResponsiveSelect';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const TYPE_COLORS = {
   oil_change: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
