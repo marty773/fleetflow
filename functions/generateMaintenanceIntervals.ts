@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
 
   let prompt = `You are a fleet maintenance expert. Generate a complete manufacturer-recommended maintenance schedule for a ${year} ${make} ${model}.
 
-Schedule type requested: ${schedule_type === 'severe' ? 'Severe Duty (frequent stop/start, towing, dusty conditions)' : 'Normal/Standard'}.
+Schedule type requested: ${severe_service ? 'Severe Duty (frequent stop/start, towing, dusty conditions) — use the SEVERE SERVICE schedule intervals from the owner\'s manual where applicable' : 'Normal/Standard — use normal driving condition intervals'}.
 
 For EVERY distinct maintenance task, return a JSON object with these fields:
 - interval_name: descriptive name like "6-Month Oil Change" or "30k Mile Brake Inspection"
