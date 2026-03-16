@@ -79,13 +79,34 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
 
     // Prefer mileage display when available
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      if (milesLeft <= 0) return `${Number(Math.abs(milesLeft)).toLocaleString()} mi overdue`;
-      return `${Number(milesLeft).toLocaleString()} mi left`;
-    }
-    if (hasMiles && interval.next_due_mileage) {
-      return `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`;
+    if (hasMiles) {
+      const currentMiles = currentMileage[interval.vehicle_id];
+      const lastPerformedMiles = Number(interval.last_performed_mileage);
+      
+      // If we have current mileage from Motive, calculate actual miles left
+      if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
+        const intervalMiles = Number(interval.interval_miles);
+        const milesSinceService = currentMiles - lastPerformedMiles;
+        const milesLeftBeforeDue = intervalMiles - milesSinceService;
+        
+        if (milesLeftBeforeDue <= 0) {
+          return `${Number(Math.abs(milesLeftBeforeDue)).toLocaleString()} mi overdue`;
+        }
+        return `${Number(milesLeftBeforeDue).toLocaleString()} mi left`;
+      }
+      
+      // Fallback: use next_due_mileage if we don't have current mileage
+      if (interval.next_due_mileage && currentMiles !== undefined) {
+        const milesLeft = Number(interval.next_due_mileage) - currentMiles;
+        if (milesLeft <= 0) return `${Number(Math.abs(milesLeft)).toLocaleString()} mi overdue`;
+        return `${Number(milesLeft).toLocaleString()} mi left`;
+      }
+      
+      // Last resort: show interval when we can't calculate
+      if (interval.next_due_mileage) {
+        return `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`;
+      }
+      return `Every ${Number(interval.interval_miles).toLocaleString()} mi`;
     }
 
     if (hasMonths && interval.next_due_date) {
@@ -97,7 +118,6 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
       return `~${months} mo left`;
     }
 
-    if (hasMiles) return `Every ${Number(interval.interval_miles).toLocaleString()} mi`;
     if (hasMonths) return `Every ${interval.interval_months} mo`;
     return null;
   };
