@@ -6,7 +6,7 @@ import { format, differenceInDays, addMonths } from 'date-fns';
 import { Edit2, Trash2, AlertCircle, Check, Clock, CheckCircle2, ChevronDown, ChevronUp, Truck } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
-export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, onView, isDeleting, reminderMiles = 1000 }) {
+export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, onView, isDeleting, reminderMiles = 1000, currentMileage = {} }) {
   const serviceTypes = useServiceTypes(null, 'records');
 
   // Only expand vehicles that have at least one interval due/overdue/urgent within the reminder threshold
