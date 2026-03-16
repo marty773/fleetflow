@@ -56,7 +56,7 @@ export default function DashboardServiceList({ title, intervals, vehicles, onClo
             <p className="text-center text-slate-500 py-8">No services to show</p>
           )}
           {sorted.map((interval) => {
-            const urgency = getUrgency(interval.next_due_date);
+            const remaining = getRemainingBadge(interval);
             const vehicle = vehicleMap[interval.vehicle_id];
             const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
             return (
@@ -70,7 +70,7 @@ export default function DashboardServiceList({ title, intervals, vehicles, onClo
                 >
                   <div className="flex items-start justify-between mb-1">
                     <p className="font-medium text-sm text-slate-900 dark:text-white">{interval.interval_name}</p>
-                    <Badge className={`ml-2 shrink-0 ${urgency.color}`}>{urgency.label}</Badge>
+                    <Badge className={`ml-2 shrink-0 ${remaining.color}`}>{remaining.label}</Badge>
                   </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400">{vehicle?.name}</p>
                   <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 mt-1">
