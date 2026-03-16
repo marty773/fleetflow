@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [selectedInterval, setSelectedInterval] = useState(null);
   const [serviceListFilter, setServiceListFilter] = useState(null); // 'upcoming' | 'overdue'
   const [markCompleteInterval, setMarkCompleteInterval] = useState(null);
+  const [motiveVehicles, setMotiveVehicles] = React.useState({});
 
   const { data: vehicles = [] } = useQuery({
     queryKey: ['vehicles'],
