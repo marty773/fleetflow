@@ -47,6 +47,25 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Vendor.list(),
   });
 
+  const reminderMiles = getServiceReminderMiles();
+
+  const isIntervalUpcoming = (interval) => {
+    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    // Mileage-based: upcoming if miles left <= reminderMiles
+    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+      const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+      return milesLeft >= 0 && milesLeft <= reminderMiles;
+    }
+    // Time-based: upcoming if due within reminderMiles-equivalent days (200mi/day assumption) or 30 days min
+    if (hasMonths && interval.next_due_date) {
+      const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
+      const days = differenceInDays(new Date(interval.next_due_date), new Date());
+      return days >= 0 && days <= thresholdDays;
+    }
+    return false;
+  };
+
   const calculateStats = () => {
     const overdueIntervals = maintenanceIntervals.filter(
       interval => interval.next_due_date && new Date(interval.next_due_date) < new Date()
@@ -55,11 +74,7 @@ export default function Dashboard() {
     return {
       totalVehicles: vehicles.length,
       overdueServices: overdueIntervals,
-      upcomingMaintenance: maintenanceIntervals.filter(interval => {
-        if (!interval.next_due_date) return false;
-        const daysUntilDue = (new Date(interval.next_due_date) - new Date()) / (1000 * 60 * 60 * 24);
-        return daysUntilDue >= 0 && daysUntilDue <= 30;
-      }).length,
+      upcomingMaintenance: maintenanceIntervals.filter(isIntervalUpcoming).length,
     };
   };
 
@@ -68,11 +83,7 @@ export default function Dashboard() {
   const overdueIntervals = maintenanceIntervals.filter(
     i => i.next_due_date && new Date(i.next_due_date) < new Date()
   );
-  const upcomingIntervals = maintenanceIntervals.filter(i => {
-    if (!i.next_due_date) return false;
-    const days = (new Date(i.next_due_date) - new Date()) / (1000 * 60 * 60 * 24);
-    return days >= 0 && days <= 30;
-  });
+  const upcomingIntervals = maintenanceIntervals.filter(isIntervalUpcoming);
 
   const handleMarkComplete = async (data) => {
     const interval = markCompleteInterval;
