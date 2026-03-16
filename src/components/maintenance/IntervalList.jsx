@@ -53,7 +53,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
     const isMileageOnly = hasMiles && !hasMonths;
 
-    // Mileage-based status
+    // Mileage-based status — only when we have both next and last mileage
     if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
       const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
       if (milesLeft < 0) return { label: 'Overdue', icon: AlertCircle, color: 'text-red-600' };
@@ -78,12 +78,13 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
 
-    // Prefer mileage display when available
+    // Prefer mileage display when we have both next and last mileage
     if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
       const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
       if (milesLeft <= 0) return `${Number(Math.abs(milesLeft)).toLocaleString()} mi overdue`;
       return `${Number(milesLeft).toLocaleString()} mi left`;
     }
+    // Has a target mileage but no starting mileage — show the due-at target
     if (hasMiles && interval.next_due_mileage) {
       return `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`;
     }
@@ -97,6 +98,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
       return `~${months} mo left`;
     }
 
+    // Fallback: no due date/mileage set yet
     if (hasMiles) return `Every ${Number(interval.interval_miles).toLocaleString()} mi`;
     if (hasMonths) return `Every ${interval.interval_months} mo`;
     return null;
