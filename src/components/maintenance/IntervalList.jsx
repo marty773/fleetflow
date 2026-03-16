@@ -211,7 +211,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                       )}
 
                       {/* Actions */}
-                      <div className="flex gap-1 shrink-0 ml-auto">
+                      <div className="flex gap-1 shrink-0 ml-auto" onClick={e => e.stopPropagation()}>
                         {isActionable && (
                           <Button
                             variant="outline"
