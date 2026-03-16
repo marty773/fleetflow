@@ -123,16 +123,27 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
       return;
     }
     setVinLoading(true);
-    const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${cleanVin}?format=json`);
-    const data = await res.json();
-    const r = data?.Results?.[0];
-    if (r) {
-      if (r.Make) setMake(r.Make);
-      if (r.Model) setModel(r.Model);
-      if (r.ModelYear) setYear(r.ModelYear);
-      toast.success(`Found: ${r.ModelYear} ${r.Make} ${r.Model}`);
-    } else {
-      toast.error('No vehicle found for that VIN');
+    try {
+      const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${cleanVin}?format=json`);
+      const data = await res.json();
+      const r = data?.Results?.[0];
+      if (r && r.Make) {
+        if (r.Make) setMake(r.Make);
+        if (r.Model) setModel(r.Model);
+        if (r.ModelYear) setYear(r.ModelYear);
+        // Auto-detect engine type from NHTSA fuel type
+        const fuel = (r.FuelTypePrimary || '').toLowerCase();
+        if (fuel.includes('diesel')) setEngineType('diesel');
+        else if (fuel.includes('electric')) setEngineType('electric');
+        else if (fuel.includes('hybrid')) setEngineType('hybrid');
+        else if (fuel.includes('gas') || fuel.includes('gasoline') || fuel.includes('petrol')) setEngineType('gas');
+        const engineDesc = [r.DisplacementL ? `${parseFloat(r.DisplacementL).toFixed(1)}L` : '', r.EngineCylinders ? `${r.EngineCylinders}-cyl` : '', r.EngineModel || ''].filter(Boolean).join(' ');
+        toast.success(`Found: ${r.ModelYear} ${r.Make} ${r.Model}${engineDesc ? ` · ${engineDesc}` : ''}`);
+      } else {
+        toast.error('No vehicle found for that VIN');
+      }
+    } catch {
+      toast.error('VIN lookup failed');
     }
     setVinLoading(false);
   };
