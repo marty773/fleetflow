@@ -278,6 +278,7 @@ export default function Maintenance() {
             <IntervalList
               intervals={intervals}
               vehicles={vehicles}
+              vehicleOdometers={vehicleOdometers}
               reminderMiles={reminderMiles}
               onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
               onDelete={(id) => deleteIntervalMutation.mutate(id)}
