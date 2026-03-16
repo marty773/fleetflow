@@ -31,6 +31,7 @@ export default function Maintenance() {
 
   const [deletingRecord, setDeletingRecord] = useState(null);
   const [completingInterval, setCompletingInterval] = useState(null);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
