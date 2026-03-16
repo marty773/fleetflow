@@ -193,7 +193,7 @@ export default function Dashboard() {
       {/* Service List Drilldown Modal */}
       {serviceListFilter && (
         <DashboardServiceList
-          title={serviceListFilter === 'overdue' ? 'Overdue Services' : 'Upcoming Services (Next 30 Days)'}
+          title={serviceListFilter === 'overdue' ? 'Overdue Services' : 'Upcoming Services'}
           intervals={serviceListFilter === 'overdue' ? overdueIntervals : upcomingIntervals}
           vehicles={vehicles}
           onClose={() => setServiceListFilter(null)}
