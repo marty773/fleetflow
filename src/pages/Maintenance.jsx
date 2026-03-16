@@ -269,6 +269,13 @@ export default function Maintenance() {
           </TabsContent>
           </Tabs>
 
+          <AIIntervalGenerator
+            vehicles={vehicles}
+            open={showAIGenerator}
+            onClose={() => setShowAIGenerator(false)}
+            onCreated={() => queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] })}
+          />
+
           {/* Mark Complete Dialog */}
           <MarkCompleteDialog
             interval={completingInterval}
