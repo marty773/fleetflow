@@ -238,7 +238,7 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
     let skipped = 0;
 
     for (const item of toProcess) {
-      const { _status, _existing, _confirmed, ...payload } = item;
+      const { _status, _existing, _confirmed, _matched_record_id, _matched_record_title, _match_score, ...payload } = item;
 
       if (_status === 'new') {
         await base44.entities.MaintenanceInterval.create(payload);
