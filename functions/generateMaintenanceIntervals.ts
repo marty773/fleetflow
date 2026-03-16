@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
   const user = await base44.auth.me();
   if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { vehicle_id, make, model, year, severe_service, file_url } = await req.json();
+  const { vehicle_id, make, model, year, severe_service, engine_type, file_url } = await req.json();
 
   if (!make || !model || !year) {
     return Response.json({ error: 'make, model, and year are required' }, { status: 400 });
