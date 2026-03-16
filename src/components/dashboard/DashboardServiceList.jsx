@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Calendar, CheckCircle2 } from 'lucide-react';
 
-export default function DashboardServiceList({ title, intervals, vehicles, onClose, onSelectInterval, onMarkComplete }) {
+export default function DashboardServiceList({ title, intervals, vehicles, currentMileage = {}, onClose, onSelectInterval, onMarkComplete }) {
   const vehicleMap = vehicles.reduce((acc, v) => {
     acc[v.id] = v;
     return acc;
@@ -16,13 +16,29 @@ export default function DashboardServiceList({ title, intervals, vehicles, onClo
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
 
     // Mileage remaining
-    if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
-      const left = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
-      if (left <= 0) return { label: `${Math.abs(left).toLocaleString()} mi overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
-      return { label: `${left.toLocaleString()} mi left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
-    }
-    if (hasMiles && interval.next_due_mileage) {
-      return { label: `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+    if (hasMiles) {
+      const currentMiles = currentMileage[interval.vehicle_id];
+      const lastPerformedMiles = Number(interval.last_performed_mileage);
+      
+      let left;
+      if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
+        const intervalMiles = Number(interval.interval_miles);
+        const milesSinceService = currentMiles - lastPerformedMiles;
+        left = intervalMiles - milesSinceService;
+      } else if (interval.next_due_mileage && currentMiles !== undefined) {
+        left = Number(interval.next_due_mileage) - currentMiles;
+      } else if (interval.next_due_mileage && lastPerformedMiles) {
+        left = Number(interval.next_due_mileage) - lastPerformedMiles;
+      }
+      
+      if (left !== undefined) {
+        if (left <= 0) return { label: `${Math.abs(left).toLocaleString()} mi overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
+        return { label: `${left.toLocaleString()} mi left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+      }
+      
+      if (interval.next_due_mileage) {
+        return { label: `Due at ${Number(interval.next_due_mileage).toLocaleString()} mi`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
+      }
     }
 
     // Time remaining
