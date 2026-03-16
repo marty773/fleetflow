@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalList from '../components/maintenance/IntervalList';
+import AIIntervalGenerator from '../components/maintenance/AIIntervalGenerator';
 import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 import BillDetailDialog from '../components/dialogs/BillDetailDialog';
