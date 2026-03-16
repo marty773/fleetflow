@@ -361,6 +361,7 @@ export default function Maintenance() {
           <IntervalDetailDialog
             interval={viewingInterval}
             vehicle={viewingInterval ? allVehicles.find(v => v.id === viewingInterval.vehicle_id) : null}
+            currentMileage={motiveVehicles}
             onClose={() => setViewingInterval(null)}
             onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
           />
