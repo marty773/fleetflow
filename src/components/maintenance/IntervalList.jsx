@@ -8,7 +8,27 @@ import { useServiceTypes } from '@/components/useServiceTypes';
 
 export default function IntervalList({ intervals, vehicles, onEdit, onDelete, onMarkComplete, onView, isDeleting, reminderMiles = 1000 }) {
   const serviceTypes = useServiceTypes(null, 'records');
-  const [expandedVehicles, setExpandedVehicles] = useState(new Set(vehicles.map(v => v.id)));
+
+  // Only expand vehicles that have at least one interval due/overdue/urgent within the reminder threshold
+  const getInitialExpanded = () => {
+    const expanded = new Set();
+    for (const interval of intervals) {
+      const vid = interval.vehicle_id || '__none__';
+      const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+      const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+      if (hasMiles && interval.next_due_mileage && interval.last_performed_mileage) {
+        const milesLeft = Number(interval.next_due_mileage) - Number(interval.last_performed_mileage);
+        if (milesLeft <= reminderMiles) expanded.add(vid);
+      } else if (hasMonths && interval.next_due_date) {
+        const thresholdDays = Math.max(30, Math.round(reminderMiles / 200));
+        const days = Math.ceil((new Date(interval.next_due_date) - new Date()) / (1000 * 60 * 60 * 24));
+        if (days <= thresholdDays) expanded.add(vid);
+      }
+    }
+    return expanded;
+  };
+
+  const [expandedVehicles, setExpandedVehicles] = useState(getInitialExpanded);
 
   const vehicleMap = vehicles.reduce((acc, v) => { acc[v.id] = v; return acc; }, {});
 
