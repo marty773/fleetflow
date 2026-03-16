@@ -119,7 +119,6 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
     const result = await base44.functions.invoke('generateMaintenanceIntervals', {
       vehicle_id: vehicleId || null,
       make, model, year,
-      schedule_type: scheduleType,
       file_url: fileUrl || null,
     });
     const generated = result.data?.intervals || [];
