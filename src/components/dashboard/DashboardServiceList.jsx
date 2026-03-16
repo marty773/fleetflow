@@ -40,7 +40,7 @@ export default function DashboardServiceList({ title, intervals, vehicles, curre
     }
 
     // Time remaining
-    if (interval.next_due_date) {
+    if (hasMonths && interval.next_due_date) {
       const days = differenceInDays(new Date(interval.next_due_date), new Date());
       if (days < 0) return { label: `${Math.abs(days)}d overdue`, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' };
       if (days === 0) return { label: 'Due today', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300' };
