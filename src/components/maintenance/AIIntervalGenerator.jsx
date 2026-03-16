@@ -366,6 +366,24 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                 </div>
               </div>
 
+              {/* Engine Type */}
+              <div>
+                <Label className="text-slate-700 dark:text-slate-300">Engine Type</Label>
+                <div className="flex gap-2 mt-2">
+                  {[{val: 'gas', label: 'Gas'}, {val: 'diesel', label: 'Diesel'}, {val: '', label: 'Unknown'}].map(opt => (
+                    <button
+                      key={opt.val}
+                      type="button"
+                      onClick={() => setEngineType(opt.val)}
+                      className={`px-4 py-2 rounded-md border text-sm font-medium transition-colors ${engineType === opt.val ? 'bg-amber-500 border-amber-500 text-white' : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Diesel and gas engines have different service requirements.</p>
+              </div>
+
               {/* Severe Service Toggle */}
               <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
                 <div>
