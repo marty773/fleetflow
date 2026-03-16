@@ -213,9 +213,6 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                       className="px-4 py-3 bg-white dark:bg-slate-900 flex items-center gap-3 flex-wrap md:flex-nowrap cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                       onClick={() => onView && onView(interval)}
                     >
-                      {/* Status icon */}
-                      <StatusIcon className={`w-4 h-4 shrink-0 ${status.color}`} />
-
                       {/* Name + type badge */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -223,12 +220,6 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                           <Badge className={`text-xs ${getTypeColor(interval.maintenance_type)}`}>
                             {getTypeLabel(interval.maintenance_type)}
                           </Badge>
-                          {(interval.linked_record_id || interval.linked_bill_id) && (
-                            <span className="flex gap-1">
-                              {interval.linked_record_id && <FileText className="w-3 h-3 text-blue-400" title="Maintenance record linked" />}
-                              {interval.linked_bill_id && <Receipt className="w-3 h-3 text-purple-400" title="Bill linked" />}
-                            </span>
-                          )}
                         </div>
                         {interval.last_performed_date && (
                           <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
