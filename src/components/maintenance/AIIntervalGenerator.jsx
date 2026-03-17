@@ -578,6 +578,17 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                             <Label className="text-xs text-slate-500">Notes</Label>
                             <Textarea value={editDraft.notes} onChange={e => setEditDraft(d => ({ ...d, notes: e.target.value }))} className="text-xs mt-0.5 min-h-[60px]" placeholder="Notes (manufacturer note will be removed on save)" />
                           </div>
+                          {intervals[i]._matched_record_title && (
+                            <div
+                              className={`flex items-center gap-2 p-2 rounded border text-xs cursor-pointer select-none transition-colors ${editDraft.keep_record_link === false ? 'border-red-300 bg-red-50 dark:bg-red-900/20 text-red-700' : 'border-green-300 bg-green-50 dark:bg-green-900/20 text-green-700'}`}
+                              onClick={e => { e.stopPropagation(); setEditDraft(d => ({ ...d, keep_record_link: d.keep_record_link === false ? true : false })); }}
+                            >
+                              {editDraft.keep_record_link === false
+                                ? <><Link2Off className="w-3 h-3 shrink-0" /> <span>Record link removed — will not pre-fill last performed date/mileage</span></>
+                                : <><Check className="w-3 h-3 shrink-0" /> <span>Linked to: <strong>{intervals[i]._matched_record_title}</strong> — click to unlink</span></>
+                              }
+                            </div>
+                          )}
                           <div className="flex gap-2 pt-1">
                             <Button size="sm" className="h-7 text-xs bg-blue-600 hover:bg-blue-700" onClick={(e) => handleSaveEdit(e, i)}>Save</Button>
                             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleCancelEdit}>Cancel</Button>
