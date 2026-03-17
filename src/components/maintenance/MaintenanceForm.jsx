@@ -113,6 +113,28 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
   const [vendorSearchOpen, setVendorSearchOpen] = useState(false);
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
 
+  // Auto-fill odometer from Motive when vehicle changes (new records only, trucks only)
+  useEffect(() => {
+    if (record) return; // Don't override when editing
+    const vehicle = vehicles.find(v => v.id === formData.vehicle_id);
+    if (!vehicle || vehicle.type !== 'truck') return;
+
+    setLoadingOdometer(true);
+    base44.functions.invoke('fetchMotiveVehicleData', {})
+      .then(result => {
+        if (result.data?.success && result.data?.vehicles) {
+          const match = result.data.vehicles.find(
+            mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
+          );
+          if (match?.odometer) {
+            setFormData(prev => ({ ...prev, odometer_reading: String(Math.round(Number(match.odometer))) }));
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOdometer(false));
+  }, [formData.vehicle_id]);
+
   // Update form data when record prop changes (important for editing)
   React.useEffect(() => {
     if (record) {
