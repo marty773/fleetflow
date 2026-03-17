@@ -79,20 +79,7 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
             </div>
           )}
 
-          {(interval.linked_record_id || interval.linked_bill_id) && (
-            <div className="flex gap-2 flex-wrap pt-1">
-              {interval.linked_record_id && (
-                <Badge variant="outline" className="gap-1 text-blue-700 border-blue-300 bg-blue-50">
-                  <FileText className="w-3 h-3" /> Maintenance Record Linked
-                </Badge>
-              )}
-              {interval.linked_bill_id && (
-                <Badge variant="outline" className="gap-1 text-purple-700 border-purple-300 bg-purple-50">
-                  <Receipt className="w-3 h-3" /> Bill Linked
-                </Badge>
-              )}
-            </div>
-          )}
+
         </div>
 
         <div className="flex justify-end gap-2 mt-4">
