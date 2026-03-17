@@ -52,6 +52,12 @@ export default function Maintenance() {
   const [deletingRecord, setDeletingRecord] = useState(null);
   const [completingInterval, setCompletingInterval] = useState(null);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+
+  // History tab filter state (lifted from MaintenanceList)
+  const [vehicleFilter, setVehicleFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [search, setSearch] = useState('');
+  const [vehicleOpen, setVehicleOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
