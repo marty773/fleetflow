@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { format, parseISO } from 'date-fns';
-import { Camera, ChevronRight } from 'lucide-react';
+import { format } from 'date-fns';
+import { Camera, ChevronRight, Link2 } from 'lucide-react';
 
-export default function BillList({ bills, vehicles, items, onView, onEdit, onDelete, isDeleting }) {
+export default function BillList({ bills, vehicles, items, records = [], onView, onEdit, onDelete, isDeleting }) {
   const categoryColors = {
      fuel: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
      maintenance: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
