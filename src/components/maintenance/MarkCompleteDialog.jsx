@@ -42,6 +42,7 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
   const [billVendor, setBillVendor] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingOdometer, setLoadingOdometer] = useState(false);
 
   useEffect(() => {
     if (interval) {
@@ -59,6 +60,25 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
       setAttachBill(false);
       setBillAmount('');
       setBillVendor('');
+
+      // Auto-fill odometer from Motive for trucks
+      const vehicle = vehicles.find(v => v.id === interval.vehicle_id);
+      if (vehicle?.type === 'truck') {
+        setLoadingOdometer(true);
+        base44.functions.invoke('fetchMotiveVehicleData', {})
+          .then(result => {
+            if (result.data?.success && result.data?.vehicles) {
+              const match = result.data.vehicles.find(
+                mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
+              );
+              if (match?.odometer) {
+                setOdometer(String(Math.round(Number(match.odometer))));
+              }
+            }
+          })
+          .catch(() => {})
+          .finally(() => setLoadingOdometer(false));
+      }
     }
   }, [interval?.id]);
 
