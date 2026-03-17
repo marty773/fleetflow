@@ -13,7 +13,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { format } from 'date-fns';
-import { CheckCircle2, Plus, Trash2, Edit, Package, Check, ChevronsUpDown } from 'lucide-react';
+import { CheckCircle2, Plus, Trash2, Edit, Package, Check, ChevronsUpDown, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
