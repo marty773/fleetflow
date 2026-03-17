@@ -346,15 +346,6 @@ export default function Maintenance() {
           </TabsContent>
 
           <TabsContent value="history" className="mt-6">
-            <div className="mb-6">
-              <Button
-                onClick={() => navigate('/MaintenanceRecordFormPage')}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Log Maintenance
-              </Button>
-            </div>
-
             <MaintenanceList
               records={records}
               vehicles={vehicles}
