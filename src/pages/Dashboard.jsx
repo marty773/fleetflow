@@ -161,12 +161,14 @@ export default function Dashboard() {
       const newRecord = await base44.entities.MaintenanceRecord.create({
         vehicle_id: interval.vehicle_id,
         title: data.new_record.title || interval.interval_name,
-        maintenance_type: interval.maintenance_type || 'other',
+        maintenance_type: data.new_record.maintenance_type || interval.maintenance_type || 'other',
         performed_date: data.performed_date,
         vendor: data.new_record.vendor || undefined,
         odometer_reading: data.odometer ? String(data.odometer) : undefined,
         total_cost: data.new_record.total_cost || undefined,
         notes: data.new_record.notes || undefined,
+        work_items: data.new_record.work_items?.length ? data.new_record.work_items : undefined,
+        parts_used: data.new_record.parts_used?.length ? data.new_record.parts_used : undefined,
         company_id: interval.company_id,
         linked_bill_id: billId || undefined,
       });
