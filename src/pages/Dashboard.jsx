@@ -108,16 +108,6 @@ export default function Dashboard() {
     return false;
   };
 
-  const calculateStats = () => {
-    return {
-      totalVehicles: vehicles.length,
-      overdueServices: maintenanceIntervals.filter(isIntervalOverdue).length,
-      upcomingMaintenance: maintenanceIntervals.filter(i => isIntervalUpcoming(i) && !isIntervalOverdue(i)).length,
-    };
-  };
-
-  const stats = calculateStats();
-
   const isIntervalOverdue = (interval) => {
     const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
     const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
