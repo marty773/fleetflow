@@ -75,7 +75,7 @@ export default function Bills() {
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       // Find the bill being deleted
-      const billToDelete = allBills.find(b => b.id === id);
+      const billToDelete = bills.find(b => b.id === id);
       
       if (billToDelete) {
         // Reverse inventory changes
