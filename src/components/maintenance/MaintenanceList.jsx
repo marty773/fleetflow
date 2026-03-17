@@ -63,56 +63,6 @@ export default function MaintenanceList({ records, vehicles, items, bills = [], 
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
-        {/* Searchable vehicle dropdown */}
-        <Popover open={vehicleOpen} onOpenChange={setVehicleOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" className="w-56 justify-between font-normal">
-              <span className="truncate">
-                {selectedVehicle ? selectedVehicle.name : 'All Vehicles'}
-              </span>
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-72 p-0" align="start">
-            <Command>
-              <CommandInput placeholder="Search vehicles..." />
-              <CommandEmpty>No vehicles found.</CommandEmpty>
-              <CommandGroup>
-                <CommandItem value="all" onSelect={() => { setVehicleFilter('all'); setVehicleOpen(false); }}>
-                  <Check className={cn('mr-2 h-4 w-4', vehicleFilter === 'all' ? 'opacity-100' : 'opacity-0')} />
-                  All Vehicles
-                </CommandItem>
-                {vehicles.map(v => (
-                  <CommandItem key={v.id} value={`${v.name} ${v.year} ${v.make} ${v.model}`} onSelect={() => { setVehicleFilter(v.id); setVehicleOpen(false); }}>
-                    <Check className={cn('mr-2 h-4 w-4', vehicleFilter === v.id ? 'opacity-100' : 'opacity-0')} />
-                    {v.name} — {v.year} {v.make} {v.model}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
-
-        <Select value={sortOrder} onValueChange={setSortOrder}>
-          <SelectTrigger className="w-44">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="desc">Newest First</SelectItem>
-            <SelectItem value="asc">Oldest First</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Input
-          placeholder="Search records..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-52"
-        />
-      </div>
-
       {filteredRecords.length === 0 && (
         <Card className="border-2 border-dashed dark:border-slate-700">
           <CardContent className="p-12 text-center">
