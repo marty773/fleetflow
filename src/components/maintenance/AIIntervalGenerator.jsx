@@ -71,7 +71,7 @@ function diffSummary(aiInterval, existing) {
   return lines;
 }
 
-export default function AIIntervalGenerator({ vehicles, existingIntervals = [], open, onClose, onCreated }) {
+export default function AIIntervalGenerator({ vehicles, existingIntervals = [], records = [], open, onClose, onCreated }) {
   const [step, setStep] = useState('input');
   const [vehicleId, setVehicleId] = useState('');
   const [make, setMake] = useState('');
