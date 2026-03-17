@@ -1,12 +1,15 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
-import { Eye, Edit2, Trash2, Wrench } from 'lucide-react';
+import { Wrench, Link2 } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
-export default function MaintenanceList({ records, vehicles, items, onView, onEdit, onDelete, isDeleting }) {
+export default function MaintenanceList({ records, vehicles, items, bills = [], onView, onEdit, onDelete, isDeleting }) {
+  const [vehicleFilter, setVehicleFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('desc');
   const serviceTypes = useServiceTypes(null, 'records');
 
   const vehicleMap = vehicles.reduce((acc, v) => {
