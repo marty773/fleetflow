@@ -345,6 +345,7 @@ export default function Maintenance() {
           <AIIntervalGenerator
             vehicles={vehicles}
             existingIntervals={intervals}
+            records={records}
             open={showAIGenerator}
             onClose={() => setShowAIGenerator(false)}
             onCreated={() => queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] })}
