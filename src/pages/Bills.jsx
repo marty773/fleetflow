@@ -25,6 +25,7 @@ import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceReco
 export default function Bills() {
   const navigate = useNavigate();
   const [viewingBill, setViewingBill] = useState(null);
+  const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
   const [deletingBill, setDeletingBill] = useState(null);
   const queryClient = useQueryClient();
@@ -187,6 +188,22 @@ export default function Bills() {
             setDeletingBill(bills.find(b => b.id === id));
           }}
           onViewPhoto={() => setViewingBill(null)}
+          onViewRecord={(record) => setViewingRecord(record)}
+        />
+
+        {/* View Maintenance Record Dialog */}
+        <MaintenanceRecordDetailDialog
+          record={viewingRecord}
+          vehicles={vehicles}
+          items={filteredItems}
+          bills={bills}
+          intervals={[]}
+          onClose={() => setViewingRecord(null)}
+          onEdit={(record) => {
+            setViewingRecord(null);
+            navigate(`/MaintenanceRecordFormPage?edit=${record.id}`);
+          }}
+          onViewBill={(bill) => { setViewingRecord(null); setViewingBill(bill); }}
         />
 
         {/* Delete Confirmation Dialog */}
