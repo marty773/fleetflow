@@ -301,6 +301,7 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
     setIntervals([]);
     setSelected(new Set());
     setExpandedNotes(new Set());
+    setExpandedMatchedRecord(new Set());
     setUpdateQueue([]);
     setCurrentConfirm(null);
     setEditingIndex(null);
