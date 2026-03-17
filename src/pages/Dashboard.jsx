@@ -280,6 +280,12 @@ export default function Dashboard() {
                   <span className="font-medium text-slate-900 dark:text-white text-right">{format(new Date(selectedInterval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy')}</span>
                 </div>
               )}
+              {selectedInterval.last_performed_mileage && (
+                <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="text-slate-500 dark:text-slate-400">Last Performed Mileage</span>
+                  <span className="font-medium text-slate-900 dark:text-white text-right">{Number(selectedInterval.last_performed_mileage).toLocaleString()} mi</span>
+                </div>
+              )}
 
               {motiveVehicles[selectedInterval.vehicle_id] !== undefined && (
                 <div className="flex justify-between items-start gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
