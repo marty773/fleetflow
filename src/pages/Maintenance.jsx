@@ -278,41 +278,59 @@ export default function Maintenance() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
-            <TabsTrigger value="upcoming" className="flex items-center gap-2">
-              Upcoming
-              {upcomingCount > 0 && (
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold">
-                  {upcomingCount}
-                </span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b dark:border-slate-800">
+            <TabsList className="bg-white dark:bg-slate-950 rounded-none border-0 h-auto">
+              <TabsTrigger value="upcoming" className="flex items-center gap-2">
+                Upcoming
+                {upcomingCount > 0 && (
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold">
+                    {upcomingCount}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="history">History</TabsTrigger>
+            </TabsList>
+            <div className="flex flex-wrap gap-2 pb-2 sm:pb-0 justify-end">
+              {activeTab === 'upcoming' && (
+                <>
+                  <Button
+                    onClick={handleSyncAll}
+                    variant="outline"
+                    size="sm"
+                    className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                  >
+                    Sync to Calendar
+                  </Button>
+                  <Button
+                    onClick={() => setShowAIGenerator(true)}
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-400 text-amber-700 hover:bg-amber-50 gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" /> AI Generate
+                  </Button>
+                  <Button
+                    onClick={() => navigate('/MaintenanceIntervalFormPage')}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="w-4 h-4 mr-1" /> Create Interval
+                  </Button>
+                </>
               )}
-            </TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-          </TabsList>
+              {activeTab === 'history' && (
+                <Button
+                  onClick={() => navigate('/MaintenanceRecordFormPage')}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Log Maintenance
+                </Button>
+              )}
+            </div>
+          </div>
 
           <TabsContent value="upcoming" className="mt-6">
-            <div className="flex flex-col lg:flex-row justify-end gap-2 mb-6">
-              <Button
-                onClick={handleSyncAll}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                Sync All to Google Calendar
-              </Button>
-              <Button
-                onClick={() => setShowAIGenerator(true)}
-                variant="outline"
-                className="border-amber-400 text-amber-700 hover:bg-amber-50 gap-2"
-              >
-                <Sparkles className="w-4 h-4" /> AI Generate Schedule
-              </Button>
-              <Button
-                onClick={() => navigate('/MaintenanceIntervalFormPage')}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Create Interval
-              </Button>
-            </div>
 
             <IntervalList
               intervals={intervals}
