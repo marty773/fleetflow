@@ -109,14 +109,10 @@ export default function Dashboard() {
   };
 
   const calculateStats = () => {
-    const overdueIntervals = maintenanceIntervals.filter(
-      interval => interval.next_due_date && new Date(interval.next_due_date) < new Date()
-    ).length;
-
     return {
       totalVehicles: vehicles.length,
-      overdueServices: overdueIntervals,
-      upcomingMaintenance: maintenanceIntervals.filter(isIntervalUpcoming).length,
+      overdueServices: maintenanceIntervals.filter(isIntervalOverdue).length,
+      upcomingMaintenance: maintenanceIntervals.filter(i => isIntervalUpcoming(i) && !isIntervalOverdue(i)).length,
     };
   };
 
