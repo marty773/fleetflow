@@ -61,6 +61,7 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
       .finally(() => setLoadingOdometer(false));
   };
 
+  // Reset form when interval changes
   useEffect(() => {
     if (interval) {
       setPerformedDate(new Date().toISOString().split('T')[0]);
@@ -77,27 +78,27 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
       setAttachBill(false);
       setBillAmount('');
       setBillVendor('');
-
-      // Auto-fill odometer from Motive for trucks
-      const vehicle = vehicles.find(v => v.id === interval.vehicle_id);
-      if (vehicle?.type === 'truck') {
-        setLoadingOdometer(true);
-        base44.functions.invoke('fetchMotiveVehicleData', {})
-          .then(result => {
-            if (result.data?.success && result.data?.vehicles) {
-              const match = result.data.vehicles.find(
-                mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
-              );
-              if (match?.odometer) {
-                setOdometer(String(Math.round(Number(match.odometer))));
-              }
-            }
-          })
-          .catch(() => {})
-          .finally(() => setLoadingOdometer(false));
-      }
     }
   }, [interval?.id]);
+
+  // Auto-fill odometer from Motive when interval opens (runs when both interval and vehicles are ready)
+  useEffect(() => {
+    if (!interval) return;
+    const vehicle = vehicles.find(v => v.id === interval.vehicle_id);
+    if (!vehicle || vehicle.type !== 'truck') return;
+    setLoadingOdometer(true);
+    base44.functions.invoke('fetchMotiveVehicleData', {})
+      .then(result => {
+        if (result.data?.success && result.data?.vehicles) {
+          const match = result.data.vehicles.find(
+            mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
+          );
+          if (match?.odometer) setOdometer(String(Math.round(Number(match.odometer))));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOdometer(false));
+  }, [interval?.id, vehicles.length]);
 
   if (!interval) return null;
 
