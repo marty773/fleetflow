@@ -27,7 +27,9 @@ export default function BillList({ bills, vehicles, items, records = [], onView,
 
   return (
     <div className="space-y-3">
-      {bills.map((bill) => (
+      {bills.map((bill) => {
+        const linkedRecord = records.find(r => r.linked_bill_id === bill.id);
+        return (
         <Card 
           key={bill.id} 
           className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
@@ -36,12 +38,17 @@ export default function BillList({ bills, vehicles, items, records = [], onView,
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                 <div className="flex items-center gap-2 mb-1">
+                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                    <p className="font-semibold text-slate-900 dark:text-white">
                      {bill.bill_number || 'No Invoice #'}
                    </p>
                    {bill.photo_url && (
                      <Camera className="w-4 h-4 text-amber-600" />
+                   )}
+                   {linkedRecord && (
+                     <Badge variant="outline" className="gap-1 text-blue-700 border-blue-300 bg-blue-50 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-700 text-xs">
+                       <Link2 className="w-3 h-3" /> Linked Record
+                     </Badge>
                    )}
                  </div>
                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">{bill.vendor}</p>
