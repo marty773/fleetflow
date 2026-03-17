@@ -1,21 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { Wrench, Link2, ChevronsUpDown, Check } from 'lucide-react';
+import { Wrench, Link2 } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
-import { cn } from '@/lib/utils';
 
-export default function MaintenanceList({ records, vehicles, items, bills = [], onView, onEdit, onDelete, isDeleting }) {
-  const [vehicleFilter, setVehicleFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [search, setSearch] = useState('');
-  const [vehicleOpen, setVehicleOpen] = useState(false);
+export default function MaintenanceList({ records, vehicles, items, bills = [], vehicleFilter = 'all', sortOrder = 'desc', search = '', onView, onEdit, onDelete, isDeleting }) {
   const serviceTypes = useServiceTypes(null, 'records');
 
   const vehicleMap = vehicles.reduce((acc, v) => {
