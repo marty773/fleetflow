@@ -610,10 +610,38 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
                             {item.interval_miles && <span>Every {Number(item.interval_miles).toLocaleString()} mi</span>}
                           </div>
                           {item._matched_record_title && (
-                            <div className="mt-1 text-xs text-green-700 dark:text-green-400 flex items-center gap-1">
-                              <Check className="w-3 h-3 shrink-0" />
-                              Seeded from: <span className="font-medium">{item._matched_record_title}</span>
-                              {item.last_performed_date && <span className="text-slate-400 ml-1">({item.last_performed_date}{item.last_performed_mileage ? ` · ${Number(item.last_performed_mileage).toLocaleString()} mi` : ''})</span>}
+                            <div className="mt-1 text-xs space-y-1">
+                              <div className="flex items-center gap-1 text-green-700 dark:text-green-400 flex-wrap">
+                                <Check className="w-3 h-3 shrink-0" />
+                                <span>Last completed:</span>
+                                <span className="font-medium">{item._matched_record_title}</span>
+                                {item.last_performed_date && <span className="text-slate-400">({item.last_performed_date}{item.last_performed_mileage ? ` · ${Number(item.last_performed_mileage).toLocaleString()} mi` : ''})</span>}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setExpandedMatchedRecord(prev => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n; }); }}
+                                  className="ml-1 text-green-600 hover:text-green-800 flex items-center gap-0.5 underline"
+                                >
+                                  <Eye className="w-3 h-3" />{expandedMatchedRecord.has(i) ? 'Hide' : 'View'}
+                                </button>
+                              </div>
+                              {expandedMatchedRecord.has(i) && (() => {
+                                const matchedRecords = records.filter(r =>
+                                  r.vehicle_id === item.vehicle_id &&
+                                  (r.id === item._matched_record_id ||
+                                    (r.title && r.title.toLowerCase().includes((item._matched_record_title || '').toLowerCase().substring(0, 10))))
+                                );
+                                return (
+                                  <div className="ml-4 p-2 rounded bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 space-y-1">
+                                    {matchedRecords.length > 0 ? matchedRecords.slice(0, 5).map(r => (
+                                      <div key={r.id} className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
+                                        <span className="font-medium">{r.title}</span>
+                                        <span className="text-slate-400">{r.performed_date}{r.odometer_reading ? ` · ${Number(r.odometer_reading).toLocaleString()} mi` : ''}</span>
+                                      </div>
+                                    )) : (
+                                      <p className="text-xs text-slate-400 italic">No matching records found in history.</p>
+                                    )}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           )}
                           {item._status === 'update' && item._existing && (
