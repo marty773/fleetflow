@@ -400,6 +400,14 @@ export default function Maintenance() {
             onViewRecord={(record) => { setViewingBill(null); setViewingRecord(record); }}
           />
 
+          {/* Sync Dialog */}
+          <SyncDialog
+            open={showSyncDialog}
+            onOpenChange={setShowSyncDialog}
+            onSync={handleSyncAll}
+            isLoading={isSyncing}
+          />
+
           {/* Delete Confirmation Dialog */}
           <AlertDialog open={!!deletingRecord} onOpenChange={() => setDeletingRecord(null)}>
             <AlertDialogContent>

@@ -251,16 +251,15 @@ export default function Calendar() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8 pt-14 lg:pt-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
             <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Maintenance Calendar</h1>
-                <p className="text-slate-600 dark:text-slate-400 mt-2">Schedule and track upcoming maintenance</p>
-              </div>
-            <div className="flex flex-wrap gap-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Maintenance Calendar</h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-2">Schedule and track upcoming maintenance</p>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-end">
               <Button
                 variant="outline"
                 onClick={() => setShowCompanySyncDialog(true)}
-                className="w-full sm:w-auto"
               >
                 <CalendarIcon className="w-4 h-4 mr-2" />
                 Sync to Google Calendar
@@ -270,7 +269,7 @@ export default function Calendar() {
                   setEditingAppointment(null);
                   setShowAppointmentForm(true);
                 }}
-                className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" /> New Appointment
               </Button>
