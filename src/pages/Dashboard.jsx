@@ -48,6 +48,11 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Vendor.list(),
   });
 
+  const { data: items = [] } = useQuery({
+    queryKey: ['items'],
+    queryFn: () => base44.entities.Item.list(),
+  });
+
   const reminderMiles = getServiceReminderMiles();
 
   // Fetch current vehicle mileage from Motive on mount
