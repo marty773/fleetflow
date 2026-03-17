@@ -113,6 +113,25 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
   const [vendorSearchOpen, setVendorSearchOpen] = useState(false);
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
 
+  const fetchOdometerFromMotive = () => {
+    const vehicle = vehicles.find(v => v.id === formData.vehicle_id);
+    if (!vehicle || vehicle.type !== 'truck') return;
+    setLoadingOdometer(true);
+    base44.functions.invoke('fetchMotiveVehicleData', {})
+      .then(result => {
+        if (result.data?.success && result.data?.vehicles) {
+          const match = result.data.vehicles.find(
+            mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
+          );
+          if (match?.odometer) {
+            setFormData(prev => ({ ...prev, odometer_reading: String(Math.round(Number(match.odometer))) }));
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOdometer(false));
+  };
+
   // Auto-fill odometer from Motive when vehicle changes (new records only, trucks only)
   useEffect(() => {
     if (record) return; // Don't override when editing
@@ -411,19 +430,35 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
               <Label htmlFor="odometer" className="flex items-center gap-1">
                 Odometer Reading
                 {loadingOdometer && <span className="text-xs text-slate-400 font-normal animate-pulse">fetching...</span>}
-                {!loadingOdometer && formData.odometer_reading && !record && vehicles.find(v => v.id === formData.vehicle_id)?.type === 'truck' && (
+                {!loadingOdometer && formData.odometer_reading && vehicles.find(v => v.id === formData.vehicle_id)?.type === 'truck' && (
                   <span className="text-xs text-green-600 font-normal">from Motive</span>
                 )}
               </Label>
-              <Input
-                id="odometer"
-                type="number"
-                placeholder={loadingOdometer ? 'Fetching...' : 'Miles'}
-                value={formData.odometer_reading}
-                onChange={(e) => handleChange('odometer_reading', e.target.value)}
-                className="mt-2 select-text"
-                disabled={loadingOdometer}
-              />
+              <div className="flex gap-2 mt-2">
+                <Input
+                  id="odometer"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={loadingOdometer ? 'Fetching...' : 'Miles'}
+                  value={formData.odometer_reading}
+                  onChange={(e) => handleChange('odometer_reading', e.target.value)}
+                  className="select-text"
+                  disabled={loadingOdometer}
+                />
+                {vehicles.find(v => v.id === formData.vehicle_id)?.type === 'truck' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={fetchOdometerFromMotive}
+                    disabled={loadingOdometer}
+                    title="Fetch current odometer from Motive"
+                    className="shrink-0"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${loadingOdometer ? 'animate-spin' : ''}`} />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
