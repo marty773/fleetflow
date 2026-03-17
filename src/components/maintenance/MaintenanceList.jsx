@@ -41,8 +41,6 @@ export default function MaintenanceList({ records, vehicles, items, bills = [], 
     );
   }
 
-  const selectedVehicle = vehicles.find(v => v.id === vehicleFilter);
-
   const filteredRecords = records
     .filter(r => vehicleFilter === 'all' || r.vehicle_id === vehicleFilter)
     .sort((a, b) => sortOrder === 'desc'
