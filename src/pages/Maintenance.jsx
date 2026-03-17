@@ -3,12 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus, Download, Sparkles, ChevronsUpDown, Check } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { Plus, Download, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -52,12 +47,6 @@ export default function Maintenance() {
   const [deletingRecord, setDeletingRecord] = useState(null);
   const [completingInterval, setCompletingInterval] = useState(null);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
-
-  // History tab filter state (lifted from MaintenanceList)
-  const [vehicleFilter, setVehicleFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [search, setSearch] = useState('');
-  const [vehicleOpen, setVehicleOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
@@ -309,8 +298,8 @@ export default function Maintenance() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 border-b dark:border-slate-800">
-            <TabsList className="bg-white dark:bg-slate-950 rounded-none border-0 h-auto shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b dark:border-slate-800">
+            <TabsList className="bg-white dark:bg-slate-950 rounded-none border-0 h-auto">
               <TabsTrigger value="upcoming" className="flex items-center gap-2">
                 Upcoming
                 {upcomingCount > 0 && (
@@ -322,56 +311,6 @@ export default function Maintenance() {
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
 
-            {/* History filters — shown inline on desktop */}
-            {activeTab === 'history' && (
-              <div className="hidden lg:flex items-center gap-2 pb-2">
-                <Popover open={vehicleOpen} onOpenChange={setVehicleOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" role="combobox" className="w-48 justify-between font-normal h-8 text-xs">
-                      <span className="truncate">
-                        {vehicles.find(v => v.id === vehicleFilter)?.name ?? 'All Vehicles'}
-                      </span>
-                      <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-72 p-0" align="start">
-                    <Command>
-                      <CommandInput placeholder="Search vehicles..." />
-                      <CommandEmpty>No vehicles found.</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem value="all" onSelect={() => { setVehicleFilter('all'); setVehicleOpen(false); }}>
-                          <Check className={cn('mr-2 h-4 w-4', vehicleFilter === 'all' ? 'opacity-100' : 'opacity-0')} />
-                          All Vehicles
-                        </CommandItem>
-                        {vehicles.map(v => (
-                          <CommandItem key={v.id} value={`${v.name} ${v.year} ${v.make} ${v.model}`} onSelect={() => { setVehicleFilter(v.id); setVehicleOpen(false); }}>
-                            <Check className={cn('mr-2 h-4 w-4', vehicleFilter === v.id ? 'opacity-100' : 'opacity-0')} />
-                            {v.name} — {v.year} {v.make} {v.model}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-
-                <Select value={sortOrder} onValueChange={setSortOrder}>
-                  <SelectTrigger className="w-36 h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="desc">Newest First</SelectItem>
-                    <SelectItem value="asc">Oldest First</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Input
-                  placeholder="Search..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="w-40 h-8 text-xs"
-                />
-              </div>
-            )}
           </div>
 
           <TabsContent value="upcoming" className="mt-6">
@@ -399,12 +338,6 @@ export default function Maintenance() {
               onEdit={(record) => navigate(`/MaintenanceRecordFormPage?edit=${record.id}`)}
               onDelete={(id) => deleteRecordMutation.mutate(id)}
               isDeleting={deleteRecordMutation.isPending}
-              vehicleFilter={vehicleFilter}
-              setVehicleFilter={setVehicleFilter}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-              search={search}
-              setSearch={setSearch}
             />
           </TabsContent>
           </Tabs>
