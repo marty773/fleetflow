@@ -440,65 +440,56 @@ export default function Calendar() {
                     ...upcomingAppointments.map(a => ({ ...a, type: 'appointment', sortDate: new Date(a.appointment_date + 'T12:00:00') }))
                   ].sort((a, b) => a.sortDate - b.sortDate);
 
-                  return items.length > 0 ? items.map(item => {
-                      if (item.type === 'appointment') {
-                        return (
-                          <div
-                            key={item.id}
-                            className="p-3 rounded-lg bg-indigo-100 border-l-4 border-indigo-500 cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => setSelectedDay(item.sortDate)}
-                          >
-                            <p className="font-semibold text-sm text-slate-900 mb-1">
-                              📅 {item.title}
-                            </p>
-                            <p className="text-xs text-slate-600 mb-2">
-                              {vehicleMap[item.vehicle_id]?.name}
-                            </p>
-                            <p className="text-xs text-slate-700">
-                              {format(new Date(item.appointment_date + 'T12:00:00'), 'MMM dd, yyyy')}
-                              {item.appointment_time && ` at ${item.appointment_time}`}
-                            </p>
-                            {item.location && (
-                              <p className="text-xs text-slate-600 mt-1">
-                                📍 {item.location}
-                              </p>
-                            )}
-                          </div>
-                        );
-                      } else {
-                        const status = getEventStatus(item);
-                        return (
-                          <div
-                            key={item.id}
-                            className={`p-3 rounded-lg ${statusColors[status]} cursor-pointer hover:opacity-80 transition-opacity`}
-                            onClick={() => setSelectedDay(item.sortDate)}
-                          >
-                            <p className="font-semibold text-sm text-slate-900 mb-1">
-                              {item.interval_name}
-                            </p>
-                            <p className="text-xs text-slate-600 mb-2">
-                              {vehicleMap[item.vehicle_id]?.name}
-                            </p>
-                            <p className="text-xs text-slate-700">
-                              {format(new Date((item.scheduled_date || item.next_due_date) + 'T12:00:00'), 'MMM dd, yyyy')}
-                              {item.scheduled_date && <span className="ml-1 text-blue-600">📌</span>}
-                            </p>
-                            {status === 'overdue' && (
-                              <div className="flex items-center gap-1 mt-1 text-red-600">
-                                <AlertCircle className="w-3 h-3" />
-                                <span className="text-xs font-semibold">Overdue</span>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
-                    })
-                  ) : (
-                    <div className="text-center py-6">
-                      <Wrench className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-                      <p className="text-sm text-slate-500 dark:text-slate-400">No services in the next 30 days</p>
-                    </div>
-                  );
+                  if (items.length === 0) {
+                    return (
+                      <div className="text-center py-6">
+                        <Wrench className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                        <p className="text-sm text-slate-500 dark:text-slate-400">No services in the next 30 days</p>
+                      </div>
+                    );
+                  }
+
+                  return items.map(item => {
+                    if (item.type === 'appointment') {
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-3 rounded-lg bg-indigo-100 border-l-4 border-indigo-500 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setSelectedDay(item.sortDate)}
+                        >
+                          <p className="font-semibold text-sm text-slate-900 mb-1">📅 {item.title}</p>
+                          <p className="text-xs text-slate-600 mb-2">{vehicleMap[item.vehicle_id]?.name}</p>
+                          <p className="text-xs text-slate-700">
+                            {format(new Date(item.appointment_date + 'T12:00:00'), 'MMM dd, yyyy')}
+                            {item.appointment_time && ` at ${item.appointment_time}`}
+                          </p>
+                          {item.location && <p className="text-xs text-slate-600 mt-1">📍 {item.location}</p>}
+                        </div>
+                      );
+                    } else {
+                      const status = getEventStatus(item);
+                      return (
+                        <div
+                          key={item.id}
+                          className={`p-3 rounded-lg ${statusColors[status]} cursor-pointer hover:opacity-80 transition-opacity`}
+                          onClick={() => setSelectedDay(item.sortDate)}
+                        >
+                          <p className="font-semibold text-sm text-slate-900 mb-1">{item.interval_name}</p>
+                          <p className="text-xs text-slate-600 mb-2">{vehicleMap[item.vehicle_id]?.name}</p>
+                          <p className="text-xs text-slate-700">
+                            {format(new Date((item.scheduled_date || item.next_due_date) + 'T12:00:00'), 'MMM dd, yyyy')}
+                            {item.scheduled_date && <span className="ml-1 text-blue-600">📌</span>}
+                          </p>
+                          {status === 'overdue' && (
+                            <div className="flex items-center gap-1 mt-1 text-red-600">
+                              <AlertCircle className="w-3 h-3" />
+                              <span className="text-xs font-semibold">Overdue</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                  });
                 })()}
               </CardContent>
             </Card>
