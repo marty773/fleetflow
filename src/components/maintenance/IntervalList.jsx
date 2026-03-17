@@ -157,8 +157,10 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
       if (days === 0) return 'Due today';
       if (days < 30) return `${days}d left`;
       const months = Math.round(days / 30);
-      return `~${months} mo left`;
+      return `${months} mo left`;
     }
+    // Time-only interval with no next_due_date yet — show nothing
+    if (hasMonths && !interval.next_due_date) return null;
 
     return null;
   };
