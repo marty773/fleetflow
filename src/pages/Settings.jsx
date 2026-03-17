@@ -14,6 +14,10 @@ import ServiceReminderSettings from '@/components/settings/ServiceReminderSettin
 export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const appId = window.location.hostname.includes('localhost') 
+    ? window.location.pathname.split('/')[1] 
+    : window.location.pathname.match(/apps\/([^/]+)/)?.[1] || new URLSearchParams(window.location.search).get('app_id') || window.__APP_ID__ || 'See URL bar';
   const [isDeleting, setIsDeleting] = useState(false);
   const [notifSettings, setNotifSettings] = useState(null);
   const [notifSettingsId, setNotifSettingsId] = useState(null);
