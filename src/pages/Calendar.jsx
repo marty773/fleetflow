@@ -409,13 +409,38 @@ export default function Calendar() {
                 <CardTitle className="text-lg text-slate-900 dark:text-white">Upcoming Services</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-3 max-h-[70vh] overflow-y-auto">
-                {(filteredIntervals.filter(i => i.next_due_date).length > 0 || filteredAppointments.length > 0) ? (
-                  [
-                    ...filteredIntervals.filter(i => i.next_due_date || i.scheduled_date).map(i => ({ ...i, type: 'interval', sortDate: new Date((i.scheduled_date || i.next_due_date) + 'T12:00:00') })),
-                    ...filteredAppointments.map(a => ({ ...a, type: 'appointment', sortDate: new Date(a.appointment_date) }))
-                  ]
-                    .sort((a, b) => a.sortDate - b.sortDate)
-                    .map(item => {
+                {(() => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const in30Days = new Date(today);
+                  in30Days.setDate(in30Days.getDate() + 30);
+
+                  // An interval is "done" if it was completed (has linked_record_id or last_performed_date is today or later relative to its due date)
+                  const completedIntervalIds = new Set(
+                    filteredRecords.map(r => r.linked_interval_id).filter(Boolean)
+                  );
+
+                  const upcomingIntervals = filteredIntervals.filter(i => {
+                    if (completedIntervalIds.has(i.id)) return false;
+                    // Also skip if linked_record_id is set (marked complete via mark-complete flow)
+                    if (i.linked_record_id) return false;
+                    const calDate = i.scheduled_date || i.next_due_date;
+                    if (!calDate) return false;
+                    const d = new Date(calDate + 'T12:00:00');
+                    return d <= in30Days; // show overdue + within 30 days
+                  });
+
+                  const upcomingAppointments = filteredAppointments.filter(a => {
+                    const d = new Date(a.appointment_date + 'T12:00:00');
+                    return d >= today && d <= in30Days;
+                  });
+
+                  const items = [
+                    ...upcomingIntervals.map(i => ({ ...i, type: 'interval', sortDate: new Date((i.scheduled_date || i.next_due_date) + 'T12:00:00') })),
+                    ...upcomingAppointments.map(a => ({ ...a, type: 'appointment', sortDate: new Date(a.appointment_date + 'T12:00:00') }))
+                  ].sort((a, b) => a.sortDate - b.sortDate);
+
+                  return items.length > 0 ? items.map(item => {
                       if (item.type === 'appointment') {
                         return (
                           <div
