@@ -408,14 +408,21 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
             </div>
 
             <div>
-              <Label htmlFor="odometer">Odometer Reading</Label>
+              <Label htmlFor="odometer" className="flex items-center gap-1">
+                Odometer Reading
+                {loadingOdometer && <span className="text-xs text-slate-400 font-normal animate-pulse">fetching...</span>}
+                {!loadingOdometer && formData.odometer_reading && !record && vehicles.find(v => v.id === formData.vehicle_id)?.type === 'truck' && (
+                  <span className="text-xs text-green-600 font-normal">from Motive</span>
+                )}
+              </Label>
               <Input
                 id="odometer"
                 type="number"
-                placeholder="Miles"
+                placeholder={loadingOdometer ? 'Fetching...' : 'Miles'}
                 value={formData.odometer_reading}
                 onChange={(e) => handleChange('odometer_reading', e.target.value)}
                 className="mt-2 select-text"
+                disabled={loadingOdometer}
               />
             </div>
           </div>
