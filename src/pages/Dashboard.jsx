@@ -219,12 +219,31 @@ export default function Dashboard() {
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">Fleet Dashboard</h1>
           <p className="text-slate-600 dark:text-slate-400">Manage your truck and trailer fleet</p>
         </div>
+        <div className="hidden sm:flex flex-wrap gap-2 shrink-0">
+          <Button
+            onClick={() => navigate('/BillFormPage')}
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+          >
+            <Plus className="w-4 h-4 mr-2" /> New Bill
+          </Button>
+          <Button
+            onClick={() => navigate('/MaintenanceRecordFormPage')}
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+          >
+            <Plus className="w-4 h-4 mr-2" /> New Maintenance
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
+      {/* Mobile-only buttons */}
+      <div className="flex sm:hidden flex-wrap gap-2 mb-8">
         <Button
           onClick={() => navigate('/BillFormPage')}
-          className="flex-1 sm:flex-none"
+          className="flex-1"
           style={{ backgroundColor: 'var(--color-primary)' }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
@@ -233,7 +252,7 @@ export default function Dashboard() {
         </Button>
         <Button
           onClick={() => navigate('/MaintenanceRecordFormPage')}
-          className="flex-1 sm:flex-none"
+          className="flex-1"
           style={{ backgroundColor: 'var(--color-primary)' }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
