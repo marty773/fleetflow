@@ -18,6 +18,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalList from '../components/maintenance/IntervalList';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { ChevronsUpDown, Check } from 'lucide-react';
 import AIIntervalGenerator from '../components/maintenance/AIIntervalGenerator';
 import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
 import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
