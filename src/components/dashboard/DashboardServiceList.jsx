@@ -47,7 +47,7 @@ export default function DashboardServiceList({ title, intervals, vehicles, curre
       if (days <= 7) return { label: `${days}d left`, color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300' };
       if (days < 30) return { label: `${days}d left`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' };
       const months = Math.round(days / 30);
-      return { label: `~${months} mo left`, color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' };
+      return { label: `${months} mo left`, color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' };
     }
 
     return { label: 'Scheduled', color: 'bg-slate-100 text-slate-800' };
