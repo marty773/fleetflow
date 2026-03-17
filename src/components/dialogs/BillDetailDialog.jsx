@@ -127,10 +127,10 @@ export default function BillDetailDialog({ bill, vehicles = [], records = [], on
             const linkedRecord = records.find(r => r.linked_bill_id === bill.id);
             return linkedRecord ? (
               <button
-                onClick={() => {
-                  onClose();
-                  onViewRecord?.(linkedRecord);
-                }}
+              onClick={() => {
+                onViewRecord?.(linkedRecord);
+                onClose();
+              }}
                 className="w-full text-left flex items-start gap-2 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
               >
                 <Wrench className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
