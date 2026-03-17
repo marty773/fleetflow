@@ -26,7 +26,7 @@ function VehicleRow({ motiveVehicle, localVehicle, isSelected, isExpanded, onCli
   const {
     speed, lat, lon, located_at, odometer, fuel_level,
     fault_codes = [], current_driver, status, number, description,
-    vin, license_plate, heading
+    vin, license_plate, heading, location_type
   } = motiveVehicle;
 
   const name = localVehicle?.name || number || `Vehicle ${motiveVehicle.motive_id}`;
