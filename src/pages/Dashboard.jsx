@@ -131,6 +131,16 @@ export default function Dashboard() {
     return false;
   };
 
+  const calculateStats = () => {
+    return {
+      totalVehicles: vehicles.length,
+      overdueServices: maintenanceIntervals.filter(isIntervalOverdue).length,
+      upcomingMaintenance: maintenanceIntervals.filter(i => isIntervalUpcoming(i) && !isIntervalOverdue(i)).length,
+    };
+  };
+
+  const stats = calculateStats();
+
   const overdueIntervals = maintenanceIntervals.filter(isIntervalOverdue);
   const upcomingIntervals = maintenanceIntervals.filter(isIntervalUpcoming);
 
