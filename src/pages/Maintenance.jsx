@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import SyncDialog from '../components/calendar/SyncDialog';
 import MaintenanceList from '../components/maintenance/MaintenanceList';
 import IntervalList from '../components/maintenance/IntervalList';
 import AIIntervalGenerator from '../components/maintenance/AIIntervalGenerator';
@@ -47,6 +48,8 @@ export default function Maintenance() {
   const [deletingRecord, setDeletingRecord] = useState(null);
   const [completingInterval, setCompletingInterval] = useState(null);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [showSyncDialog, setShowSyncDialog] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
@@ -239,17 +242,16 @@ export default function Maintenance() {
     toast.success('Interval marked as complete');
   };
 
-  const handleSyncAll = async () => {
+  const handleSyncAll = async ({ futureOnly }) => {
+    setIsSyncing(true);
     try {
-      toast.loading('Syncing to Google Calendar...');
-      const result = await base44.functions.invoke('syncToGoogleCalendar', {
-        futureOnly: false,
-      });
-      toast.dismiss();
+      const result = await base44.functions.invoke('syncToGoogleCalendar', { futureOnly });
       toast.success(result.data.message);
+      setShowSyncDialog(false);
     } catch (error) {
-      toast.dismiss();
       toast.error('Failed to sync to calendar');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -280,7 +282,7 @@ export default function Maintenance() {
           <div className="flex flex-wrap gap-2 justify-end">
             {activeTab === 'upcoming' && (
               <>
-                <Button onClick={handleSyncAll} variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-50">
+                <Button onClick={() => setShowSyncDialog(true)} variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-50">
                   Sync to Calendar
                 </Button>
                 <Button onClick={() => setShowAIGenerator(true)} variant="outline" size="sm" className="border-amber-400 text-amber-700 hover:bg-amber-50 gap-2">
