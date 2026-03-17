@@ -270,10 +270,30 @@ export default function Maintenance() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8 pt-14 lg:pt-0">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-8 pt-14 lg:pt-0">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Maintenance</h1>
             <p className="text-slate-600 dark:text-slate-400 mt-2">Track maintenance records and scheduled intervals</p>
+          </div>
+          <div className="flex flex-wrap gap-2 justify-end">
+            {activeTab === 'upcoming' && (
+              <>
+                <Button onClick={handleSyncAll} variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-50">
+                  Sync to Calendar
+                </Button>
+                <Button onClick={() => setShowAIGenerator(true)} variant="outline" size="sm" className="border-amber-400 text-amber-700 hover:bg-amber-50 gap-2">
+                  <Sparkles className="w-4 h-4" /> AI Generate
+                </Button>
+                <Button onClick={() => navigate('/MaintenanceIntervalFormPage')} size="sm" className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-1" /> Create Interval
+                </Button>
+              </>
+            )}
+            {activeTab === 'history' && (
+              <Button onClick={() => navigate('/MaintenanceRecordFormPage')} size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-1" /> Log Maintenance
+              </Button>
+            )}
           </div>
         </div>
 

@@ -39,7 +39,6 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
 
   const rows = [
     vehicle && { label: 'Vehicle', value: `${vehicle.name}${vehicle.year ? ` — ${vehicle.year} ${vehicle.make} ${vehicle.model}` : ''}` },
-    { label: 'Status', value: <span className={`font-semibold flex items-center gap-1 ${status.color}`}><StatusIcon className="w-4 h-4" />{status.label}</span> },
     {
       label: 'Interval', value: hasMonths && hasMiles
         ? `Every ${interval.interval_months} month${interval.interval_months > 1 ? 's' : ''} / ${Number(interval.interval_miles).toLocaleString()} mi`

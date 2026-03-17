@@ -2,10 +2,10 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Package, Download } from 'lucide-react';
+import { Package, Download, Wrench } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
-export default function BillDetailDialog({ bill, vehicles = [], onClose, onEdit, onDelete, onViewPhoto }) {
+export default function BillDetailDialog({ bill, vehicles = [], records = [], onClose, onEdit, onDelete, onViewPhoto, onViewRecord }) {
   if (!bill) return null;
 
   const handleDownload = async () => {
