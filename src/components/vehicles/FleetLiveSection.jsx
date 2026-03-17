@@ -76,6 +76,14 @@ function VehicleRow({ motiveVehicle, localVehicle, isSelected, isExpanded, onCli
           )}
         </div>
 
+        {/* Address */}
+        {description && (
+          <div className="hidden md:flex flex-1 min-w-0 items-center gap-1 text-xs text-slate-500 dark:text-slate-400 truncate">
+            <MapPin className="w-3 h-3 flex-shrink-0 text-slate-400" />
+            <span className="truncate">{description}</span>
+          </div>
+        )}
+
         {/* Speed */}
         <div className="hidden sm:flex flex-col items-center flex-shrink-0" style={{minWidth:'52px'}}>
           <span className="text-base font-bold text-slate-900 dark:text-white">{speed != null ? speed : '—'}</span>
