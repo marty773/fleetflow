@@ -17,7 +17,7 @@ import { CheckCircle2, Plus, Trash2, Edit, Package, Check, ChevronsUpDown } from
 import { cn } from '@/lib/utils';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
-export default function MarkCompleteDialog({ interval, records, bills, vendors, items = [], onConfirm, onClose }) {
+export default function MarkCompleteDialog({ interval, records, bills, vendors, items = [], vehicles = [], onConfirm, onClose }) {
   const serviceTypes = useServiceTypes(null, 'records');
 
   const [performedDate, setPerformedDate] = useState(new Date().toISOString().split('T')[0]);
