@@ -11,11 +11,23 @@ import { Wrench, Link2, ChevronsUpDown, Check } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
 import { cn } from '@/lib/utils';
 
-export default function MaintenanceList({ records, vehicles, items, bills = [], onView, onEdit, onDelete, isDeleting }) {
-  const [vehicleFilter, setVehicleFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [search, setSearch] = useState('');
+export default function MaintenanceList({ records, vehicles, items, bills = [], onView, onEdit, onDelete, isDeleting,
+  vehicleFilter: vehicleFilterProp, setVehicleFilter: setVehicleFilterProp,
+  sortOrder: sortOrderProp, setSortOrder: setSortOrderProp,
+  search: searchProp, setSearch: setSearchProp,
+}) {
+  const [vehicleFilterLocal, setVehicleFilterLocal] = useState('all');
+  const [sortOrderLocal, setSortOrderLocal] = useState('desc');
+  const [searchLocal, setSearchLocal] = useState('');
   const [vehicleOpen, setVehicleOpen] = useState(false);
+
+  // Use lifted state if provided, otherwise fall back to local state (mobile)
+  const vehicleFilter = vehicleFilterProp !== undefined ? vehicleFilterProp : vehicleFilterLocal;
+  const setVehicleFilter = setVehicleFilterProp ?? setVehicleFilterLocal;
+  const sortOrder = sortOrderProp !== undefined ? sortOrderProp : sortOrderLocal;
+  const setSortOrder = setSortOrderProp ?? setSortOrderLocal;
+  const search = searchProp !== undefined ? searchProp : searchLocal;
+  const setSearch = setSearchProp ?? setSearchLocal;
   const serviceTypes = useServiceTypes(null, 'records');
 
   const vehicleMap = vehicles.reduce((acc, v) => {
