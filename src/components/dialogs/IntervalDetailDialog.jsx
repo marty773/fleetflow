@@ -49,12 +49,12 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
     },
     interval.last_performed_date && { label: 'Last Performed', value: format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy') },
     hasMiles && currentMiles !== undefined && { label: 'Current Mileage', value: `${Math.round(currentMiles).toLocaleString()} mi` },
+    interval.last_performed_mileage && { label: 'Last Performed Mileage', value: `${Number(interval.last_performed_mileage).toLocaleString()} mi` },
     milesRemaining !== undefined && { 
       label: 'Miles Remaining', 
-      value: <span className={milesRemaining <= 0 ? 'text-red-600 font-semibold' : ''}>{Math.abs(milesRemaining).toLocaleString()} mi ${milesRemaining <= 0 ? 'overdue' : 'left'}</span>
+      value: <span className={milesRemaining <= 0 ? 'text-red-600 font-semibold' : ''}>{Math.abs(milesRemaining).toLocaleString()} mi {milesRemaining <= 0 ? 'overdue' : 'left'}</span>
     },
     interval.next_due_date && { label: 'Next Due Date', value: format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy') },
-    interval.scheduled_date && { label: 'Shop Scheduled', value: format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy') },
   ].filter(Boolean);
 
   return (
