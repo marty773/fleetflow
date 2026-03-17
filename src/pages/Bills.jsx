@@ -21,6 +21,7 @@ import {
 import BillList from '../components/bills/BillList';
 import BillGallery from '../components/bills/BillGallery';
 import BillDetailDialog from '../components/dialogs/BillDetailDialog';
+import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceRecordDetailDialog';
 export default function Bills() {
   const navigate = useNavigate();
   const [viewingBill, setViewingBill] = useState(null);
