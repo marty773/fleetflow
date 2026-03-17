@@ -7,7 +7,6 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { company_id, futureOnly = false } = await req.json();
-    if (!company_id) return Response.json({ error: 'company_id is required' }, { status: 400 });
 
     // Get the app connector OAuth token
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('googlecalendar');
@@ -15,7 +14,9 @@ Deno.serve(async (req) => {
     // Use the Vehicle Maintenance calendar
     const calendarId = 'c_10bb602c9c4c33dbbe38bebe8f98f2be393e13f7e1b183ce7f807347e799bc0d@group.calendar.google.com';
 
-    const vehicles = await base44.asServiceRole.entities.Vehicle.filter({ company_id });
+    // Fetch vehicles — filter by company_id if provided, otherwise get all
+    const vehicleFilter = company_id ? { company_id } : {};
+    const vehicles = await base44.asServiceRole.entities.Vehicle.filter(vehicleFilter);
     const vehicleMap = Object.fromEntries(vehicles.map(v => [v.id, v]));
 
     // Fetch maintenance intervals
