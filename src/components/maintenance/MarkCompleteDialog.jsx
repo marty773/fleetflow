@@ -20,6 +20,7 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
   const [newRecordVendor, setNewRecordVendor] = useState('');
   const [newRecordNotes, setNewRecordNotes] = useState('');
   const [newRecordCost, setNewRecordCost] = useState('');
+  const [workItems, setWorkItems] = useState([]);
   const [attachBill, setAttachBill] = useState(false);
   const [billAmount, setBillAmount] = useState('');
   const [billVendor, setBillVendor] = useState('');
