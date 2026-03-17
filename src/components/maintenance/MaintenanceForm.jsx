@@ -42,6 +42,7 @@ import { cn } from '@/lib/utils';
 
 export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], bills = [], onSubmit, onCancel, isLoading }) {
   const serviceTypes = useServiceTypes(null, 'records');
+  const [loadingOdometer, setLoadingOdometer] = useState(false);
 
   // When editing, merge parts_used back into work_items so they show correctly
   const initializeFormData = () => {
