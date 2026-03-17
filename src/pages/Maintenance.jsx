@@ -369,6 +369,7 @@ export default function Maintenance() {
             bills={bills}
             vendors={vendors}
             items={filteredItems}
+            vehicles={vehicles}
             onConfirm={handleMarkComplete}
             onClose={() => setCompletingInterval(null)}
           />
