@@ -34,23 +34,61 @@ export default function MaintenanceList({ records, vehicles, items, bills = [], 
   const getTypeColor = (value) => maintenanceColors[value] || 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300';
 
   if (records.length === 0) {
-     return (
-       <Card className="border-2 border-dashed dark:border-slate-700">
-         <CardContent className="p-12 text-center">
-           <Wrench className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-           <p className="text-slate-600 dark:text-slate-400">No maintenance records yet</p>
-         </CardContent>
-       </Card>
-     );
-   }
+    return (
+      <Card className="border-2 border-dashed dark:border-slate-700">
+        <CardContent className="p-12 text-center">
+          <Wrench className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+          <p className="text-slate-600 dark:text-slate-400">No maintenance records yet</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
-  const sortedRecords = [...records].sort(
-    (a, b) => new Date(b.performed_date) - new Date(a.performed_date)
-  );
+  const filteredRecords = records
+    .filter(r => vehicleFilter === 'all' || r.vehicle_id === vehicleFilter)
+    .sort((a, b) => sortOrder === 'desc'
+      ? new Date(b.performed_date) - new Date(a.performed_date)
+      : new Date(a.performed_date) - new Date(b.performed_date)
+    );
 
   return (
     <div className="space-y-4">
-      {sortedRecords.map((record) => (
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <Select value={vehicleFilter} onValueChange={setVehicleFilter}>
+          <SelectTrigger className="w-56">
+            <SelectValue placeholder="All Vehicles" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Vehicles</SelectItem>
+            {vehicles.map(v => (
+              <SelectItem key={v.id} value={v.id}>{v.name} — {v.year} {v.make} {v.model}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={sortOrder} onValueChange={setSortOrder}>
+          <SelectTrigger className="w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desc">Newest First</SelectItem>
+            <SelectItem value="asc">Oldest First</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {filteredRecords.length === 0 && (
+        <Card className="border-2 border-dashed dark:border-slate-700">
+          <CardContent className="p-12 text-center">
+            <Wrench className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+            <p className="text-slate-600 dark:text-slate-400">No records match the selected filter</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {filteredRecords.map((record) => {
+        const hasLinkedBill = !!record.linked_bill_id && bills.some(b => b.id === record.linked_bill_id);
+        return (
         <Card 
           key={record.id} 
           className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
