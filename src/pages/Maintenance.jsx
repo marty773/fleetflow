@@ -310,44 +310,7 @@ export default function Maintenance() {
               </TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
-            <div className="flex flex-wrap gap-2 pb-2 sm:pb-0 justify-end">
-              {activeTab === 'upcoming' && (
-                <>
-                  <Button
-                    onClick={handleSyncAll}
-                    variant="outline"
-                    size="sm"
-                    className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                  >
-                    Sync to Calendar
-                  </Button>
-                  <Button
-                    onClick={() => setShowAIGenerator(true)}
-                    variant="outline"
-                    size="sm"
-                    className="border-amber-400 text-amber-700 hover:bg-amber-50 gap-2"
-                  >
-                    <Sparkles className="w-4 h-4" /> AI Generate
-                  </Button>
-                  <Button
-                    onClick={() => navigate('/MaintenanceIntervalFormPage')}
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Plus className="w-4 h-4 mr-1" /> Create Interval
-                  </Button>
-                </>
-              )}
-              {activeTab === 'history' && (
-                <Button
-                  onClick={() => navigate('/MaintenanceRecordFormPage')}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Log Maintenance
-                </Button>
-              )}
-            </div>
+
           </div>
 
           <TabsContent value="upcoming" className="mt-6">

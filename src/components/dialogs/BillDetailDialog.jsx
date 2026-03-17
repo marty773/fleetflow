@@ -123,6 +123,28 @@ export default function BillDetailDialog({ bill, vehicles = [], records = [], on
               </div>
             </div>
           )}
+          {(() => {
+            const linkedRecord = records.find(r => r.linked_bill_id === bill.id);
+            return linkedRecord ? (
+              <button
+                onClick={() => {
+                  onClose();
+                  onViewRecord?.(linkedRecord);
+                }}
+                className="w-full text-left flex items-start gap-2 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
+              >
+                <Wrench className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <Label className="text-green-700 dark:text-green-300 pointer-events-none">Linked Maintenance Record</Label>
+                  <p className="font-medium text-green-900 dark:text-green-100">
+                    {linkedRecord.title} — {format(new Date(linkedRecord.performed_date + 'T12:00:00'), 'MMM dd, yyyy')}
+                  </p>
+                  {linkedRecord.vendor && <p className="text-xs text-green-600 dark:text-green-400">{linkedRecord.vendor}</p>}
+                </div>
+              </button>
+            ) : null;
+          })()}
+
           {bill.notes && (
             <div>
               <Label className="text-slate-500">Notes</Label>
