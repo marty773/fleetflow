@@ -97,11 +97,16 @@ export default function MaintenanceList({ records, vehicles, items, bills = [], 
           <CardContent className="p-6">
              <div className="flex items-start justify-between">
                <div className="flex-1">
-                 <div className="flex items-center gap-3 mb-2">
+                 <div className="flex items-center gap-3 mb-2 flex-wrap">
                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{record.title}</h3>
                    <Badge className={getTypeColor(record.maintenance_type)}>
                      {getTypeLabel(record.maintenance_type)}
                    </Badge>
+                   {hasLinkedBill && (
+                     <Badge variant="outline" className="gap-1 text-purple-700 border-purple-300 bg-purple-50 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-700">
+                       <Link2 className="w-3 h-3" /> Linked Bill
+                     </Badge>
+                   )}
                  </div>
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
                    <div>
