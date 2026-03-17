@@ -70,7 +70,8 @@ export default function BillList({ bills, vehicles, items, records = [], onView,
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }
