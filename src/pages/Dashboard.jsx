@@ -291,6 +291,7 @@ export default function Dashboard() {
                       <span className={`font-medium text-right ${milesRemaining <= 0 ? 'text-red-600 font-semibold' : 'text-slate-900 dark:text-white'}`}>
                         {Math.abs(milesRemaining).toLocaleString()} mi {milesRemaining <= 0 ? 'overdue' : 'left'}
                       </span>
+
                     </div>
                   ) : null;
                 })()
