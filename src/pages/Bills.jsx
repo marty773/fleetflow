@@ -182,7 +182,7 @@ export default function Bills() {
             navigate(`/BillFormPage?edit=${bill.id}`);
           }}
           onDelete={(id) => {
-            setDeletingBill(allBills.find(b => b.id === id));
+            setDeletingBill(bills.find(b => b.id === id));
           }}
           onViewPhoto={() => setViewingBill(null)}
         />
