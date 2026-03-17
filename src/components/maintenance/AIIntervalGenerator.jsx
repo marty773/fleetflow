@@ -317,6 +317,7 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
       interval_miles: intervals[i].interval_miles ?? '',
       maintenance_type: intervals[i].maintenance_type,
       notes: intervals[i].notes || '',
+      keep_record_link: true,
     });
   };
 
