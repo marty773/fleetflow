@@ -395,6 +395,7 @@ export default function Dashboard() {
         bills={bills}
         vendors={vendors}
         items={items}
+        vehicles={vehicles}
         onConfirm={handleMarkComplete}
         onClose={() => setMarkCompleteInterval(null)}
       />
