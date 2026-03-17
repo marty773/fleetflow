@@ -188,13 +188,15 @@ export default function Maintenance() {
     if (create_record && new_record) {
       const createdRecord = await base44.entities.MaintenanceRecord.create({
         vehicle_id: interval.vehicle_id,
-        maintenance_type: interval.maintenance_type || 'other',
+        maintenance_type: new_record.maintenance_type || interval.maintenance_type || 'other',
         title: new_record.title || interval.interval_name,
         performed_date,
         vendor: new_record.vendor && new_record.vendor !== 'none' ? new_record.vendor : undefined,
         odometer_reading: odometer ? String(odometer) : undefined,
         total_cost: new_record.total_cost || undefined,
         notes: new_record.notes || undefined,
+        work_items: new_record.work_items?.length ? new_record.work_items : undefined,
+        parts_used: new_record.parts_used?.length ? new_record.parts_used : undefined,
       });
       resolvedRecordId = createdRecord.id;
       queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
