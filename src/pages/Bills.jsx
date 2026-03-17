@@ -150,6 +150,7 @@ export default function Bills() {
               bills={bills}
               vehicles={vehicles}
               items={filteredItems}
+              records={maintenanceRecords}
               onView={setViewingBill}
               onEdit={(bill) => navigate(`/BillFormPage?edit=${bill.id}`)}
               onDelete={(id) => deleteMutation.mutate(id)}
