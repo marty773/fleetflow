@@ -72,6 +72,23 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
   const [completeIntervalId, setCompleteIntervalId] = useState('new'); // 'new' | interval.id
   const [loadingOdometer, setLoadingOdometer] = useState(false);
 
+  const fetchOdometerFromMotive = () => {
+    const vehicle = vehicles.find(v => v.id === selectedVehicleId);
+    if (!vehicle || vehicle.type !== 'truck') return;
+    setLoadingOdometer(true);
+    base44.functions.invoke('fetchMotiveVehicleData', {})
+      .then(result => {
+        if (result.data?.success && result.data?.vehicles) {
+          const match = result.data.vehicles.find(
+            mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
+          );
+          if (match?.odometer) setOdometer(String(Math.round(Number(match.odometer))));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOdometer(false));
+  };
+
   const workItems = useMemo(() => (bill.line_items || [])
     .filter(i => !i.vehicle_id || i.vehicle_id === selectedVehicleId)
     .map(i => ({ description: i.description, quantity: i.quantity, unit_price: i.unit_price, total: i.total })),
@@ -275,13 +292,21 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
                   <span className="text-xs text-green-600 font-normal">from Motive</span>
                 )}
               </Label>
-              <Input
-                className="mt-1"
-                placeholder={loadingOdometer ? 'Fetching...' : 'Optional'}
-                value={odometer}
-                onChange={e => setOdometer(e.target.value)}
-                disabled={loadingOdometer}
-              />
+              <div className="flex gap-2 mt-1">
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={loadingOdometer ? 'Fetching...' : 'Optional'}
+                  value={odometer}
+                  onChange={e => setOdometer(e.target.value)}
+                  disabled={loadingOdometer}
+                />
+                {selectedVehicle?.type === 'truck' && (
+                  <Button type="button" variant="outline" size="icon" onClick={fetchOdometerFromMotive} disabled={loadingOdometer} title="Fetch current odometer from Motive" className="shrink-0">
+                    <RefreshCw className={`w-4 h-4 ${loadingOdometer ? 'animate-spin' : ''}`} />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
