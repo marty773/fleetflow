@@ -194,8 +194,14 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
               <Input type="date" value={performedDate} onChange={e => setPerformedDate(e.target.value)} />
             </div>
             <div className="space-y-1">
-              <Label>Odometer <span className="text-slate-400 font-normal">(optional)</span></Label>
-              <Input type="number" placeholder="e.g. 125000" value={odometer} onChange={e => setOdometer(e.target.value)} />
+              <Label className="flex items-center gap-1">
+                Odometer <span className="text-slate-400 font-normal">(optional)</span>
+                {loadingOdometer && <span className="text-xs text-slate-400 animate-pulse">fetching...</span>}
+                {!loadingOdometer && odometer && vehicles.find(v => v.id === interval.vehicle_id)?.type === 'truck' && (
+                  <span className="text-xs text-green-600">from Motive</span>
+                )}
+              </Label>
+              <Input type="number" placeholder={loadingOdometer ? 'Fetching...' : 'e.g. 125000'} value={odometer} onChange={e => setOdometer(e.target.value)} disabled={loadingOdometer} />
             </div>
           </div>
 
