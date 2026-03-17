@@ -394,6 +394,9 @@ export default function Maintenance() {
               vehicles={vehicles}
               items={filteredItems}
               bills={bills}
+              vehicleFilter={historyVehicleFilter}
+              sortOrder={historySortOrder}
+              search={historySearch}
               onView={setViewingRecord}
               onEdit={(record) => navigate(`/MaintenanceRecordFormPage?edit=${record.id}`)}
               onDelete={(id) => deleteRecordMutation.mutate(id)}
