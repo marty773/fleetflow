@@ -166,13 +166,12 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
             </div>
 
             <div>
-              <Label htmlFor="last_performed_date">Last Performed Date *</Label>
+              <Label htmlFor="last_performed_date">Last Performed Date <span className="text-slate-400 font-normal">(optional)</span></Label>
               <Input
                 id="last_performed_date"
                 type="date"
                 value={formData.last_performed_date}
                 onChange={(e) => handleChange('last_performed_date', e.target.value)}
-                required
                 className="mt-2"
               />
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">When was this maintenance last done?</p>
