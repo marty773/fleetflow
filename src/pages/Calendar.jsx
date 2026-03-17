@@ -493,12 +493,13 @@ export default function Calendar() {
                         );
                       }
                     })
-                ) : (
-                  <div className="text-center py-6">
-                    <Wrench className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-                            <p className="text-sm text-slate-500 dark:text-slate-400">No scheduled services</p>
-                  </div>
-                )}
+                  ) : (
+                    <div className="text-center py-6">
+                      <Wrench className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                      <p className="text-sm text-slate-500 dark:text-slate-400">No services in the next 30 days</p>
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           </div>
