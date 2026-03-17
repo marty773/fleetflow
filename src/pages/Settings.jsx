@@ -171,6 +171,31 @@ export default function SettingsPage() {
 
         <ServiceTypesEditor />
 
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg text-slate-900 dark:text-white">App ID</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Use this ID when connecting external agents or integrations.</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded text-sm font-mono break-all">
+                {appId}
+              </code>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(appId);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg text-slate-900 dark:text-white">Danger Zone</CardTitle>
