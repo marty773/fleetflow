@@ -122,9 +122,30 @@ export default function Dashboard() {
 
   const stats = calculateStats();
 
-  const overdueIntervals = maintenanceIntervals.filter(
-    i => i.next_due_date && new Date(i.next_due_date) < new Date()
-  );
+  const isIntervalOverdue = (interval) => {
+    const hasMiles = interval.interval_miles && parseFloat(interval.interval_miles) > 0;
+    const hasMonths = interval.interval_months && parseFloat(interval.interval_months) > 0;
+    if (hasMiles) {
+      const currentMiles = motiveVehicles[interval.vehicle_id];
+      const lastPerformedMiles = Number(interval.last_performed_mileage);
+      let milesLeft;
+      if (currentMiles !== undefined && lastPerformedMiles !== undefined) {
+        milesLeft = Number(interval.interval_miles) - (currentMiles - lastPerformedMiles);
+      } else if (interval.next_due_mileage && currentMiles !== undefined) {
+        milesLeft = Number(interval.next_due_mileage) - currentMiles;
+      }
+      if (milesLeft !== undefined) return milesLeft < 0;
+    }
+    if (hasMonths && interval.next_due_date) {
+      return new Date(interval.next_due_date) < new Date();
+    }
+    if (!hasMiles && hasMonths && interval.next_due_date) {
+      return new Date(interval.next_due_date) < new Date();
+    }
+    return false;
+  };
+
+  const overdueIntervals = maintenanceIntervals.filter(isIntervalOverdue);
   const upcomingIntervals = maintenanceIntervals.filter(isIntervalUpcoming);
 
   const handleMarkComplete = async (data) => {
