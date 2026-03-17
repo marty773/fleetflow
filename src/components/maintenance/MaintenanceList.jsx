@@ -143,7 +143,8 @@ export default function MaintenanceList({ records, vehicles, items, bills = [], 
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }
