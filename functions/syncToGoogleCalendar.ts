@@ -19,10 +19,11 @@ Deno.serve(async (req) => {
     const vehicles = await base44.asServiceRole.entities.Vehicle.filter(vehicleFilter);
     const vehicleMap = Object.fromEntries(vehicles.map(v => [v.id, v]));
 
-    // Fetch maintenance intervals
-    const intervals = await base44.asServiceRole.entities.MaintenanceInterval.filter({ company_id });
-    // Fetch calendar appointments
-    const appointments = await base44.asServiceRole.entities.CalendarAppointment.filter({ company_id });
+    // Fetch maintenance intervals and appointments — filter by company_id if provided
+    const intervalFilter = company_id ? { company_id } : {};
+    const appointmentFilter = company_id ? { company_id } : {};
+    const intervals = await base44.asServiceRole.entities.MaintenanceInterval.filter(intervalFilter);
+    const appointments = await base44.asServiceRole.entities.CalendarAppointment.filter(appointmentFilter);
 
     const today = new Date().toISOString().split('T')[0];
     let synced = 0;
