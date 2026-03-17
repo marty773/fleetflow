@@ -280,9 +280,6 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium text-sm text-slate-900 dark:text-white truncate">{interval.interval_name}</span>
-                          <Badge className={`text-xs ${getTypeColor(interval.maintenance_type)}`}>
-                            {getTypeLabel(interval.maintenance_type)}
-                          </Badge>
                         </div>
 
                       </div>
