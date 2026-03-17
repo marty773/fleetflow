@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Sparkles, Upload, X, Check, Loader2, ChevronDown, ChevronUp, FileText, RefreshCw, Search, Pencil } from 'lucide-react';
+import { Sparkles, Upload, X, Check, Loader2, ChevronDown, ChevronUp, FileText, RefreshCw, Search, Pencil, Link2Off, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
