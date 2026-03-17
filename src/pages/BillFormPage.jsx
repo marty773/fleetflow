@@ -112,8 +112,9 @@ export default function BillFormPage() {
       <CreateMaintenanceFromBillDialog
          bill={maintenancePromptBill}
          vehicles={vehicles}
+         intervals={allIntervals}
          onClose={() => { setMaintenancePromptBill(null); navigate('/Bills'); }}
-         onCreated={() => { queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] }); navigate('/Bills'); }}
+         onCreated={() => { queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] }); queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] }); navigate('/Bills'); }}
        />
     </PageTransition>
   );
