@@ -47,7 +47,7 @@ export default function IntervalList({ intervals, vehicles, onEdit, onDelete, on
     return expanded;
   };
 
-  const [expandedVehicles, setExpandedVehicles] = useState(getInitialExpanded);
+  const [expandedVehicles, setExpandedVehicles] = useState(() => new Set());
 
   const vehicleMap = vehicles.reduce((acc, v) => { acc[v.id] = v; return acc; }, {});
 
