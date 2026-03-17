@@ -44,6 +44,23 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingOdometer, setLoadingOdometer] = useState(false);
 
+  const fetchOdometerFromMotive = () => {
+    const vehicle = vehicles.find(v => v.id === interval?.vehicle_id);
+    if (!vehicle || vehicle.type !== 'truck') return;
+    setLoadingOdometer(true);
+    base44.functions.invoke('fetchMotiveVehicleData', {})
+      .then(result => {
+        if (result.data?.success && result.data?.vehicles) {
+          const match = result.data.vehicles.find(
+            mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
+          );
+          if (match?.odometer) setOdometer(String(Math.round(Number(match.odometer))));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOdometer(false));
+  };
+
   useEffect(() => {
     if (interval) {
       setPerformedDate(new Date().toISOString().split('T')[0]);
@@ -201,7 +218,14 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
                   <span className="text-xs text-green-600">from Motive</span>
                 )}
               </Label>
-              <Input type="number" placeholder={loadingOdometer ? 'Fetching...' : 'e.g. 125000'} value={odometer} onChange={e => setOdometer(e.target.value)} disabled={loadingOdometer} />
+              <div className="flex gap-2">
+                <Input type="text" inputMode="numeric" placeholder={loadingOdometer ? 'Fetching...' : 'e.g. 125000'} value={odometer} onChange={e => setOdometer(e.target.value)} disabled={loadingOdometer} />
+                {vehicles.find(v => v.id === interval.vehicle_id)?.type === 'truck' && (
+                  <Button type="button" variant="outline" size="icon" onClick={fetchOdometerFromMotive} disabled={loadingOdometer} title="Fetch current odometer from Motive" className="shrink-0">
+                    <RefreshCw className={`w-4 h-4 ${loadingOdometer ? 'animate-spin' : ''}`} />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
