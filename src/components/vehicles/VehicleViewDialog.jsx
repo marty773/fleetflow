@@ -185,6 +185,24 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             </div>
           )}
 
+          {/* Engine Info */}
+          {(vehicle.engine_type && vehicle.engine_type !== 'unknown' || vehicle.engine_description) && (
+            <div className="grid grid-cols-2 gap-4">
+              {vehicle.engine_type && vehicle.engine_type !== 'unknown' && (
+                <div className="space-y-1">
+                  <Label className="text-slate-500 dark:text-slate-400">Engine Type</Label>
+                  <p className="text-base font-medium text-slate-900 dark:text-white capitalize">{vehicle.engine_type}</p>
+                </div>
+              )}
+              {vehicle.engine_description && (
+                <div className="space-y-1 col-span-2">
+                  <Label className="text-slate-500 dark:text-slate-400">Engine</Label>
+                  <p className="text-base font-medium text-slate-900 dark:text-white">{vehicle.engine_description}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Additional Info */}
           <div className="grid grid-cols-2 gap-4">
             {vehicle.gvw && (
