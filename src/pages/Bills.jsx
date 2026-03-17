@@ -47,6 +47,11 @@ export default function Bills() {
     queryKey: ['bills'],
     queryFn: () => base44.entities.Bill.list(),
   });
+
+  const { data: maintenanceRecords = [] } = useQuery({
+    queryKey: ['maintenanceRecords'],
+    queryFn: () => base44.entities.MaintenanceRecord.list(),
+  });
   
   const vehicles = allVehicles;
   const vendors = allVendors;
