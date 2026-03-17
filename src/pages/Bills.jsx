@@ -176,6 +176,7 @@ export default function Bills() {
         <BillDetailDialog
           bill={viewingBill}
           vehicles={vehicles}
+          records={maintenanceRecords}
           onClose={() => setViewingBill(null)}
           onEdit={(bill) => {
             setViewingBill(null);

@@ -387,7 +387,10 @@ export default function Maintenance() {
           {/* View Bill Dialog */}
           <BillDetailDialog
             bill={viewingBill}
+            vehicles={vehicles}
+            records={records}
             onClose={() => setViewingBill(null)}
+            onViewRecord={(record) => { setViewingBill(null); setViewingRecord(record); }}
           />
 
           {/* Delete Confirmation Dialog */}
