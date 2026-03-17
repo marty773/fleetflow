@@ -399,6 +399,12 @@ export default function Maintenance() {
               onEdit={(record) => navigate(`/MaintenanceRecordFormPage?edit=${record.id}`)}
               onDelete={(id) => deleteRecordMutation.mutate(id)}
               isDeleting={deleteRecordMutation.isPending}
+              vehicleFilter={vehicleFilter}
+              setVehicleFilter={setVehicleFilter}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+              search={search}
+              setSearch={setSearch}
             />
           </TabsContent>
           </Tabs>
