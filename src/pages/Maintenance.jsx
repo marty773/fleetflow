@@ -309,8 +309,8 @@ export default function Maintenance() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b dark:border-slate-800">
-            <TabsList className="bg-white dark:bg-slate-950 rounded-none border-0 h-auto">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 border-b dark:border-slate-800">
+            <TabsList className="bg-white dark:bg-slate-950 rounded-none border-0 h-auto shrink-0">
               <TabsTrigger value="upcoming" className="flex items-center gap-2">
                 Upcoming
                 {upcomingCount > 0 && (
@@ -322,6 +322,56 @@ export default function Maintenance() {
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
 
+            {/* History filters — shown inline on desktop */}
+            {activeTab === 'history' && (
+              <div className="hidden lg:flex items-center gap-2 pb-2">
+                <Popover open={vehicleOpen} onOpenChange={setVehicleOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" role="combobox" className="w-48 justify-between font-normal h-8 text-xs">
+                      <span className="truncate">
+                        {vehicles.find(v => v.id === vehicleFilter)?.name ?? 'All Vehicles'}
+                      </span>
+                      <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search vehicles..." />
+                      <CommandEmpty>No vehicles found.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem value="all" onSelect={() => { setVehicleFilter('all'); setVehicleOpen(false); }}>
+                          <Check className={cn('mr-2 h-4 w-4', vehicleFilter === 'all' ? 'opacity-100' : 'opacity-0')} />
+                          All Vehicles
+                        </CommandItem>
+                        {vehicles.map(v => (
+                          <CommandItem key={v.id} value={`${v.name} ${v.year} ${v.make} ${v.model}`} onSelect={() => { setVehicleFilter(v.id); setVehicleOpen(false); }}>
+                            <Check className={cn('mr-2 h-4 w-4', vehicleFilter === v.id ? 'opacity-100' : 'opacity-0')} />
+                            {v.name} — {v.year} {v.make} {v.model}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
+                <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger className="w-36 h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="desc">Newest First</SelectItem>
+                    <SelectItem value="asc">Oldest First</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Input
+                  placeholder="Search..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-40 h-8 text-xs"
+                />
+              </div>
+            )}
           </div>
 
           <TabsContent value="upcoming" className="mt-6">
