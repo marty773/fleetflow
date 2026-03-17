@@ -90,6 +90,7 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
   const [selected, setSelected] = useState(new Set());
   const [expandedNotes, setExpandedNotes] = useState(new Set());
   const [saving, setSaving] = useState(false);
+  const [expandedMatchedRecord, setExpandedMatchedRecord] = useState(new Set());
 
   // Confirm-update queue
   const [updateQueue, setUpdateQueue] = useState([]); // list of enriched intervals to confirm
