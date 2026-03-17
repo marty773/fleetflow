@@ -333,6 +333,13 @@ export default function AIIntervalGenerator({ vehicles, existingIntervals = [], 
         interval_miles: editDraft.interval_miles !== '' ? Number(editDraft.interval_miles) : null,
         maintenance_type: editDraft.maintenance_type,
         notes: cleanedNotes || null,
+        // If user chose to unlink, clear matched record fields
+        ...(editDraft.keep_record_link === false ? {
+          _matched_record_id: null,
+          _matched_record_title: null,
+          last_performed_date: null,
+          last_performed_mileage: null,
+        } : {}),
       } : item
     ));
     setEditingIndex(null);
