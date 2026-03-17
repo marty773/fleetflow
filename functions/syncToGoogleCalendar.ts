@@ -29,43 +29,39 @@ Deno.serve(async (req) => {
     let synced = 0;
     let skipped = 0;
 
-    const createEvent = async (eventData) => {
-      const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`, {
+    const createEvent = (eventData) =>
+      fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(eventData),
+      }).then(async (res) => {
+        if (!res.ok) console.error('Calendar API error:', await res.text());
       });
-      if (!res.ok) {
-        const err = await res.text();
-        console.error('Calendar API error:', err);
-      }
-    };
 
-    // Sync maintenance intervals
+    // Build all event payloads first, then fire in parallel
+    const eventPromises = [];
+
     for (const interval of intervals) {
       const calDate = interval.scheduled_date || interval.next_due_date;
       if (!calDate) { skipped++; continue; }
       if (futureOnly && calDate < today) { skipped++; continue; }
-
       const vehicle = vehicleMap[interval.vehicle_id];
-      await createEvent({
+      eventPromises.push(createEvent({
         summary: `${interval.interval_name} - ${vehicle?.name || 'Vehicle'}`,
         description: interval.notes || '',
         start: { date: calDate },
         end: { date: calDate },
-      });
+      }));
       synced++;
     }
 
-    // Sync calendar appointments
     for (const appointment of appointments) {
       const calDate = appointment.appointment_date;
       if (!calDate) { skipped++; continue; }
       if (futureOnly && calDate < today) { skipped++; continue; }
-
       const vehicle = vehicleMap[appointment.vehicle_id];
       const eventData = {
         summary: `${appointment.title} - ${vehicle?.name || 'Vehicle'}`,
@@ -74,16 +70,16 @@ Deno.serve(async (req) => {
         start: { date: calDate },
         end: { date: calDate },
       };
-
       if (appointment.appointment_time) {
         const dateTime = `${calDate}T${appointment.appointment_time}:00`;
         eventData.start = { dateTime, timeZone: 'America/New_York' };
         eventData.end = { dateTime, timeZone: 'America/New_York' };
       }
-
-      await createEvent(eventData);
+      eventPromises.push(createEvent(eventData));
       synced++;
     }
+
+    await Promise.all(eventPromises);
 
     return Response.json({
       success: true,
