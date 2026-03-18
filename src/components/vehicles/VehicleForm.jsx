@@ -315,6 +315,19 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                     Front Load Extension
                   </label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="self_adjusting_brakes"
+                    checked={formData.self_adjusting_brakes}
+                    onCheckedChange={(checked) => handleChange('self_adjusting_brakes', checked)}
+                  />
+                  <label
+                    htmlFor="self_adjusting_brakes"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Self Adjusting Brakes
+                  </label>
+                </div>
               </div>
             </div>
             )}
