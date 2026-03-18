@@ -195,7 +195,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
               <p className="text-xs text-slate-400 mt-1">Auto-fills Make, Model, Year & Engine via NHTSA.</p>
             </div>
 
-            {formData.vehicle_type === 'Truck'}
+            {formData.vehicle_type === 'truck' && (
             <div>
               <Label>Engine Type</Label>
               <div className="flex gap-2 mt-2 flex-wrap">
@@ -211,6 +211,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 ))}
               </div>
             </div>
+            )}
 
             <div>
               <Label htmlFor="engine_description">Engine Description</Label>
