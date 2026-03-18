@@ -213,6 +213,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
             </div>
             )} //
 
+            {formData.vehicle_type === 'truck' && (
             <div>
               <Label htmlFor="engine_description">Engine Description</Label>
               <Input
@@ -223,6 +224,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 className="mt-2"
               />
             </div>
+            )} //
 
             <div>
               <Label htmlFor="gvw">GVW (lbs)</Label>
