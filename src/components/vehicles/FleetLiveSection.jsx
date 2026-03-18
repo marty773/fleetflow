@@ -78,7 +78,7 @@ function VehicleRow({ motiveVehicle, localVehicle, isSelected, isExpanded, onCli
 
         {/* Address */}
         {description && (
-          <div className="hidden md:flex flex-1 min-w-0 items-center gap-1 text-xs text-slate-500 dark:text-slate-400 truncate">
+          <div className="flex flex-1 min-w-0 items-center gap-1 text-xs text-slate-500 dark:text-slate-400 truncate">
             <MapPin className="w-3 h-3 flex-shrink-0 text-slate-400" />
             <span className="truncate">{description}</span>
           </div>

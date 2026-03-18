@@ -62,7 +62,7 @@ export default function BottomTabs({ currentPageName }) {
               aria-current={isActive ? 'page' : undefined}
               className={`flex flex-col items-center justify-center px-4 flex-1 transition-colors ${
                  isActive
-                   ? 'text-amber-600 border-t-2 border-amber-600'
+                   ? 'text-amber-600'
                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
