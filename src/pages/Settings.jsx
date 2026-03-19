@@ -172,6 +172,8 @@ export default function SettingsPage() {
 
         <ServiceTypesEditor />
 
+        <DataExport />
+
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg text-slate-900 dark:text-white">App ID</CardTitle>
