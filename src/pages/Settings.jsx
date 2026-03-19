@@ -10,6 +10,7 @@ import { Settings, LogOut, Trash2, Bell, Save, Copy, Check } from 'lucide-react'
 import PageTransition from '@/components/PageTransition';
 import ServiceTypesEditor from '@/components/settings/ServiceTypesEditor';
 import ServiceReminderSettings from '@/components/settings/ServiceReminderSettings';
+import DataExport from '@/components/settings/DataExport';
 
 export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
