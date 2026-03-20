@@ -17,9 +17,15 @@ export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [copied, setCopied] = useState({});
+  const [jwtToken, setJwtToken] = useState('');
   const appId = appParams.appId;
   const apiBaseUrl = appParams.appBaseUrl || `https://api.base44.com/api/apps/${appId}`;
-  const apiKey = appParams.appId;
+
+  React.useEffect(() => {
+    // Retrieve the current user's JWT from localStorage
+    const token = localStorage.getItem('base44_access_token') || localStorage.getItem('token') || '';
+    setJwtToken(token);
+  }, []);
   const [isDeleting, setIsDeleting] = useState(false);
   const [notifSettings, setNotifSettings] = useState(null);
   const [notifSettingsId, setNotifSettingsId] = useState(null);
