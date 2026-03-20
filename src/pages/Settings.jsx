@@ -197,7 +197,7 @@ export default function SettingsPage() {
 
               {[
                 { label: 'FLEETFLOW_API_BASE_URL', value: apiBaseUrl, key: 'url' },
-                { label: 'FLEETFLOW_APP_ID (API Key)', value: appId, key: 'key' },
+                { label: 'FLEETFLOW_API_KEY (JWT Token)', value: jwtToken, key: 'key' },
               ].map(({ label, value, key }) => (
                 <div key={key}>
                   <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 font-mono">{label}</p>
