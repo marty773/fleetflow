@@ -147,7 +147,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
                 <KeyRound className="w-5 h-5 text-amber-600" />
-                {user.has_password === false ? 'Set a Password' : 'Change Password'}
+                {user.login_provider && user.login_provider !== 'email' ? 'Set a Password' : 'Change Password'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
