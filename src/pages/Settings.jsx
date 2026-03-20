@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Settings, LogOut, Trash2, Bell, Save, Copy, Check, Lock } from 'lucide-react';
+import { Settings, LogOut, Trash2, Bell, Save, Copy, Check, Lock, KeyRound } from 'lucide-react';
 import { appParams } from '@/lib/app-params';
 import PageTransition from '@/components/PageTransition';
 import ServiceTypesEditor from '@/components/settings/ServiceTypesEditor';
