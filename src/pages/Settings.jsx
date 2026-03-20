@@ -151,7 +151,7 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {user.has_password === false ? (
+              {user.login_provider && user.login_provider !== 'email' ? (
                 <>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
                     Your account uses Google sign-in and doesn't have a password yet. Click below to receive an email that lets you set one.
