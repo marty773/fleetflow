@@ -127,6 +127,37 @@ export default function SettingsPage() {
           </Card>
         )}
 
+        {user && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                <KeyRound className="w-5 h-5 text-amber-600" /> Change Password
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-1">
+                <Label className="text-slate-700 dark:text-slate-300">Current Password</Label>
+                <Input type="password" placeholder="••••••••" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} className="dark:bg-slate-950 dark:border-slate-700" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-slate-700 dark:text-slate-300">New Password</Label>
+                <Input type="password" placeholder="••••••••" value={pwForm.newPw} onChange={e => setPwForm(f => ({ ...f, newPw: e.target.value }))} className="dark:bg-slate-950 dark:border-slate-700" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-slate-700 dark:text-slate-300">Confirm New Password</Label>
+                <Input type="password" placeholder="••••••••" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} className="dark:bg-slate-950 dark:border-slate-700" />
+              </div>
+              {pwMessage && (
+                <p className={`text-sm ${pwMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{pwMessage.text}</p>
+              )}
+              <Button onClick={handleChangePassword} disabled={pwSaving || !pwForm.current || !pwForm.newPw || !pwForm.confirm} className="w-full" style={{ backgroundColor: 'var(--color-primary)' }}>
+                <KeyRound className="w-4 h-4 mr-2" />
+                {pwSaving ? 'Updating...' : 'Update Password'}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="mb-6">
            <CardHeader>
              <CardTitle className="text-lg text-slate-900 dark:text-white">Preferences</CardTitle>
