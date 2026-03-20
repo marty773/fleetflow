@@ -324,9 +324,56 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
             <Textarea className="mt-1 h-20" placeholder="Optional notes..." value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 text-sm text-slate-600 dark:text-slate-400">
-            {workItems.length} line item(s) will be copied from the bill &mdash; Total: <span className="font-semibold text-slate-900 dark:text-white">${totalCost.toFixed(2)}</span>
-          </div>
+          {allWorkItems.length > 0 && (
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg text-sm">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                onClick={() => setLineItemsExpanded(e => !e)}
+              >
+                <span>
+                  <span className="font-medium text-slate-900 dark:text-white">{workItems.length}</span> of {allWorkItems.length} line item(s) selected &mdash; Total: <span className="font-semibold text-slate-900 dark:text-white">${totalCost.toFixed(2)}</span>
+                </span>
+                {lineItemsExpanded ? <ChevronUp className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
+              </button>
+
+              {lineItemsExpanded && (
+                <div className="border-t border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-700">
+                  <div className="flex items-center gap-2 px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
+                    <Checkbox
+                      id="select-all"
+                      checked={selectedLineItemIndexes.length === allWorkItems.length}
+                      onCheckedChange={(checked) => {
+                        setSelectedLineItemIndexes(checked ? allWorkItems.map((_, i) => i) : []);
+                      }}
+                    />
+                    <label htmlFor="select-all" className="cursor-pointer font-medium">Select all</label>
+                  </div>
+                  {allWorkItems.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2 px-3 py-2">
+                      <Checkbox
+                        id={`li-${idx}`}
+                        checked={selectedLineItemIndexes.includes(idx)}
+                        onCheckedChange={(checked) => {
+                          setSelectedLineItemIndexes(prev =>
+                            checked ? [...prev, idx] : prev.filter(i => i !== idx)
+                          );
+                        }}
+                        className="mt-0.5"
+                      />
+                      <label htmlFor={`li-${idx}`} className="flex-1 cursor-pointer">
+                        <span className="text-slate-800 dark:text-slate-200">{item.description || '(no description)'}</span>
+                        {item.quantity && <span className="text-slate-500 dark:text-slate-400"> × {item.quantity}</span>}
+                        {item.total != null && (
+                          <span className="ml-2 font-medium text-slate-700 dark:text-slate-300">${item.total.toFixed(2)}</span>
+                        )}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2">
