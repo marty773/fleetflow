@@ -31,7 +31,10 @@ export default function SettingsPage() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    base44.auth.me().then(setUser);
+    base44.auth.me().then(u => {
+      console.log('[Settings] user object:', JSON.stringify(u));
+      setUser(u);
+    });
   }, []);
 
   useEffect(() => {
