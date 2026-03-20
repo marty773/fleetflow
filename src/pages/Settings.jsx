@@ -75,7 +75,8 @@ export default function SettingsPage() {
       setPwMessage({ type: 'success', text: 'Password updated successfully!' });
       setPwForm({ current: '', newPw: '', confirm: '' });
     } catch (e) {
-      setPwMessage({ type: 'error', text: e.message || 'Incorrect current password.' });
+      const msg = typeof e === 'string' ? e : e?.message || e?.error || e?.detail || 'Incorrect current password.';
+      setPwMessage({ type: 'error', text: msg });
     }
     setPwSaving(false);
   };
@@ -87,7 +88,8 @@ export default function SettingsPage() {
       await base44.auth.resetPasswordRequest({ email: user.email });
       setPwMessage({ type: 'success', text: `Password setup email sent to ${user.email}. Check your inbox!` });
     } catch (e) {
-      setPwMessage({ type: 'error', text: e.message || 'Failed to send email.' });
+      const msg = typeof e === 'string' ? e : e?.message || e?.error || e?.detail || 'Failed to send email.';
+      setPwMessage({ type: 'error', text: msg });
     }
     setPwSaving(false);
   };
