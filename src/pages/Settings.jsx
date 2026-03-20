@@ -16,8 +16,10 @@ import DataExport from '@/components/settings/DataExport';
 export default function SettingsPage() {
   const [user, setUser] = React.useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const appId = window.location.pathname.match(/apps\/([^/?#]+)/)?.[1] || window.location.hostname.split('.')[0];
+  const [copied, setCopied] = useState({});
+  const appId = appParams.appId;
+  const apiBaseUrl = appParams.appBaseUrl || `https://api.base44.com/api/apps/${appId}`;
+  const apiKey = appParams.appId;
   const [isDeleting, setIsDeleting] = useState(false);
   const [notifSettings, setNotifSettings] = useState(null);
   const [notifSettingsId, setNotifSettingsId] = useState(null);
