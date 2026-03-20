@@ -72,6 +72,8 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
   // Interval completion mode: null = create new record, interval.id = complete that interval
   const [completeIntervalId, setCompleteIntervalId] = useState('new'); // 'new' | interval.id
   const [loadingOdometer, setLoadingOdometer] = useState(false);
+  const [lineItemsExpanded, setLineItemsExpanded] = useState(false);
+  const [selectedLineItemIndexes, setSelectedLineItemIndexes] = useState([]);
 
   const fetchOdometerFromMotive = () => {
     const vehicle = vehicles.find(v => v.id === selectedVehicleId);
