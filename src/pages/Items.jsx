@@ -449,9 +449,12 @@ export default function Items() {
         transactions={viewingItem ? getItemTransactions(viewingItem.id) : []}
         onClose={() => setViewingItem(null)}
         onEdit={(item) => {
-          setEditingItem(item);
           setViewingItem(null);
-          setFormOpen(true);
+          navigate(`/ItemFormPage?edit=${item.id}`);
+        }}
+        onDelete={(item) => {
+          setViewingItem(null);
+          setDeleteItem(item);
         }}
         onViewBill={(billId) => {
           const bill = bills.find(b => b.id === billId);
