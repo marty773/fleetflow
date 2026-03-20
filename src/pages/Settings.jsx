@@ -222,7 +222,7 @@ export default function SettingsPage() {
 
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
                 <p className="text-xs text-amber-800 dark:text-amber-300 font-medium mb-1">How to use in App 1:</p>
-                <p className="text-xs text-amber-700 dark:text-amber-400">Set <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_API_BASE_URL</code> and <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_APP_ID</code> as secrets in App 1's dashboard. The App ID acts as the API key for identifying requests from App 1.</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400">Set <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_API_BASE_URL</code> and <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_API_KEY</code> as secrets in App 1's dashboard. The JWT token authenticates as <strong>{user?.email}</strong> on requests to FleetFlow.</p>
               </div>
             </CardContent>
           </Card>
