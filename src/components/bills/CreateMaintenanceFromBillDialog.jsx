@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Wrench, Loader2, CheckCircle2, Calendar, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Wrench, Loader2, CheckCircle2, Calendar, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { addMonths } from 'date-fns';
 
