@@ -92,11 +92,17 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
       .finally(() => setLoadingOdometer(false));
   };
 
-  const workItems = useMemo(() => (bill.line_items || [])
+  const allWorkItems = useMemo(() => (bill.line_items || [])
     .filter(i => !i.vehicle_id || i.vehicle_id === selectedVehicleId)
     .map(i => ({ description: i.description, quantity: i.quantity, unit_price: i.unit_price, total: i.total })),
     [bill.line_items, selectedVehicleId]);
 
+  // Initialize all items as selected when vehicle changes
+  useEffect(() => {
+    setSelectedLineItemIndexes(allWorkItems.map((_, idx) => idx));
+  }, [selectedVehicleId, allWorkItems.length]);
+
+  const workItems = allWorkItems.filter((_, idx) => selectedLineItemIndexes.includes(idx));
   const totalCost = workItems.reduce((sum, i) => sum + (i.total || 0), 0);
 
   // Open intervals for selected vehicle
