@@ -80,6 +80,18 @@ export default function SettingsPage() {
     setPwSaving(false);
   };
 
+  const handleSetPasswordEmail = async () => {
+    setPwSaving(true);
+    setPwMessage(null);
+    try {
+      await base44.auth.resetPasswordRequest({ email: user.email });
+      setPwMessage({ type: 'success', text: `Password setup email sent to ${user.email}. Check your inbox!` });
+    } catch (e) {
+      setPwMessage({ type: 'error', text: e.message || 'Failed to send email.' });
+    }
+    setPwSaving(false);
+  };
+
   const handleLogout = () => {
     base44.auth.logout();
   };
