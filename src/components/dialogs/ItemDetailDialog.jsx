@@ -2,9 +2,9 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 
-export default function ItemDetailDialog({ item, transactions = [], onClose, onEdit, onViewBill, onViewMaintenance }) {
+export default function ItemDetailDialog({ item, transactions = [], onClose, onEdit, onDelete, onViewBill, onViewMaintenance }) {
   if (!item) return null;
 
   return (
@@ -104,18 +104,14 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           >
            Edit
           </Button>
-          {item.photo_url && (
+          {onDelete && (
            <Button
              variant="outline"
-             onClick={() => {
-               const link = document.createElement('a');
-               link.href = item.photo_url;
-               link.download = `${item.name}.jpg`;
-               link.click();
-             }}
-             className="flex-1"
+             onClick={() => onDelete?.(item)}
+             className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
            >
-             Download
+             <Trash2 className="w-4 h-4 mr-2" />
+             Delete
            </Button>
           )}
           </div>

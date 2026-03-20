@@ -145,39 +145,20 @@ export default function SettingsPage() {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-amber-600" /> Change Password
+                <KeyRound className="w-5 h-5 text-amber-600" /> Password
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="space-y-1">
-                <Label className="text-slate-700 dark:text-slate-300">Current Password</Label>
-                <Input type="password" placeholder="••••••••" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} className="dark:bg-slate-950 dark:border-slate-700" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-slate-700 dark:text-slate-300">New Password</Label>
-                <Input type="password" placeholder="••••••••" value={pwForm.newPw} onChange={e => setPwForm(f => ({ ...f, newPw: e.target.value }))} className="dark:bg-slate-950 dark:border-slate-700" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-slate-700 dark:text-slate-300">Confirm New Password</Label>
-                <Input type="password" placeholder="••••••••" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} className="dark:bg-slate-950 dark:border-slate-700" />
-              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Click below to receive an email to set or change your password.
+              </p>
               {pwMessage && (
                 <p className={`text-sm ${pwMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>{pwMessage.text}</p>
               )}
-              <Button onClick={handleChangePassword} disabled={pwSaving || !pwForm.current || !pwForm.newPw || !pwForm.confirm} className="w-full" style={{ backgroundColor: 'var(--color-primary)' }}>
+              <Button onClick={handleSetPasswordEmail} disabled={pwSaving} className="w-full" style={{ backgroundColor: 'var(--color-primary)' }}>
                 <KeyRound className="w-4 h-4 mr-2" />
-                {pwSaving ? 'Updating...' : 'Update Password'}
+                {pwSaving ? 'Sending...' : 'Send Password Setup Email'}
               </Button>
-              <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
-                Don't have a password yet (e.g. signed in with Google)?{' '}
-                <button
-                  onClick={handleSetPasswordEmail}
-                  disabled={pwSaving}
-                  className="underline text-amber-600 hover:text-amber-700 disabled:opacity-50"
-                >
-                  Send a password setup email
-                </button>
-              </p>
             </CardContent>
           </Card>
         )}
