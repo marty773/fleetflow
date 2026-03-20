@@ -25,6 +25,9 @@ export default function SettingsPage() {
   const [notifSettingsId, setNotifSettingsId] = useState(null);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifSaved, setNotifSaved] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' });
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwMessage, setPwMessage] = useState(null); // { type: 'success'|'error', text }
   const navigate = useNavigate();
 
   React.useEffect(() => {
