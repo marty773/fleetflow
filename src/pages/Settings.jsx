@@ -59,6 +59,27 @@ export default function SettingsPage() {
     setTimeout(() => setNotifSaved(false), 2000);
   };
 
+  const handleChangePassword = async () => {
+    if (pwForm.newPw !== pwForm.confirm) {
+      setPwMessage({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+    if (pwForm.newPw.length < 6) {
+      setPwMessage({ type: 'error', text: 'New password must be at least 6 characters.' });
+      return;
+    }
+    setPwSaving(true);
+    setPwMessage(null);
+    try {
+      await base44.auth.changePassword({ userId: user.id, currentPassword: pwForm.current, newPassword: pwForm.newPw });
+      setPwMessage({ type: 'success', text: 'Password updated successfully!' });
+      setPwForm({ current: '', newPw: '', confirm: '' });
+    } catch (e) {
+      setPwMessage({ type: 'error', text: e.message || 'Incorrect current password.' });
+    }
+    setPwSaving(false);
+  };
+
   const handleLogout = () => {
     base44.auth.logout();
   };
