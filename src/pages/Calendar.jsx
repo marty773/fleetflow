@@ -716,6 +716,14 @@ export default function Calendar() {
                              <span className="text-sm font-semibold">Overdue</span>
                            </div>
                          )}
+                         {/* Complete Now button */}
+                         <Button
+                           size="sm"
+                           className="mt-3 mr-2 bg-green-600 hover:bg-green-700 text-white gap-1"
+                           onClick={() => { setSelectedDay(null); setCompletingInterval(event); }}
+                         >
+                           ✓ Complete Now
+                         </Button>
                          {/* Reschedule control */}
                          {isRescheduling ? (
                            <div className="mt-3 flex items-center gap-2">
