@@ -58,8 +58,11 @@ export default function VehicleCostReport() {
     return acc;
   }, {});
 
+  const timeframeDays = parseInt(timeframe);
   const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - parseInt(timeframe));
+  cutoffDate.setDate(cutoffDate.getDate() - timeframeDays);
+  const timeframeMonths = timeframeDays / 30;
+  const showPerMonth = timeframeDays > 30;
 
   const filteredBills = bills.filter(
     (b) => new Date(b.bill_date) >= cutoffDate
