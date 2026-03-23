@@ -17,6 +17,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSam
 import { toast } from 'sonner';
 import AppointmentForm from '../components/calendar/AppointmentForm';
 import SyncDialog from '../components/calendar/SyncDialog';
+import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 
 export default function Calendar() {
   const queryClient = useQueryClient();
@@ -27,6 +28,7 @@ export default function Calendar() {
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [showCompanySyncDialog, setShowCompanySyncDialog] = useState(false);
   const [isSyncingCompany, setIsSyncingCompany] = useState(false);
+  const [completingInterval, setCompletingInterval] = useState(null);
 
   const { data: allVehicles = [] } = useQuery({
     queryKey: ['vehicles'],
