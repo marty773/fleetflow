@@ -370,6 +370,18 @@ export default function Maintenance() {
           </TabsContent>
           </Tabs>
 
+          {/* Mobile FAB */}
+          <button
+            onClick={() => activeTab === 'history'
+              ? navigate('/MaintenanceRecordFormPage')
+              : navigate('/MaintenanceIntervalFormPage')
+            }
+            aria-label={activeTab === 'history' ? 'Log Maintenance' : 'Create Interval'}
+            className="fixed bottom-24 right-6 sm:hidden z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation bg-blue-600"
+          >
+            <Plus className="w-6 h-6" />
+          </button>
+
           <AIIntervalGenerator
             vehicles={vehicles}
             existingIntervals={intervals}
