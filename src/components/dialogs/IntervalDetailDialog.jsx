@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import { Edit2, Clock, AlertCircle, Check, FileText, Receipt } from 'lucide-react';
 
-export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, currentMileage = {} }) {
+export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, onMarkComplete, currentMileage = {} }) {
   if (!interval) return null;
 
   const getStatus = () => {
@@ -82,6 +82,14 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
         </div>
 
         <div className="flex justify-end gap-2 mt-4">
+          {onMarkComplete && (
+            <Button
+              onClick={() => { onClose(); onMarkComplete(interval); }}
+              className="gap-2 bg-green-600 hover:bg-green-700 text-white mr-auto"
+            >
+              <Check className="w-4 h-4" /> Complete Now
+            </Button>
+          )}
           <Button variant="outline" onClick={onClose}>Close</Button>
           {onEdit && (
             <Button onClick={() => { onClose(); onEdit(interval); }} className="gap-2 bg-amber-500 hover:bg-amber-600 text-white">
