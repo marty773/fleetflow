@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import VehicleForm from '@/components/vehicles/VehicleForm';
 import PageTransition from '@/components/PageTransition';
+import { toast } from 'sonner';
 
 export default function VehicleFormPage() {
   const navigate = useNavigate();
