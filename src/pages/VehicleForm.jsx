@@ -26,6 +26,9 @@ export default function VehicleFormPage() {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       navigate('/Vehicles');
     },
+    onError: (err) => {
+      console.error('Failed to create vehicle:', err);
+    },
   });
 
   const updateMutation = useMutation({
