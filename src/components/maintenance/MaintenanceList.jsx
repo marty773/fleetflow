@@ -11,7 +11,7 @@ import { Wrench, Link2, ChevronsUpDown, Check } from 'lucide-react';
 import { useServiceTypes } from '@/components/useServiceTypes';
 import { cn } from '@/lib/utils';
 
-export default function MaintenanceList({ records, vehicles, items, bills = [], onView, onEdit, onDelete, isDeleting }) {
+export default function MaintenanceList({ records, vehicles, items, bills = [], intervals = [], onView, onEdit, onDelete, isDeleting }) {
   const [vehicleFilter, setVehicleFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('desc');
   const [search, setSearch] = useState('');
