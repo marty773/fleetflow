@@ -185,22 +185,24 @@ export default function Bills() {
               ))}
             </SelectContent>
           </Select>
-          <Input
-            type="date"
-            value={dateFrom}
-            onChange={e => setDateFrom(e.target.value)}
-            className="w-full sm:w-40"
-            title="From date"
-            placeholder="From"
-          />
-          <Input
-            type="date"
-            value={dateTo}
-            onChange={e => setDateTo(e.target.value)}
-            className="w-full sm:w-40"
-            title="To date"
-            placeholder="To"
-          />
+          <div className="flex flex-col gap-1 w-full sm:w-40">
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">Start Date</label>
+            <Input
+              type="date"
+              value={dateFrom}
+              onChange={e => setDateFrom(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <div className="flex flex-col gap-1 w-full sm:w-40">
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">End Date</label>
+            <Input
+              type="date"
+              value={dateTo}
+              onChange={e => setDateTo(e.target.value)}
+              className="w-full"
+            />
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
