@@ -155,6 +155,11 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
       .finally(() => setLoadingOdometer(false));
   }, [formData.vehicle_id]);
 
+  // Update linkedIntervalId when record changes
+  React.useEffect(() => {
+    setLinkedIntervalId(record?.linked_interval_id || '');
+  }, [record?.id]);
+
   // Update form data when record prop changes (important for editing)
   React.useEffect(() => {
     if (record) {
