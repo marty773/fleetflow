@@ -30,6 +30,10 @@ export default function Bills() {
   const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
   const [deletingBill, setDeletingBill] = useState(null);
+  const [search, setSearch] = useState('');
+  const [vendorFilter, setVendorFilter] = useState('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const queryClient = useQueryClient();
 
   const { data: allVehicles = [] } = useQuery({
