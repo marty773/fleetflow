@@ -349,8 +349,21 @@ export default function Maintenance() {
               items={filteredItems}
               bills={bills}
               intervals={intervals}
+              vehicleFilter={historyVehicleFilter}
+              sortOrder={historySortOrder}
+              search={historySearch}
+              onVehicleFilterChange={setHistoryVehicleFilter}
+              onSortOrderChange={setHistorySortOrder}
+              onSearchChange={setHistorySearch}
               onView={setViewingRecord}
-              onEdit={(record) => navigate(`/MaintenanceRecordFormPage?edit=${record.id}`)}
+              onEdit={(record) => {
+                const params = new URLSearchParams({ edit: record.id });
+                const returnParams = new URLSearchParams({ tab: 'history' });
+                if (historyVehicleFilter !== 'all') returnParams.set('vehicle', historyVehicleFilter);
+                if (historySortOrder !== 'desc') returnParams.set('sort', historySortOrder);
+                if (historySearch) returnParams.set('search', historySearch);
+                navigate(`/MaintenanceRecordFormPage?${params.toString()}&returnTo=${encodeURIComponent('/Maintenance?' + returnParams.toString())}`);
+              }}
               onDelete={(id) => deleteRecordMutation.mutate(id)}
               isDeleting={deleteRecordMutation.isPending}
             />
