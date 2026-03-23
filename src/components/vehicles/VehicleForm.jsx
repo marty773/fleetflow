@@ -337,7 +337,7 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
             )}
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="bg-slate-900 hover:bg-slate-800">
