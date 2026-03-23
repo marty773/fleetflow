@@ -176,7 +176,7 @@ export default function MaintenanceRecordFormPage() {
             bills={bills}
             intervals={allIntervals}
             onSubmit={handleSubmit}
-            onCancel={() => navigate('/Maintenance')}
+            onCancel={() => navigate(returnTo)}
             isLoading={createMutation.isPending || updateMutation.isPending}
           />
         </div>
