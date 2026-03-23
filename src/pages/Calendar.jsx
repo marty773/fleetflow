@@ -50,6 +50,16 @@ export default function Calendar() {
     queryFn: () => base44.entities.MaintenanceRecord.list(),
   });
 
+  const { data: allBills = [] } = useQuery({
+    queryKey: ['bills'],
+    queryFn: () => base44.entities.Bill.list(),
+  });
+
+  const { data: allVendors = [] } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => base44.entities.Vendor.list(),
+  });
+
   const vehicles = allVehicles;
   const intervals = allIntervals;
   const appointments = allAppointments;
