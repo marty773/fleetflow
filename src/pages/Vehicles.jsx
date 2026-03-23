@@ -141,15 +141,6 @@ export default function Vehicles() {
           )}
         </div>
 
-        {/* Mobile FAB */}
-        <button
-          onClick={() => navigate('/VehicleForm')}
-          aria-label="Add Vehicle"
-          className="fixed bottom-24 right-6 sm:hidden z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation bg-slate-900"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
-
         <VehicleViewDialog
           vehicle={viewingVehicle}
           open={!!viewingVehicle}
