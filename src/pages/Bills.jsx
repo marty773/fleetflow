@@ -118,6 +118,24 @@ export default function Bills() {
     },
   });
 
+  const uniqueVendors = [...new Set(bills.map(b => b.vendor).filter(Boolean))].sort();
+
+  const filteredBills = bills.filter(b => {
+    if (vendorFilter !== 'all' && b.vendor !== vendorFilter) return false;
+    if (dateFrom && b.bill_date < dateFrom) return false;
+    if (dateTo && b.bill_date > dateTo) return false;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      if (
+        !b.vendor?.toLowerCase().includes(q) &&
+        !b.bill_number?.toLowerCase().includes(q) &&
+        !b.notes?.toLowerCase().includes(q) &&
+        !b.category?.toLowerCase().includes(q)
+      ) return false;
+    }
+    return true;
+  });
+
   const billsWithPhotos = bills.filter(b => b.photo_url);
 
   const handleRefresh = async () => {
