@@ -316,7 +316,7 @@ export default function Items() {
             disabled={recalculating}
             variant="outline"
             size="icon"
-            className="h-11 w-11"
+            className="h-9 w-9"
             title="Recalculate Inventory"
             aria-label="Recalculate inventory"
           >
