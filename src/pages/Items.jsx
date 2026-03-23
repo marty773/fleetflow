@@ -329,7 +329,7 @@ export default function Items() {
 
           <Button
             onClick={handleAddNew}
-            className="h-11 shadow-sm hidden sm:flex"
+            className="h-9 shadow-sm hidden sm:flex"
             style={{ backgroundColor: 'var(--color-primary)' }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
