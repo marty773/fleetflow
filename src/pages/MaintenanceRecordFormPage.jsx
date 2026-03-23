@@ -28,6 +28,16 @@ export default function MaintenanceRecordFormPage() {
   const bills = allBills;
   const editingRecord = editId ? allRecords.find(r => r.id === editId) || null : null;
 
+  // Scroll to linked-interval section if navigated with that hash
+  useEffect(() => {
+    if (window.location.hash === '#linked-interval') {
+      setTimeout(() => {
+        const el = document.getElementById('linked-interval');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 400);
+    }
+  }, [editingRecord?.id]);
+
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.MaintenanceRecord.create(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] }),
