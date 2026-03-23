@@ -154,7 +154,7 @@ export default function Bills() {
           </div>
           <Button
             onClick={() => navigate('/BillFormPage')}
-            className="w-full sm:w-auto"
+            className="hidden sm:flex"
             style={{ backgroundColor: 'var(--color-primary)' }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
