@@ -146,10 +146,16 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
           {(() => {
             const linkedInterval = intervals.find(i => i.linked_record_id === record.id);
             return linkedInterval ? (
-              <div className="flex items-start gap-2 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+              <button
+                onClick={() => {
+                  onClose();
+                  onEdit?.(record, 'linked-interval');
+                }}
+                className="w-full text-left flex items-start gap-2 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
+              >
                 <CalendarClock className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <Label className="text-green-700 dark:text-green-300">Completed Interval</Label>
+                  <Label className="text-green-700 dark:text-green-300 pointer-events-none">Completed Interval</Label>
                   <p className="font-medium text-green-900 dark:text-green-100">{linkedInterval.interval_name}</p>
                   {linkedInterval.next_due_date && (
                     <p className="text-xs text-green-600 dark:text-green-400">
@@ -157,7 +163,7 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
                     </p>
                   )}
                 </div>
-              </div>
+              </button>
             ) : null;
           })()}
 
