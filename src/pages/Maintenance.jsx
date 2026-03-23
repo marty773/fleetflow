@@ -415,7 +415,11 @@ export default function Maintenance() {
             onClose={() => setViewingRecord(null)}
             onEdit={(record, anchor) => {
               setViewingRecord(null);
-              navigate(`/MaintenanceRecordFormPage?edit=${record.id}${anchor ? `#${anchor}` : ''}`);
+              const returnParams = new URLSearchParams({ tab: 'history' });
+              if (historyVehicleFilter !== 'all') returnParams.set('vehicle', historyVehicleFilter);
+              if (historySortOrder !== 'desc') returnParams.set('sort', historySortOrder);
+              if (historySearch) returnParams.set('search', historySearch);
+              navigate(`/MaintenanceRecordFormPage?edit=${record.id}&returnTo=${encodeURIComponent('/Maintenance?' + returnParams.toString())}${anchor ? `#${anchor}` : ''}`);
             }}
             onViewBill={(bill) => setViewingBill(bill)}
           />
