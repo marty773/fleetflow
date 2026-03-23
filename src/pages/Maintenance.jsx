@@ -390,9 +390,9 @@ export default function Maintenance() {
             bills={bills}
             intervals={intervals}
             onClose={() => setViewingRecord(null)}
-            onEdit={(record) => {
+            onEdit={(record, anchor) => {
               setViewingRecord(null);
-              navigate(`/MaintenanceRecordFormPage?edit=${record.id}`);
+              navigate(`/MaintenanceRecordFormPage?edit=${record.id}${anchor ? `#${anchor}` : ''}`);
             }}
             onViewBill={(bill) => setViewingBill(bill)}
           />
