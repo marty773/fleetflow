@@ -66,7 +66,7 @@ export default function Vehicles() {
           </div>
           <Button
             onClick={() => navigate('/VehicleForm')}
-            className="bg-slate-900 hover:bg-slate-800 w-full sm:w-auto"
+            className="bg-slate-900 hover:bg-slate-800 hidden sm:flex"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Vehicle
           </Button>
