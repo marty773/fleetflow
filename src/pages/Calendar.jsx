@@ -176,6 +176,61 @@ export default function Calendar() {
 
 
 
+  const handleMarkComplete = async ({ performed_date, odometer, linked_record_id, linked_bill_id, create_record, new_record, attach_bill, new_bill }) => {
+    const interval = completingInterval;
+    let resolvedRecordId = linked_record_id || null;
+    let resolvedBillId = linked_bill_id || null;
+
+    if (create_record && new_record) {
+      const createdRecord = await base44.entities.MaintenanceRecord.create({
+        vehicle_id: interval.vehicle_id,
+        maintenance_type: new_record.maintenance_type || interval.maintenance_type || 'other',
+        title: new_record.title || interval.interval_name,
+        performed_date,
+        vendor: new_record.vendor && new_record.vendor !== 'none' ? new_record.vendor : undefined,
+        odometer_reading: odometer ? String(odometer) : undefined,
+        total_cost: new_record.total_cost || undefined,
+        notes: new_record.notes || undefined,
+        work_items: new_record.work_items?.length ? new_record.work_items : undefined,
+        parts_used: new_record.parts_used?.length ? new_record.parts_used : undefined,
+      });
+      resolvedRecordId = createdRecord.id;
+      queryClient.invalidateQueries({ queryKey: ['maintenanceRecords'] });
+    }
+
+    if (attach_bill && new_bill) {
+      const createdBill = await base44.entities.Bill.create({
+        vendor: new_bill.vendor,
+        bill_date: new_bill.bill_date,
+        total_amount: new_bill.total_amount,
+        category: new_bill.category,
+        line_items: new_bill.line_items,
+      });
+      resolvedBillId = createdBill.id;
+      queryClient.invalidateQueries({ queryKey: ['bills'] });
+    }
+
+    const updateData = {
+      last_performed_date: performed_date,
+      linked_record_id: resolvedRecordId,
+      linked_bill_id: resolvedBillId,
+    };
+    if (odometer) {
+      updateData.last_performed_mileage = odometer;
+      if (interval.interval_miles) updateData.next_due_mileage = odometer + parseFloat(interval.interval_miles);
+    }
+    if (interval.interval_months) {
+      const nextDate = new Date(performed_date);
+      nextDate.setMonth(nextDate.getMonth() + parseInt(interval.interval_months));
+      updateData.next_due_date = nextDate.toISOString().split('T')[0];
+    }
+
+    await base44.entities.MaintenanceInterval.update(interval.id, updateData);
+    queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+    setCompletingInterval(null);
+    toast.success('Interval marked as complete');
+  };
+
   const handleSyncCompanyCalendar = async ({ futureOnly }) => {
     setIsSyncingCompany(true);
     try {
