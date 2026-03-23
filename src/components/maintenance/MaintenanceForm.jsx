@@ -40,7 +40,7 @@ import {
  } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], bills = [], onSubmit, onCancel, isLoading }) {
+export default function MaintenanceForm({ record, vehicles, items = [], vendors = [], bills = [], intervals = [], onSubmit, onCancel, isLoading }) {
   const serviceTypes = useServiceTypes(null, 'records');
   const [loadingOdometer, setLoadingOdometer] = useState(false);
 
