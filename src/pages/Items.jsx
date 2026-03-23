@@ -420,16 +420,6 @@ export default function Items() {
         </div>
       )}
 
-      {/* Mobile FAB */}
-      <button
-        onClick={handleAddNew}
-        aria-label="Add Item"
-        className="fixed bottom-24 right-6 sm:hidden z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation"
-        style={{ backgroundColor: 'var(--color-primary)' }}
-      >
-        <Plus className="w-6 h-6" />
-      </button>
-
       {/* ItemFormDialog removed — now handled by ItemFormPage */}
 
       {/* Delete Confirmation */}
