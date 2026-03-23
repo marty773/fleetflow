@@ -117,13 +117,19 @@ export default function Maintenance() {
     if (allVehicles.length > 0) fetchMileage();
   }, [allVehicles]);
 
-  // Check for URL parameter
-  React.useEffect(() => {
+  // Check for URL parameter and restore filter state
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const viewId = urlParams.get('view');
     const tab = urlParams.get('tab');
+    const vehicle = urlParams.get('vehicle');
+    const sort = urlParams.get('sort');
+    const search = urlParams.get('search');
     if (tab === 'history') setActiveTab('history');
     if (tab === 'upcoming') setActiveTab('upcoming');
+    if (vehicle) setHistoryVehicleFilter(vehicle);
+    if (sort) setHistorySortOrder(sort);
+    if (search) setHistorySearch(search);
     if (viewId && records.length > 0) {
       const record = records.find(r => r.id === viewId);
       if (record) setViewingRecord(record);
