@@ -628,6 +628,32 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
             )}
           </div>
 
+          {/* Link to Interval */}
+          <div id="linked-interval">
+            <Label htmlFor="linked_interval_id">
+              Link to Maintenance Interval <span className="text-slate-400 font-normal">(optional — marks interval as completed)</span>
+            </Label>
+            <Select
+              value={linkedIntervalId || 'none'}
+              onValueChange={(val) => setLinkedIntervalId(val === 'none' ? '' : val)}
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue placeholder="Select an interval..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No interval</SelectItem>
+                {intervals
+                  .filter(i => !formData.vehicle_id || i.vehicle_id === formData.vehicle_id)
+                  .map(i => (
+                    <SelectItem key={i.id} value={i.id}>
+                      {i.interval_name}
+                      {i.next_due_date ? ` — due ${format(new Date(i.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}` : ''}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Link to Bill */}
           <div>
             <Label htmlFor="linked_bill_id">Link to Bill <span className="text-slate-400 font-normal">(optional)</span></Label>
