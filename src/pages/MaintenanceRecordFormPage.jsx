@@ -158,6 +158,7 @@ export default function MaintenanceRecordFormPage() {
             items={filteredItems}
             vendors={vendors}
             bills={bills}
+            intervals={allIntervals}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/Maintenance')}
             isLoading={createMutation.isPending || updateMutation.isPending}
