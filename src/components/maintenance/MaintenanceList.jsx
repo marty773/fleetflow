@@ -133,6 +133,7 @@ export default function MaintenanceList({ records, vehicles, items, bills = [], 
 
       {filteredRecords.map((record) => {
         const hasLinkedBill = !!record.linked_bill_id && bills.some(b => b.id === record.linked_bill_id);
+        const hasLinkedInterval = intervals.some(i => i.linked_record_id === record.id);
         return (
           <Card
             key={record.id}
