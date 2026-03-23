@@ -528,6 +528,16 @@ export default function Items() {
       />
         </div>
       </PullToRefresh>
+
+      {/* Mobile FAB */}
+      <button
+        onClick={handleAddNew}
+        aria-label="Add Item"
+        className="fixed bottom-24 right-6 sm:hidden z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all active:scale-95 touch-manipulation"
+        style={{ backgroundColor: 'var(--color-primary)' }}
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </PageTransition>
   );
 }
