@@ -38,6 +38,9 @@ export default function VehicleFormPage() {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       navigate('/Vehicles');
     },
+    onError: (err) => {
+      toast.error('Failed to update vehicle: ' + (err?.message || 'Unknown error'));
+    },
   });
 
   const handleSubmit = (data) => {
