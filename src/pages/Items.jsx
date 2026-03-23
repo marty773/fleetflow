@@ -263,7 +263,7 @@ export default function Items() {
           />
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
           {/* Sort controls */}
           <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
             {[
