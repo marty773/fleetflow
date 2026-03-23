@@ -363,6 +363,10 @@ export default function Maintenance() {
             onClose={() => setViewingInterval(null)}
             onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
             onMarkComplete={(interval) => { setViewingInterval(null); setCompletingInterval(interval); }}
+            onViewRecord={(recordId) => {
+              const rec = allRecords.find(r => r.id === recordId);
+              if (rec) { setViewingInterval(null); setViewingRecord(rec); }
+            }}
           />
 
           {/* Mark Complete Dialog */}
