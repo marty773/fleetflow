@@ -29,7 +29,7 @@ function LayoutContent({ children, currentPageName }) {
     window.history.back();
   }, []);
 
-  const mainTabPaths = ['Dashboard', 'Vehicles', 'Bills', 'Maintenance'];
+  const mainTabPaths = ['Dashboard', 'Vehicles', 'Bills', 'Maintenance', 'Items', 'Calendar', 'Reports', 'Vendors', 'Settings', 'UserManagement'];
   const isSubPage = !mainTabPaths.includes(currentPageName);
 
   useEffect(() => {
