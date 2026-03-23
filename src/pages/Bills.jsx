@@ -191,7 +191,7 @@ export default function Bills() {
               type="date"
               value={dateFrom}
               onChange={e => setDateFrom(e.target.value)}
-              className="w-full"
+              className="flex-1 h10 bg-white dark:bg-slate-900 text-slate-900 dark:text-white dark:[color-scheme:dark]"
             />
           </div>
           <div className="flex flex-col gap-1 w-full sm:w-40">
@@ -200,7 +200,7 @@ export default function Bills() {
               type="date"
               value={dateTo}
               onChange={e => setDateTo(e.target.value)}
-              className="w-full"
+              className="flex-1 h10 bg-white dark:bg-slate-900 text-slate-900 dark:text-white dark:[color-scheme:dark]"
             />
           </div>
         </div>
