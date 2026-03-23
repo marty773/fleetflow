@@ -255,6 +255,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
       create_recurring_interval: createRecurringInterval && (intervalMonths || intervalMiles),
       interval_months: intervalMonths ? parseInt(intervalMonths) : null,
       interval_miles: intervalMiles ? parseInt(intervalMiles) : null,
+      linked_interval_id: linkedIntervalId || null,
     });
   };
 
