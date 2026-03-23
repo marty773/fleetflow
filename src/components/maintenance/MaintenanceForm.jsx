@@ -99,6 +99,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
   };
   
   const [formData, setFormData] = useState(initializeFormData());
+  const [linkedIntervalId, setLinkedIntervalId] = useState(record?.linked_interval_id || '');
 
   const [newItem, setNewItem] = useState({
     description: '',
