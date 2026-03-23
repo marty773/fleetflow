@@ -41,7 +41,7 @@ export default function Vendors() {
           </div>
           <Button
             onClick={() => navigate('/VendorFormPage')}
-            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+            className="bg-blue-600 hover:bg-blue-700 hidden sm:flex"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Vendor
           </Button>
