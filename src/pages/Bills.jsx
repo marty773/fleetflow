@@ -163,7 +163,47 @@ export default function Bills() {
           </Button>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+        {/* Search & Filters */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-4 mt-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search vendor, invoice #, notes..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={vendorFilter} onValueChange={setVendorFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="All Vendors" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Vendors</SelectItem>
+              {uniqueVendors.map(v => (
+                <SelectItem key={v} value={v}>{v}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            type="date"
+            value={dateFrom}
+            onChange={e => setDateFrom(e.target.value)}
+            className="w-full sm:w-40"
+            title="From date"
+            placeholder="From"
+          />
+          <Input
+            type="date"
+            value={dateTo}
+            onChange={e => setDateTo(e.target.value)}
+            className="w-full sm:w-40"
+            title="To date"
+            placeholder="To"
+          />
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
           <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
             <TabsTrigger value="list">All Bills</TabsTrigger>
             <TabsTrigger value="gallery" className="flex items-center gap-2">
