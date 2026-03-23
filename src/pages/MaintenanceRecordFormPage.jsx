@@ -118,30 +118,31 @@ export default function MaintenanceRecordFormPage() {
         queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
       }
     } else {
-      // Auto-link by matching vehicle + type (original behavior)
-      const relatedIntervals = allIntervals.filter(
-        i => i.vehicle_id === data.vehicle_id && i.maintenance_type === data.maintenance_type
+      // Auto-link only if interval_name exactly matches the record title (same vehicle)
+      const matchingInterval = allIntervals.find(
+        i => i.vehicle_id === data.vehicle_id &&
+             i.interval_name?.trim().toLowerCase() === data.title?.trim().toLowerCase()
       );
-      for (const interval of relatedIntervals) {
+      if (matchingInterval) {
         const updateData = {
           last_performed_date: data.performed_date,
           linked_record_id: savedRecordId
         };
         if (data.odometer_reading) {
           updateData.last_performed_mileage = parseFloat(data.odometer_reading);
-          if (interval.interval_miles) updateData.next_due_mileage = parseFloat(data.odometer_reading) + parseFloat(interval.interval_miles);
+          if (matchingInterval.interval_miles) updateData.next_due_mileage = parseFloat(data.odometer_reading) + parseFloat(matchingInterval.interval_miles);
         }
-        if (interval.interval_months) {
+        if (matchingInterval.interval_months) {
           const nextDate = new Date(data.performed_date);
-          nextDate.setMonth(nextDate.getMonth() + parseInt(interval.interval_months));
+          nextDate.setMonth(nextDate.getMonth() + parseInt(matchingInterval.interval_months));
           updateData.next_due_date = nextDate.toISOString().split('T')[0];
         }
-        await base44.entities.MaintenanceInterval.update(interval.id, updateData);
+        await base44.entities.MaintenanceInterval.update(matchingInterval.id, updateData);
+        if (!editingRecord) {
+          await base44.entities.MaintenanceRecord.update(savedRecordId, { linked_interval_id: matchingInterval.id });
+        }
+        queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
       }
-      if (relatedIntervals.length > 0 && !editingRecord) {
-        await base44.entities.MaintenanceRecord.update(savedRecordId, { linked_interval_id: relatedIntervals[0].id });
-      }
-      queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
     }
 
     navigate('/Maintenance');
