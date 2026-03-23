@@ -362,6 +362,7 @@ export default function Maintenance() {
             currentMileage={motiveVehicles}
             onClose={() => setViewingInterval(null)}
             onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
+            onMarkComplete={(interval) => { setViewingInterval(null); setCompletingInterval(interval); }}
           />
 
           {/* Mark Complete Dialog */}
