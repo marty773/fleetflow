@@ -33,6 +33,10 @@ export default function Maintenance() {
   const [viewingBill, setViewingBill] = useState(null);
   const [viewingInterval, setViewingInterval] = useState(null);
   const [activeTab, setActiveTab] = useState('upcoming');
+  // Lifted filter state from MaintenanceList so we can preserve it on navigation
+  const [historyVehicleFilter, setHistoryVehicleFilter] = useState('all');
+  const [historySortOrder, setHistorySortOrder] = useState('desc');
+  const [historySearch, setHistorySearch] = useState('');
   const [reminderMiles, setReminderMiles] = useState(() => getServiceReminderMiles());
   const [motiveVehicles, setMotiveVehicles] = useState({});
 
