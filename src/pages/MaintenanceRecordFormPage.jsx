@@ -150,7 +150,7 @@ export default function MaintenanceRecordFormPage() {
       }
     }
 
-    navigate('/Maintenance');
+    navigate(returnTo);
   };
 
   if (editId && allRecords.length === 0) {
