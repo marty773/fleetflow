@@ -153,6 +153,11 @@ export default function MaintenanceList({ records, vehicles, items, bills = [], 
                         <Link2 className="w-3 h-3" /> Linked Bill
                       </Badge>
                     )}
+                    {hasLinkedInterval && (
+                      <Badge variant="outline" className="gap-1 text-green-700 border-green-300 bg-green-50 dark:bg-green-950 dark:text-green-300 dark:border-green-700">
+                        <Link2 className="w-3 h-3" /> Linked Interval
+                      </Badge>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
                     <div>
