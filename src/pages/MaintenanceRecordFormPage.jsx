@@ -14,6 +14,7 @@ export default function MaintenanceRecordFormPage() {
   const urlParams = new URLSearchParams(window.location.search);
   const editId = urlParams.get('edit');
   const presetVehicleId = urlParams.get('vehicle');
+  const returnTo = urlParams.get('returnTo') || '/Maintenance';
 
   const { data: allVehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list() });
   const { data: allItems = [] } = useQuery({ queryKey: ['items'], queryFn: () => base44.entities.Item.list() });
