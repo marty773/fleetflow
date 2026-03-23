@@ -555,6 +555,18 @@ export default function Calendar() {
           </div>
         </div>
 
+        {/* Mark Complete Dialog */}
+        <MarkCompleteDialog
+          interval={completingInterval}
+          records={allRecords}
+          bills={[]}
+          vendors={[]}
+          items={[]}
+          vehicles={allVehicles}
+          onConfirm={handleMarkComplete}
+          onClose={() => setCompletingInterval(null)}
+        />
+
         {/* Sync Dialog */}
         <SyncDialog
           open={showCompanySyncDialog}
