@@ -298,13 +298,13 @@ export default function Maintenance() {
                 <Button onClick={() => setShowAIGenerator(true)} variant="outline" size="sm" className="border-amber-400 text-amber-700 hover:bg-amber-50 gap-2">
                   <Sparkles className="w-4 h-4" /> AI Generate
                 </Button>
-                <Button onClick={() => navigate('/MaintenanceIntervalFormPage')} size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => navigate('/MaintenanceIntervalFormPage')} size="sm" className="bg-blue-600 hover:bg-blue-700 hidden sm:flex">
                   <Plus className="w-4 h-4 mr-1" /> Create Interval
                 </Button>
               </>
             )}
             {activeTab === 'history' && (
-              <Button onClick={() => navigate('/MaintenanceRecordFormPage')} size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => navigate('/MaintenanceRecordFormPage')} size="sm" className="bg-blue-600 hover:bg-blue-700 hidden sm:flex">
                 <Plus className="w-4 h-4 mr-1" /> Log Maintenance
               </Button>
             )}
