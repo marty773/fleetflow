@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings, ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect, useCallback } from 'react';
-import GlobalSearch from '@/components/GlobalSearch';
+
 import BottomTabs from '@/components/mobile/BottomTabs';
 
 function LayoutContent({ children, currentPageName }) {
