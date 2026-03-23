@@ -185,7 +185,7 @@ export default function Bills() {
               ))}
             </SelectContent>
           </Select>
-          <div className="flex flex-row gap-2 w-full sm:auto">
+          <div className="flex flex-row gap-2 w-full sm:w-auto">
             <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">Start Date</label>
             <Input
               type="date"
