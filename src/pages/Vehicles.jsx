@@ -74,6 +74,15 @@ export default function Vehicles() {
 
         {/* Search + Filter Controls */}
         <div className="flex flex-wrap items-center gap-2 mb-6">
+          <div className="relative flex-1 min-w-[160px] max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search vehicles..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-10 h-9"
+            />
+          </div>
           <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
             {['all', 'truck', 'trailer'].map(type => (
               <button
