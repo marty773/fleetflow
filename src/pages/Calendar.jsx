@@ -339,7 +339,7 @@ export default function Calendar() {
                   setEditingAppointment(null);
                   setShowAppointmentForm(true);
                 }}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 hidden sm:flex"
               >
                 <Plus className="w-4 h-4 mr-2" /> New Appointment
               </Button>
