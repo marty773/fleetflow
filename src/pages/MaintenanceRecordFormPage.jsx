@@ -95,10 +95,14 @@ export default function MaintenanceRecordFormPage() {
       queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
     }
 
-    // If a specific interval was linked, update that interval to mark it completed
+    // Only update interval data on NEW records, or if the linked interval changed during edit
+    const originalLinkedIntervalId = editingRecord?.linked_interval_id || null;
+    const intervalLinkChanged = data.linked_interval_id !== originalLinkedIntervalId;
+
     if (data.linked_interval_id) {
       const linkedInterval = allIntervals.find(i => i.id === data.linked_interval_id);
-      if (linkedInterval) {
+      if (linkedInterval && (!editingRecord || intervalLinkChanged)) {
+        // Only update last_performed info when creating or when the linked interval was explicitly changed
         const updateData = {
           last_performed_date: data.performed_date,
           linked_record_id: savedRecordId,
@@ -113,12 +117,14 @@ export default function MaintenanceRecordFormPage() {
           updateData.next_due_date = nextDate.toISOString().split('T')[0];
         }
         await base44.entities.MaintenanceInterval.update(linkedInterval.id, updateData);
-        // Also store the linked_interval_id on the record
-        await base44.entities.MaintenanceRecord.update(savedRecordId, { linked_interval_id: data.linked_interval_id });
         queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
       }
-    } else {
-      // Auto-link only if interval_name exactly matches the record title (same vehicle)
+      // Always keep linked_interval_id on the record in sync
+      if (!editingRecord || intervalLinkChanged) {
+        await base44.entities.MaintenanceRecord.update(savedRecordId, { linked_interval_id: data.linked_interval_id });
+      }
+    } else if (!editingRecord) {
+      // Auto-link only on new records: match by exact interval name (same vehicle)
       const matchingInterval = allIntervals.find(
         i => i.vehicle_id === data.vehicle_id &&
              i.interval_name?.trim().toLowerCase() === data.title?.trim().toLowerCase()
@@ -138,9 +144,7 @@ export default function MaintenanceRecordFormPage() {
           updateData.next_due_date = nextDate.toISOString().split('T')[0];
         }
         await base44.entities.MaintenanceInterval.update(matchingInterval.id, updateData);
-        if (!editingRecord) {
-          await base44.entities.MaintenanceRecord.update(savedRecordId, { linked_interval_id: matchingInterval.id });
-        }
+        await base44.entities.MaintenanceRecord.update(savedRecordId, { linked_interval_id: matchingInterval.id });
         queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
       }
     }
