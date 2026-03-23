@@ -153,6 +153,15 @@ export default function Vehicles() {
           </div>
         </div>
       </PullToRefresh>
+
+      {/* Mobile FAB */}
+      <button
+        onClick={() => navigate('/VehicleForm')}
+        aria-label="Add Vehicle"
+        className="fixed bottom-24 right-6 sm:hidden z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all active:scale-95 touch-manipulation bg-slate-900 dark:bg-slate-100 dark:text-slate-900"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </PageTransition>
   );
 }
