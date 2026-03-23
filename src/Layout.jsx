@@ -195,8 +195,7 @@ function LayoutContent({ children, currentPageName }) {
       {/* Mobile Bottom Tabs */}
       <BottomTabs currentPageName={currentPageName} />
 
-      {/* Global Search */}
-      <GlobalSearch />
+
       </div>
       );
       }
