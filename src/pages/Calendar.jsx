@@ -569,8 +569,8 @@ export default function Calendar() {
         <MarkCompleteDialog
           interval={completingInterval}
           records={allRecords}
-          bills={[]}
-          vendors={[]}
+          bills={allBills}
+          vendors={allVendors}
           items={[]}
           vehicles={allVehicles}
           onConfirm={handleMarkComplete}
