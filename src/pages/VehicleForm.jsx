@@ -28,7 +28,7 @@ export default function VehicleFormPage() {
       navigate('/Vehicles');
     },
     onError: (err) => {
-      console.error('Failed to create vehicle:', err);
+      toast.error('Failed to save vehicle: ' + (err?.message || 'Unknown error'));
     },
   });
 
