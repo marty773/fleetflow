@@ -322,6 +322,11 @@ export default function VehicleCostReport() {
                           <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
                             ${item.totalCost.toFixed(2)}
                           </TableCell>
+                          {showPerMonth && (
+                            <TableCell className="text-right text-slate-700 dark:text-slate-300">
+                              ${(item.totalCost / timeframeMonths).toFixed(2)}/mo
+                            </TableCell>
+                          )}
                           <TableCell className="text-right text-slate-900 dark:text-slate-300">
                             {((item.totalCost / totalExpenses) * 100).toFixed(1)}%
                           </TableCell>
