@@ -16,6 +16,7 @@ export default function Vehicles() {
   const [viewingVehicle, setViewingVehicle] = useState(null);
   const [sortBy, setSortBy] = useState('name');
   const [filterType, setFilterType] = useState('all');
+  const [search, setSearch] = useState('');
   const queryClient = useQueryClient();
 
   const { data: vehicles = [] } = useQuery({
