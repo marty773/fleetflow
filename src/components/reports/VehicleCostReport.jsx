@@ -295,6 +295,7 @@ export default function VehicleCostReport() {
                     <TableHead className="text-slate-700 dark:text-slate-300">Type</TableHead>
                     <TableHead className="text-slate-700 dark:text-slate-300">License Plate</TableHead>
                     <TableHead className="text-right text-slate-700 dark:text-slate-300">Total Cost</TableHead>
+                    {showPerMonth && <TableHead className="text-right text-slate-700 dark:text-slate-300">Per Month</TableHead>}
                     <TableHead className="text-right text-slate-700 dark:text-slate-300">% of Total</TableHead>
                   </TableRow>
                 </TableHeader>
