@@ -213,7 +213,7 @@ export default function Bills() {
 
           <TabsContent value="list" className="mt-6">
             <BillList
-              bills={bills}
+              bills={filteredBills}
               vehicles={vehicles}
               items={filteredItems}
               records={maintenanceRecords}
