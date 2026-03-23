@@ -26,6 +26,17 @@ export default function Vehicles() {
 
   const filteredVehicles = vehicles
     .filter(v => filterType === 'all' || v.type === filterType)
+    .filter(v => {
+      if (!search.trim()) return true;
+      const q = search.toLowerCase();
+      return (
+        v.name?.toLowerCase().includes(q) ||
+        v.make?.toLowerCase().includes(q) ||
+        v.model?.toLowerCase().includes(q) ||
+        v.license_plate?.toLowerCase().includes(q) ||
+        v.vin?.toLowerCase().includes(q)
+      );
+    })
     .sort((a, b) => {
       if (sortBy === 'type') {
         if (a.type !== b.type) return a.type.localeCompare(b.type);
