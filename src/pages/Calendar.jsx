@@ -565,6 +565,15 @@ export default function Calendar() {
           </div>
         </div>
 
+        {/* Mobile FAB */}
+        <button
+          onClick={() => { setEditingAppointment(null); setShowAppointmentForm(true); }}
+          aria-label="New Appointment"
+          className="fixed bottom-24 right-6 sm:hidden z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation bg-blue-600"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+
         {/* Mark Complete Dialog */}
         <MarkCompleteDialog
           interval={completingInterval}
