@@ -186,30 +186,32 @@ export default function Bills() {
             </SelectContent>
           </Select>
    
+          {/* This container ensures they stay side-by-side but don't overlap */}
           <div className="flex flex-row gap-2 w-full sm:w-auto">
-          
-            <div className="flex flex-col gap-1 flex-1">
+            
+            {/* Start Date */}
+            <div className="flex flex-col gap-1 min-w-0 flex-1 sm:w-40">
               <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">Start Date</label>
               <Input
                 type="date"
                 value={dateFrom}
                 onChange={e => setDateFrom(e.target.value)}
-                className="w-full h-10 dark:[color-scheme:dark]"
+                {/* Changed h-10 to h-9 to make it slightly shorter/slimmer */}
+                className="w-full h-9 text-sm dark:[color-scheme:dark]"
               />
             </div>
-          
-            <div className="flex flex-col gap-1 flex-1">
+
+            {/* End Date */}
+            <div className="flex flex-col gap-1 min-w-0 flex-1 sm:w-40">
               <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">End Date</label>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={e => setDateTo(e.target.value)}
-                className="w-full h-10 dark:[color-scheme:dark]"
+                className="w-full h-9 text-sm dark:[color-scheme:dark]"
               />
             </div>
-
           </div>
-        </div>
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
