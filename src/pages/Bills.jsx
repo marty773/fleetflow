@@ -211,7 +211,7 @@ export default function Bills() {
               />
             </div>
           </div>
-
+        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
           <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
