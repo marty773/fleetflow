@@ -196,7 +196,6 @@ export default function Bills() {
                 type="date"
                 value={dateFrom}
                 onChange={e => setDateFrom(e.target.value)}
-                {/* Changed h-10 to h-9 to make it slightly shorter/slimmer */}
                 className="w-full h-9 text-sm dark:[color-scheme:dark]"
               />
             </div>
