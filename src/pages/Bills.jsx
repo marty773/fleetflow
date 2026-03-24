@@ -163,52 +163,11 @@ export default function Bills() {
           </Button>
         </div>
 
-        {/* Filter Section */}
-        <div className="flex flex-col gap-4 mb-6 mt-2">
+        {/* Search & Filters - 'flex-wrap' is the key for desktop/mobile harmony */}
+        <div className="flex flex-wrap items-end gap-3 mb-6 mt-2">
           
-          {/* Top Row: Vendor & Dates */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            
-            {/* Vendor Dropdown */}
-            <div className="w-full sm:w-48">
-              <Select value={vendorFilter} onValueChange={setVendorFilter}>
-                <SelectTrigger className="w-full h-10 bg-background">
-                  <SelectValue placeholder="All Vendors" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Vendors</SelectItem>
-                  {uniqueVendors.map(v => (
-                    <SelectItem key={v} value={v}>{v}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Date Inputs - Split 50/50 on mobile */}
-            <div className="flex flex-row gap-2 flex-1">
-              <div className="flex-1">
-                <label className="text-[10px] uppercase font-bold text-slate-500 px-1">Start</label>
-                <Input
-                  type="date"
-                  value={dateFrom}
-                  onChange={e => setDateFrom(e.target.value)}
-                  className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-[10px] uppercase font-bold text-slate-500 px-1">End</label>
-                <Input
-                  type="date"
-                  value={dateTo}
-                  onChange={e => setDateTo(e.target.value)}
-                  className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Row: Search Bar (Easier to reach on mobile) */}
-          <div className="relative w-full">
+          {/* 1. Search Box - Grows to fill space on desktop */}
+          <div className="relative flex-1 min-w-[280px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Search vendor, invoice #..."
@@ -218,9 +177,43 @@ export default function Bills() {
             />
           </div>
 
+          {/* 2. Vendor Dropdown */}
+          <div className="w-full sm:w-48">
+            <Select value={vendorFilter} onValueChange={setVendorFilter}>
+              <SelectTrigger className="w-full h-10 bg-background">
+                <SelectValue placeholder="All Vendors" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Vendors</SelectItem>
+                {uniqueVendors.map(v => (
+                  <SelectItem key={v} value={v}>{v}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 3. Dates Container - Stays side-by-side on mobile */}
+          <div className="flex flex-row gap-2 w-full sm:w-auto">
+            <div className="flex-1 sm:w-40">
+              <label className="text-[10px] uppercase font-bold text-slate-500 px-1">Start</label>
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={e => setDateFrom(e.target.value)}
+                className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
+              />
+            </div>
+            <div className="flex-1 sm:w-40">
+              <label className="text-[10px] uppercase font-bold text-slate-500 px-1">End</label>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={e => setDateTo(e.target.value)}
+                className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
+              />
+            </div>
+          </div>
         </div>
-
-
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
