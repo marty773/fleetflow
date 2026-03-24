@@ -304,7 +304,6 @@ export default function Bills() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-          </div>
         </div>
       </PullToRefresh>
 
