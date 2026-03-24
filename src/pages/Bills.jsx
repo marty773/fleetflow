@@ -196,47 +196,24 @@ export default function Bills() {
           <div className="flex flex-row gap-2 w-full sm:w-auto">
             <div className="flex-1 sm:w-40">
               <label className="text-[10px] uppercase font-bold text-slate-500 px-1">Start</label>
-              <div className="relative">
-                <Input
-                  type="date"
-                  value={dateFrom}
-                  onChange={e => setDateFrom(e.target.value)}
-                  className="w-full h-10 text-sm bg-background dark:[color-scheme:dark] pr-10"
-                />
-                {dateFrom && (
-                  <button 
-                    type="button"
-                    onClick={() => setDateFrom('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center text-slate-400"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={e => setDateFrom(e.target.value)}
+                className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
+              />
             </div>
-
             <div className="flex-1 sm:w-40">
               <label className="text-[10px] uppercase font-bold text-slate-500 px-1">End</label>
-              <div className="relative">
-                <Input
-                  type="date"
-                  value={dateTo}
-                  onChange={e => setDateTo(e.target.value)}
-                  className="w-full h-10 text-sm bg-background dark:[color-scheme:dark] pr-10"
-                />
-                {dateTo && (
-                  <button 
-                    type="button"
-                    onClick={() => setDateTo('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center text-slate-400"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={e => setDateTo(e.target.value)}
+                className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
+              />
             </div>
           </div>
-
+        </div>
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
