@@ -164,54 +164,33 @@ export default function Bills() {
         </div>
 
         {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row sm:items-end gap-3 mb-4 mt-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search vendor, invoice #, notes..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={vendorFilter} onValueChange={setVendorFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="All Vendors" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Vendors</SelectItem>
-              {uniqueVendors.map(v => (
-                <SelectItem key={v} value={v}>{v}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-   
-          {/* This container ensures they stay side-by-side but don't overlap */}
-          <div className="flex flex-row gap-2 w-full sm:w-auto">
+          {/* This 'grid' command creates two perfectly equal columns with a gap between them */}
+          <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto">
             
-            {/* Start Date */}
-            <div className="flex flex-col gap-1 min-w-0 flex-1 sm:w-40">
-              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">Start Date</label>
+            {/* Start Date Column */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1 truncate">Start Date</label>
               <Input
                 type="date"
                 value={dateFrom}
                 onChange={e => setDateFrom(e.target.value)}
-                className="w-full h-9 text-sm dark:[color-scheme:dark]"
+                className="w-full h-9 text-xs dark:[color-scheme:dark] px-2"
               />
             </div>
 
-            {/* End Date */}
-            <div className="flex flex-col gap-1 min-w-0 flex-1 sm:w-40">
-              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">End Date</label>
+            {/* End Date Column */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1 truncate">End Date</label>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={e => setDateTo(e.target.value)}
-                className="w-full h-9 text-sm dark:[color-scheme:dark]"
+                className="w-full h-9 text-xs dark:[color-scheme:dark] px-2"
               />
             </div>
+
           </div>
-        </div>
+
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
           <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
