@@ -163,33 +163,58 @@ export default function Bills() {
           </Button>
         </div>
 
-        {/* Search & Filters */}
-          {/* This 'grid' command creates two perfectly equal columns with a gap between them */}
-          <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto">
-            
-            {/* Start Date Column */}
-            <div className="flex flex-col gap-1 min-w-0">
-              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1 truncate">Start Date</label>
+        {/* Search & Filters Container */}
+        <div className="flex flex-wrap items-end gap-3 mb-4 mt-2">
+          
+          {/* 1. Search Box - Now takes full width on phone, shared on desktop */}
+          <div className="relative w-full sm:flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-10 h-10"
+            />
+          </div>
+
+          {/* 2. Vendor Dropdown - Takes half width on phone */}
+          <div className="w-[calc(50%-6px)] sm:w-48">
+            <Select value={vendorFilter} onValueChange={setVendorFilter}>
+              <SelectTrigger className="w-full h-10">
+                <SelectValue placeholder="Vendors" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Vendors</SelectItem>
+                {uniqueVendors.map(v => (
+                  <SelectItem key={v} value={v}>{v}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 3. Date Group - Wraps to a new line on small phones */}
+          <div className="flex flex-1 gap-2 min-w-[200px]">
+            <div className="flex-1">
+              <label className="text-[10px] uppercase font-bold text-slate-500 px-1">Start</label>
               <Input
                 type="date"
                 value={dateFrom}
                 onChange={e => setDateFrom(e.target.value)}
-                className="w-full h-9 text-xs dark:[color-scheme:dark] px-2"
+                className="w-full h-10 text-xs dark:[color-scheme:dark] bg-slate-900/50"
               />
             </div>
-
-            {/* End Date Column */}
-            <div className="flex flex-col gap-1 min-w-0">
-              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1 truncate">End Date</label>
+            <div className="flex-1">
+              <label className="text-[10px] uppercase font-bold text-slate-500 px-1">End</label>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={e => setDateTo(e.target.value)}
-                className="w-full h-9 text-xs dark:[color-scheme:dark] px-2"
+                className="w-full h-10 text-xs dark:[color-scheme:dark] bg-slate-900/50"
               />
             </div>
-
           </div>
+        </div>
+
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
