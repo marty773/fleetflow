@@ -185,25 +185,32 @@ export default function Bills() {
               ))}
             </SelectContent>
           </Select>
+   
           <div className="flex flex-row gap-2 w-full sm:w-auto">
-            <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">Start Date</label>
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={e => setDateFrom(e.target.value)}
-              className="flex-1 h10 bg-white dark:bg-slate-900 text-slate-900 dark:text-white dark:[color-scheme:dark]"
-            />
-          </div>
-          <div className="flex flex-col gap-1 flex-1 sm:w-40">
-            <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">End Date</label>
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={e => setDateTo(e.target.value)}
-              className="flex-1 h10 bg-white dark:bg-slate-900 text-slate-900 dark:text-white dark:[color-scheme:dark]"
-            />
+          
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">Start Date</label>
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={e => setDateFrom(e.target.value)}
+                className="w-full h-10 dark:[color-scheme:dark]"
+              />
+            </div>
+          
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-1">End Date</label>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={e => setDateTo(e.target.value)}
+                className="w-full h-10 dark:[color-scheme:dark]"
+              />
+            </div>
+
           </div>
         </div>
+
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
           <TabsList className="bg-white dark:bg-slate-950 border-b dark:border-slate-800 rounded-none">
