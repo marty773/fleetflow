@@ -163,57 +163,63 @@ export default function Bills() {
           </Button>
         </div>
 
-        {/* Search & Filters Container */}
-        <div className="flex flex-wrap items-end gap-3 mb-4 mt-2">
+        {/* Filter Section */}
+        <div className="flex flex-col gap-4 mb-6 mt-2">
           
-          {/* 1. Search Box - Now takes full width on phone, shared on desktop */}
-          <div className="relative w-full sm:flex-1">
+          {/* Top Row: Vendor & Dates */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            
+            {/* Vendor Dropdown */}
+            <div className="w-full sm:w-48">
+              <Select value={vendorFilter} onValueChange={setVendorFilter}>
+                <SelectTrigger className="w-full h-10 bg-background">
+                  <SelectValue placeholder="All Vendors" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Vendors</SelectItem>
+                  {uniqueVendors.map(v => (
+                    <SelectItem key={v} value={v}>{v}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Date Inputs - Split 50/50 on mobile */}
+            <div className="flex flex-row gap-2 flex-1">
+              <div className="flex-1">
+                <label className="text-[10px] uppercase font-bold text-slate-500 px-1">Start</label>
+                <Input
+                  type="date"
+                  value={dateFrom}
+                  onChange={e => setDateFrom(e.target.value)}
+                  className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-[10px] uppercase font-bold text-slate-500 px-1">End</label>
+                <Input
+                  type="date"
+                  value={dateTo}
+                  onChange={e => setDateTo(e.target.value)}
+                  className="w-full h-10 text-sm bg-background dark:[color-scheme:dark]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row: Search Bar (Easier to reach on mobile) */}
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
-              placeholder="Search..."
+              placeholder="Search vendor, invoice #..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-10 h-10"
+              className="pl-10 h-10 bg-background"
             />
           </div>
 
-          {/* 2. Vendor Dropdown - Takes half width on phone */}
-          <div className="w-[calc(50%-6px)] sm:w-48">
-            <Select value={vendorFilter} onValueChange={setVendorFilter}>
-              <SelectTrigger className="w-full h-10">
-                <SelectValue placeholder="Vendors" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Vendors</SelectItem>
-                {uniqueVendors.map(v => (
-                  <SelectItem key={v} value={v}>{v}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 3. Date Group - Wraps to a new line on small phones */}
-          <div className="flex flex-1 gap-2 min-w-[200px]">
-            <div className="flex-1">
-              <label className="text-[10px] uppercase font-bold text-slate-500 px-1">Start</label>
-              <Input
-                type="date"
-                value={dateFrom}
-                onChange={e => setDateFrom(e.target.value)}
-                className="w-full h-10 text-xs dark:[color-scheme:dark] bg-slate-900/50"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="text-[10px] uppercase font-bold text-slate-500 px-1">End</label>
-              <Input
-                type="date"
-                value={dateTo}
-                onChange={e => setDateTo(e.target.value)}
-                className="w-full h-10 text-xs dark:[color-scheme:dark] bg-slate-900/50"
-              />
-            </div>
-          </div>
         </div>
+
 
 
 
