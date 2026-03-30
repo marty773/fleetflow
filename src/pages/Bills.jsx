@@ -216,7 +216,69 @@ export default function Bills() {
         </div>
       </PullToRefresh>
       
-      {viewingBill && <BillDetailDialog bill={viewingBill} isOpen={!!viewingBill} onClose={() => setViewingBill(null)} vehicles={vehicles} records={maintenanceRecords} />}
+      <BillDetailDialog
+        bill={viewingBill}
+        vehicles={vehicles}
+        records={maintenanceRecords}
+        onClose={() => setViewingBill(null)}
+        onEdit={(bill) => {
+          setViewingBill(null);
+          navigate(`/BillFormPage?edit=${bill.id}`);
+        }}
+        onDelete={(id) => {
+          setDeletingBill(bills.find(b => b.id === id));
+          setViewingBill(null);
+        }}
+        onViewPhoto={() => setViewingBill(null)}
+        onViewRecord={(record) => { setViewingBill(null); setViewingRecord(record); }}
+      />
+
+      <MaintenanceRecordDetailDialog
+        record={viewingRecord}
+        vehicles={vehicles}
+        items={filteredItems}
+        bills={bills}
+        intervals={[]}
+        onClose={() => setViewingRecord(null)}
+        onEdit={(record) => {
+          setViewingRecord(null);
+          navigate(`/MaintenanceRecordFormPage?edit=${record.id}`);
+        }}
+        onViewBill={(bill) => { setViewingRecord(null); setViewingBill(bill); }}
+      />
+
+      <AlertDialog open={!!deletingBill} onOpenChange={() => setDeletingBill(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Bill</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this bill? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                deleteMutation.mutate(deletingBill.id);
+                setDeletingBill(null);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Mobile FAB */}
+      <button
+        onClick={() => navigate('/BillFormPage')}
+        aria-label="New Bill"
+        className="fixed bottom-24 right-6 sm:hidden z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all active:scale-95 touch-manipulation"
+        style={{ backgroundColor: 'var(--color-primary)' }}
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </PageTransition>
   );
 }
