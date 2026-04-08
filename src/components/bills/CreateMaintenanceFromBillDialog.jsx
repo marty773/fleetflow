@@ -57,13 +57,11 @@ function extractKeywords(bill) {
 }
 
 export default function CreateMaintenanceFromBillDialog({ bill, vehicles, intervals = [], onClose, onCreated }) {
-  if (!bill) return null;
+  const vehicleIds = [...new Set(((bill?.line_items) || []).filter(i => i.vehicle_id).map(i => i.vehicle_id))];
+  const billVehicles = (vehicles || []).filter(v => vehicleIds.includes(v.id));
 
-  const vehicleIds = [...new Set((bill.line_items || []).filter(i => i.vehicle_id).map(i => i.vehicle_id))];
-  const billVehicles = vehicles.filter(v => vehicleIds.includes(v.id));
-
-  const [selectedVehicleId, setSelectedVehicleId] = useState(billVehicles[0]?.id || '');
-  const [title, setTitle] = useState(bill.vendor ? `Service at ${bill.vendor}` : 'Service Record');
+  const [selectedVehicleId, setSelectedVehicleId] = useState('');
+  const [title, setTitle] = useState('');
   const [maintenanceType, setMaintenanceType] = useState('other');
   const [odometer, setOdometer] = useState('');
   const [notes, setNotes] = useState('');
@@ -74,6 +72,15 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
   const [loadingOdometer, setLoadingOdometer] = useState(false);
   const [lineItemsExpanded, setLineItemsExpanded] = useState(false);
   const [selectedLineItemIndexes, setSelectedLineItemIndexes] = useState([]);
+
+  // Initialize state when bill changes
+  useEffect(() => {
+    if (!bill) return;
+    setSelectedVehicleId(billVehicles[0]?.id || '');
+    setTitle(bill.vendor ? `Service at ${bill.vendor}` : 'Service Record');
+  }, [bill?.id]);
+
+  if (!bill) return null;
 
   const fetchOdometerFromMotive = () => {
     const vehicle = vehicles.find(v => v.id === selectedVehicleId);

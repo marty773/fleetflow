@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Package, FileText, CalendarClock } from 'lucide-react';
 import { format } from 'date-fns';
 
-export default function MaintenanceRecordDetailDialog({ record, vehicles = [], items = [], bills = [], intervals = [], onClose, onEdit, onViewBill, onEditIntervalSection }) {
+export default function MaintenanceRecordDetailDialog({ record, vehicles = [], items = [], bills = [], intervals = [], onClose, onEdit, onDelete, onViewBill, onEditIntervalSection }) {
   if (!record) return null;
 
   const vehicle = vehicles.find(v => v.id === record.vehicle_id);
@@ -178,7 +178,16 @@ export default function MaintenanceRecordDetailDialog({ record, vehicles = [], i
           <Button variant="outline" onClick={onClose} className="flex-1">
             Close
           </Button>
-          <Button onClick={() => onEdit?.(record)} className="w-full bg-amber-600 hover:bg-amber-700">
+          {onDelete && (
+            <Button
+              variant="outline"
+              onClick={() => { onDelete(record.id); onClose(); }}
+              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              Delete
+            </Button>
+          )}
+          <Button onClick={() => onEdit?.(record)} className="flex-1 bg-amber-600 hover:bg-amber-700">
             Edit
           </Button>
         </div>

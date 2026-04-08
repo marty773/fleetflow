@@ -434,6 +434,7 @@ export default function Maintenance() {
               navigate(`/MaintenanceRecordFormPage?edit=${record.id}&returnTo=${encodeURIComponent('/Maintenance?' + returnParams.toString())}${anchor ? `#${anchor}` : ''}`);
             }}
             onViewBill={(bill) => setViewingBill(bill)}
+            onDelete={(id) => setDeletingRecord(records.find(r => r.id === id))}
           />
 
           {/* View Bill Dialog */}
