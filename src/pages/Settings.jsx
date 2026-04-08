@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Settings, LogOut, Trash2, Bell, Save, Copy, Check, Lock, KeyRound } from 'lucide-react';
+import { Settings, LogOut, Trash2, Bell, Save, Copy, Check, Lock, KeyRound, ChevronDown, ChevronUp, ExternalLink, Wrench } from 'lucide-react';
 import { appParams } from '@/lib/app-params';
+import { Link } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ServiceTypesEditor from '@/components/settings/ServiceTypesEditor';
 import ServiceReminderSettings from '@/components/settings/ServiceReminderSettings';
@@ -21,6 +22,7 @@ export default function SettingsPage() {
   const apiBaseUrl = appParams.appBaseUrl || `https://api.base44.com/api/apps/${appId}`;
   const apiKey = appParams.appId;
   const [isDeleting, setIsDeleting] = useState(false);
+  const [adminExpanded, setAdminExpanded] = useState(false);
   const [notifSettings, setNotifSettings] = useState(null);
   const [notifSettingsId, setNotifSettingsId] = useState(null);
   const [notifSaving, setNotifSaving] = useState(false);
@@ -239,46 +241,77 @@ export default function SettingsPage() {
 
         {user?.role === 'admin' && (
           <Card className="mb-6 border-amber-200 dark:border-amber-800">
-            <CardHeader>
+            <CardHeader className="cursor-pointer select-none" onClick={() => setAdminExpanded(e => !e)}>
               <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
                 <Lock className="w-5 h-5 text-amber-600" />
-                API Integration Credentials
-                <span className="ml-auto text-xs font-normal bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">Admin Only</span>
+                Admin Settings
+                <span className="ml-2 text-xs font-normal bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">Admin Only</span>
+                {adminExpanded
+                  ? <ChevronUp className="w-4 h-4 ml-auto text-slate-400" />
+                  : <ChevronDown className="w-4 h-4 ml-auto text-slate-400" />}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-xs text-slate-500 dark:text-slate-400">Use these credentials in App 1 to connect to FleetFlow's API.</p>
 
-              {[
-                { label: 'FLEETFLOW_API_BASE_URL', value: apiBaseUrl, key: 'url' },
-                { label: 'FLEETFLOW_APP_ID (API Key)', value: appId, key: 'key' },
-              ].map(({ label, value, key }) => (
-                <div key={key}>
-                  <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 font-mono">{label}</p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded text-sm font-mono break-all">
-                      {value}
-                    </code>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => {
-                        navigator.clipboard.writeText(value);
-                        setCopied(c => ({ ...c, [key]: true }));
-                        setTimeout(() => setCopied(c => ({ ...c, [key]: false })), 2000);
-                      }}
-                    >
-                      {copied[key] ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                    </Button>
+            {adminExpanded && (
+              <CardContent className="space-y-6 pt-0">
+
+                {/* System Updates link */}
+                <div>
+                  <Link
+                    to="/SystemUpdates"
+                    className="flex items-center justify-between w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 border border-slate-200 dark:border-slate-700 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Wrench className="w-5 h-5 text-amber-600" />
+                      <div>
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">System Updates</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Manage version number & generate update prompts</p>
+                      </div>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-amber-600 transition-colors" />
+                  </Link>
+                </div>
+
+                {/* API Credentials */}
+                <div className="space-y-4">
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-600" /> API Integration Credentials
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Use these credentials in App 1 to connect to FleetFlow's API.</p>
+
+                  {[
+                    { label: 'FLEETFLOW_API_BASE_URL', value: apiBaseUrl, key: 'url' },
+                    { label: 'FLEETFLOW_APP_ID (API Key)', value: appId, key: 'key' },
+                  ].map(({ label, value, key }) => (
+                    <div key={key}>
+                      <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 font-mono">{label}</p>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded text-sm font-mono break-all">
+                          {value}
+                        </code>
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(value);
+                            setCopied(c => ({ ...c, [key]: true }));
+                            setTimeout(() => setCopied(c => ({ ...c, [key]: false })), 2000);
+                          }}
+                        >
+                          {copied[key] ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                    <p className="text-xs text-amber-800 dark:text-amber-300 font-medium mb-1">How to use in App 1:</p>
+                    <p className="text-xs text-amber-700 dark:text-amber-400">Set <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_API_BASE_URL</code> and <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_APP_ID</code> as secrets in App 1's dashboard.</p>
                   </div>
                 </div>
-              ))}
 
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-                <p className="text-xs text-amber-800 dark:text-amber-300 font-medium mb-1">How to use in App 1:</p>
-                <p className="text-xs text-amber-700 dark:text-amber-400">Set <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_API_BASE_URL</code> and <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">FLEETFLOW_APP_ID</code> as secrets in App 1's dashboard. The App ID acts as the API key for identifying requests from App 1.</p>
-              </div>
-            </CardContent>
+              </CardContent>
+            )}
           </Card>
         )}
 

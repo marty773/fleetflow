@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+
+// Auto-populated build version: uses Vite build timestamp as an integer (YYYYMMDDHHMI)
+const BUILD_VERSION = parseInt(
+  (import.meta.env.VITE_BUILD_TIME || new Date().toISOString())
+    .replace(/[-T:Z.]/g, '')
+    .slice(0, 12)
+) || 0;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -40,8 +47,12 @@ export default function SystemUpdates() {
         if (records.length > 0) {
           const rec = records[0];
           setMetadataId(rec.id);
-          setVersionNumber(rec.version_number ?? '');
+          // Auto-populate with build version if stored version is empty/0
+          setVersionNumber(rec.version_number || BUILD_VERSION);
           setFeaturesSummary(rec.latest_features_summary ?? '');
+        } else {
+          // First time: seed with build version
+          setVersionNumber(BUILD_VERSION);
         }
         setLoading(false);
       });
