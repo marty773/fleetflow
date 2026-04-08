@@ -8,7 +8,60 @@
     },
     "latest_features_summary": {
       "type": "string",
-      "description": "Summary of latest features and schema changes"
+      "description": "Summary of latest features and schema changes (draft for next update)"
+    },
+    "pending_changes": {
+      "type": "array",
+      "description": "Automatically recorded changes since the last published update",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "version_history": {
+      "type": "array",
+      "description": "Full history of all published system updates",
+      "items": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer"
+          },
+          "published_at": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "timestamp": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "required": []

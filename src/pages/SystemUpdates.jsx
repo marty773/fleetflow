@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Copy, Check, Zap, Save, Loader2, History } from 'lucide-react';
+import { toast } from 'sonner';
+import PendingChangesList from '@/components/systemupdates/PendingChangesList';
+import VersionHistoryList from '@/components/systemupdates/VersionHistoryList';
 
 // Auto-populated build version: uses Vite build timestamp as an integer (YYYYMMDDHHMI)
 const BUILD_VERSION = parseInt(
@@ -7,13 +16,6 @@ const BUILD_VERSION = parseInt(
     .replace(/[-T:Z.]/g, '')
     .slice(0, 12)
 ) || 0;
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Check, Zap, Save, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 
 const ITEM_FIELDS = [
   'Name', 'Item Number (SKU)', 'Description', 'Vendor', 'Unit Price',
@@ -29,6 +31,8 @@ export default function SystemUpdates() {
   const [metadataId, setMetadataId] = useState(null);
   const [versionNumber, setVersionNumber] = useState('');
   const [featuresSummary, setFeaturesSummary] = useState('');
+  const [pendingChanges, setPendingChanges] = useState([]);
+  const [versionHistory, setVersionHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -47,11 +51,11 @@ export default function SystemUpdates() {
         if (records.length > 0) {
           const rec = records[0];
           setMetadataId(rec.id);
-          // Auto-populate with build version if stored version is empty/0
           setVersionNumber(rec.version_number || BUILD_VERSION);
           setFeaturesSummary(rec.latest_features_summary ?? '');
+          setPendingChanges(rec.pending_changes ?? []);
+          setVersionHistory(rec.version_history ?? []);
         } else {
-          // First time: seed with build version
           setVersionNumber(BUILD_VERSION);
         }
         setLoading(false);
@@ -59,11 +63,13 @@ export default function SystemUpdates() {
     });
   }, []);
 
-  const handleSave = async () => {
-    setSaving(true);
+  const saveToDb = async (overrides = {}) => {
     const data = {
       version_number: parseInt(versionNumber) || 0,
       latest_features_summary: featuresSummary,
+      pending_changes: pendingChanges,
+      version_history: versionHistory,
+      ...overrides,
     };
     if (metadataId) {
       await base44.entities.AppMetadata.update(metadataId, data);
@@ -71,15 +77,77 @@ export default function SystemUpdates() {
       const rec = await base44.entities.AppMetadata.create(data);
       setMetadataId(rec.id);
     }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    await saveToDb();
     setSaving(false);
     toast.success('Saved successfully');
   };
 
-  const handleGenerate = () => {
+  const handlePendingChangesChange = (newChanges) => {
+    setPendingChanges(newChanges);
+  };
+
+  const handleGenerate = async () => {
+    const version = parseInt(versionNumber) || BUILD_VERSION;
     const itemFieldList = ITEM_FIELDS.join(', ');
     const vendorFieldList = VENDOR_FIELDS.join(', ');
-    const prompt = `I am updating Fisher's Operations to version ${versionNumber || '[VERSION]'}. Please implement these new features from FleetFlow: ${featuresSummary || '[FEATURES]'}. Also, ensure the API mapping for 'Items' and 'Vendors' includes these specific fields:\n\nItems: ${itemFieldList}\n\nVendors: ${vendorFieldList}`;
+
+    // Build change log section from pending changes
+    const changeLog = pendingChanges.length > 0
+      ? '\n\nDetailed changes in this version:\n' +
+        pendingChanges.map(c => `- [${c.category}] ${c.description}`).join('\n')
+      : '';
+
+    const prompt = `I am updating Fisher's Operations to version ${version}. Please implement these new features from FleetFlow: ${featuresSummary || '[FEATURES]'}.${changeLog}\n\nAlso, ensure the API mapping for 'Items' and 'Vendors' includes these specific fields:\n\nItems: ${itemFieldList}\n\nVendors: ${vendorFieldList}`;
     setGeneratedPrompt(prompt);
+
+    // Publish this as a new version in history
+    const newEntry = {
+      version,
+      published_at: new Date().toISOString(),
+      summary: featuresSummary,
+      changes: [...pendingChanges],
+    };
+
+    // Avoid duplicate versions — replace if same version number exists
+    const updatedHistory = [
+      ...versionHistory.filter(h => h.version !== version),
+      newEntry,
+    ];
+
+    setVersionHistory(updatedHistory);
+    setPendingChanges([]); // Clear pending after publishing
+    setVersionNumber(version + 1); // Bump version for next update
+
+    await saveToDb({
+      version_number: version + 1,
+      version_history: updatedHistory,
+      pending_changes: [],
+    });
+
+    toast.success(`v${version} published to history`);
+  };
+
+  const handleRollback = async (entry) => {
+    const confirmed = window.confirm(
+      `Restore settings to v${entry.version}? This will set the current version and summary back to that snapshot. No data will be deleted.`
+    );
+    if (!confirmed) return;
+
+    setVersionNumber(entry.version);
+    setFeaturesSummary(entry.summary ?? '');
+    setPendingChanges([]);
+
+    await saveToDb({
+      version_number: entry.version,
+      latest_features_summary: entry.summary ?? '',
+      pending_changes: [],
+    });
+
+    toast.success(`Restored to v${entry.version}`);
   };
 
   const handleCopy = () => {
@@ -109,13 +177,14 @@ export default function SystemUpdates() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-slate-900 dark:text-white">System Updates</h1>
 
+      {/* App Metadata */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">App Metadata</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="version">Version Number</Label>
+            <Label htmlFor="version">Next Version Number</Label>
             <Input
               id="version"
               type="number"
@@ -126,28 +195,35 @@ export default function SystemUpdates() {
             />
           </div>
           <div>
-            <Label htmlFor="features">Latest Features / Schema Changes</Label>
+            <Label htmlFor="features">Features / Summary for This Release</Label>
             <Textarea
               id="features"
-              className="mt-1 min-h-[140px]"
+              className="mt-1 min-h-[120px]"
               value={featuresSummary}
               onChange={e => setFeaturesSummary(e.target.value)}
-              placeholder="List new features, schema changes, bug fixes..."
+              placeholder="High-level description of what's in this update..."
             />
           </div>
           <div className="flex gap-3">
             <Button onClick={handleSave} disabled={saving} variant="outline">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-              Save
+              Save Draft
             </Button>
             <Button onClick={handleGenerate} className="bg-amber-500 hover:bg-amber-600 text-white">
               <Zap className="w-4 h-4 mr-2" />
-              Generate Update Prompt
+              Publish & Generate Prompt
             </Button>
           </div>
         </CardContent>
       </Card>
 
+      {/* Pending Changes */}
+      <PendingChangesList
+        changes={pendingChanges}
+        onChange={handlePendingChangesChange}
+      />
+
+      {/* Generated Prompt */}
       {generatedPrompt && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -164,6 +240,18 @@ export default function SystemUpdates() {
           </CardContent>
         </Card>
       )}
+
+      {/* Version History */}
+      <div>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
+          <History className="w-5 h-5 text-slate-400" />
+          Version History
+        </h2>
+        <VersionHistoryList
+          history={versionHistory}
+          onRollback={handleRollback}
+        />
+      </div>
     </div>
   );
 }
