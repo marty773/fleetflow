@@ -1,0 +1,15 @@
+{
+  "name": "AppMetadata",
+  "type": "object",
+  "properties": {
+    "version_number": {
+      "type": "integer",
+      "description": "Current version number of the app"
+    },
+    "latest_features_summary": {
+      "type": "string",
+      "description": "Summary of latest features and schema changes"
+    }
+  },
+  "required": []
+}

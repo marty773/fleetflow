@@ -76,9 +76,68 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
   // Initialize state when bill changes
   useEffect(() => {
     if (!bill) return;
-    setSelectedVehicleId(billVehicles[0]?.id || '');
+    const vIds = [...new Set((bill.line_items || []).filter(i => i.vehicle_id).map(i => i.vehicle_id))];
+    const bVehicles = (vehicles || []).filter(v => vIds.includes(v.id));
+    setSelectedVehicleId(bVehicles[0]?.id || '');
     setTitle(bill.vendor ? `Service at ${bill.vendor}` : 'Service Record');
   }, [bill?.id]);
+
+  const allWorkItems = useMemo(() => (bill?.line_items || [])
+    .filter(i => !i.vehicle_id || i.vehicle_id === selectedVehicleId)
+    .map(i => ({ description: i.description, quantity: i.quantity, unit_price: i.unit_price, total: i.total })),
+    [bill?.line_items, selectedVehicleId]);
+
+  // Initialize all items as selected when vehicle changes
+  useEffect(() => {
+    setSelectedLineItemIndexes(allWorkItems.map((_, idx) => idx));
+  }, [selectedVehicleId, allWorkItems.length]);
+
+  // Open intervals for selected vehicle
+  const vehicleIntervals = useMemo(
+    () => intervals.filter(iv => iv.vehicle_id === selectedVehicleId),
+    [intervals, selectedVehicleId]
+  );
+
+  // Suggest best-matching intervals
+  const billKeywords = useMemo(() => bill ? extractKeywords(bill) : [], [bill]);
+  const suggestedIntervals = useMemo(() => {
+    const scored = vehicleIntervals.map(iv => ({ iv, score: scoreIntervalMatch(iv, billKeywords) }));
+    scored.sort((a, b) => b.score - a.score);
+    const withScore = scored.filter(s => s.score > 0);
+    return (withScore.length > 0 ? withScore : scored).slice(0, 5).map(s => s.iv);
+  }, [vehicleIntervals, billKeywords]);
+
+  // Auto-select best suggestion on mount / vehicle change
+  const firstSuggestedId = suggestedIntervals[0]?.id ?? null;
+  useEffect(() => {
+    if (firstSuggestedId) {
+      setCompleteIntervalId(firstSuggestedId);
+    } else {
+      setCompleteIntervalId('new');
+    }
+  }, [selectedVehicleId, firstSuggestedId]);
+
+  // Auto-fill odometer for trucks via Motive
+  useEffect(() => {
+    if (!selectedVehicleId) return;
+    const vehicle = (vehicles || []).find(v => v.id === selectedVehicleId);
+    if (!vehicle || vehicle.type !== 'truck') return;
+
+    setLoadingOdometer(true);
+    base44.functions.invoke('fetchMotiveVehicleData', {})
+      .then(result => {
+        if (result.data?.success && result.data?.vehicles) {
+          const match = result.data.vehicles.find(
+            mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
+          );
+          if (match?.odometer) {
+            setOdometer(String(Math.round(Number(match.odometer))));
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOdometer(false));
+  }, [selectedVehicleId]);
 
   if (!bill) return null;
 
@@ -99,64 +158,8 @@ export default function CreateMaintenanceFromBillDialog({ bill, vehicles, interv
       .finally(() => setLoadingOdometer(false));
   };
 
-  const allWorkItems = useMemo(() => (bill.line_items || [])
-    .filter(i => !i.vehicle_id || i.vehicle_id === selectedVehicleId)
-    .map(i => ({ description: i.description, quantity: i.quantity, unit_price: i.unit_price, total: i.total })),
-    [bill.line_items, selectedVehicleId]);
-
-  // Initialize all items as selected when vehicle changes
-  useEffect(() => {
-    setSelectedLineItemIndexes(allWorkItems.map((_, idx) => idx));
-  }, [selectedVehicleId, allWorkItems.length]);
-
   const workItems = allWorkItems.filter((_, idx) => selectedLineItemIndexes.includes(idx));
   const totalCost = workItems.reduce((sum, i) => sum + (i.total || 0), 0);
-
-  // Open intervals for selected vehicle
-  const vehicleIntervals = useMemo(
-    () => intervals.filter(iv => iv.vehicle_id === selectedVehicleId),
-    [intervals, selectedVehicleId]
-  );
-
-  // Suggest best-matching intervals
-  const billKeywords = useMemo(() => extractKeywords(bill), [bill]);
-  const suggestedIntervals = useMemo(() => {
-    const scored = vehicleIntervals.map(iv => ({ iv, score: scoreIntervalMatch(iv, billKeywords) }));
-    scored.sort((a, b) => b.score - a.score);
-    // Return top suggestions with score > 0, or all if none match
-    const withScore = scored.filter(s => s.score > 0);
-    return (withScore.length > 0 ? withScore : scored).slice(0, 5).map(s => s.iv);
-  }, [vehicleIntervals, billKeywords]);
-
-  // Auto-select best suggestion on mount / vehicle change
-  useEffect(() => {
-    if (suggestedIntervals.length > 0 && suggestedIntervals[0]) {
-      setCompleteIntervalId(suggestedIntervals[0].id);
-    } else {
-      setCompleteIntervalId('new');
-    }
-  }, [selectedVehicleId, suggestedIntervals.length > 0 ? suggestedIntervals[0]?.id : null]);
-
-  // Auto-fill odometer for trucks via Motive
-  useEffect(() => {
-    const vehicle = vehicles.find(v => v.id === selectedVehicleId);
-    if (!vehicle || vehicle.type !== 'truck') return;
-
-    setLoadingOdometer(true);
-    base44.functions.invoke('fetchMotiveVehicleData', {})
-      .then(result => {
-        if (result.data?.success && result.data?.vehicles) {
-          const match = result.data.vehicles.find(
-            mv => vehicle.vin && mv.vin && mv.vin.toLowerCase() === vehicle.vin.toLowerCase()
-          );
-          if (match?.odometer) {
-            setOdometer(String(Math.round(Number(match.odometer))));
-          }
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoadingOdometer(false));
-  }, [selectedVehicleId]);
 
   const selectedInterval = completeIntervalId !== 'new'
     ? intervals.find(iv => iv.id === completeIntervalId)
