@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus, Download, Sparkles } from 'lucide-react';
+import { Plus, Download, Sparkles, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -26,6 +26,7 @@ import BillDetailDialog from '../components/dialogs/BillDetailDialog';
 import { format, differenceInDays } from 'date-fns';
 import IntervalDetailDialog from '../components/dialogs/IntervalDetailDialog';
 import { getServiceReminderMiles } from '../components/settings/ServiceReminderSettings';
+import PartsNeededReport from '../components/reports/PartsNeededReport';
 
 export default function Maintenance() {
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ export default function Maintenance() {
   const [completingInterval, setCompletingInterval] = useState(null);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [showSyncDialog, setShowSyncDialog] = useState(false);
+  const [showPartsReport, setShowPartsReport] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const queryClient = useQueryClient();
 
@@ -292,6 +294,9 @@ export default function Maintenance() {
           <div className="flex flex-wrap gap-2 justify-end">
             {activeTab === 'upcoming' && (
               <>
+                <Button onClick={() => setShowPartsReport(true)} variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-50 gap-2">
+                  <Package className="w-4 h-4" /> Parts Needed
+                </Button>
                 <Button onClick={() => setShowSyncDialog(true)} variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-50">
                   Sync to Calendar
                 </Button>
@@ -389,6 +394,11 @@ export default function Maintenance() {
             open={showAIGenerator}
             onClose={() => setShowAIGenerator(false)}
             onCreated={() => queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] })}
+          />
+
+          <PartsNeededReport
+            open={showPartsReport}
+            onClose={() => setShowPartsReport(false)}
           />
 
           {/* Interval Detail Dialog */}
