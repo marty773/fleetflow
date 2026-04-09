@@ -403,6 +403,10 @@ export default function Maintenance() {
               const rec = allRecords.find(r => r.id === recordId);
               if (rec) { setViewingInterval(null); setViewingRecord(rec); }
             }}
+            onIntervalUpdated={(updated) => {
+              setViewingInterval(updated);
+              queryClient.invalidateQueries({ queryKey: ['maintenanceIntervals'] });
+            }}
           />
 
           {/* Mark Complete Dialog */}

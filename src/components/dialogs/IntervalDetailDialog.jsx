@@ -1,11 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
-import { Edit2, Clock, AlertCircle, Check } from 'lucide-react';
+import { Edit2, Clock, AlertCircle, Check, CalendarDays, X } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
-export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, onMarkComplete, currentMileage = {}, onViewRecord }) {
+export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, onMarkComplete, currentMileage = {}, onViewRecord, onIntervalUpdated }) {
+  const [scheduledDate, setScheduledDate] = useState(interval?.scheduled_date || '');
+  const [saving, setSaving] = useState(false);
+
   if (!interval) return null;
+
+  const handleSaveScheduledDate = async () => {
+    setSaving(true);
+    await base44.entities.MaintenanceInterval.update(interval.id, { scheduled_date: scheduledDate || null });
+    setSaving(false);
+    if (onIntervalUpdated) onIntervalUpdated({ ...interval, scheduled_date: scheduledDate || null });
+  };
 
   const getStatus = () => {
     const isMileageOnly = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
@@ -101,11 +112,23 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
             </Row>
           )}
 
-          {interval.scheduled_date && (
-            <Row label="Scheduled Shop Date">
-              <span className="text-amber-600 dark:text-amber-400 font-semibold">{format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy')}</span>
-            </Row>
-          )}
+          <div className="flex justify-between items-center gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+            <span className="text-slate-500 dark:text-slate-400 shrink-0 flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Shop Date</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={scheduledDate}
+                onChange={e => setScheduledDate(e.target.value)}
+                className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-0.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              />
+              {scheduledDate && (
+                <button onClick={() => setScheduledDate('')} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
+              )}
+              <Button size="sm" onClick={handleSaveScheduledDate} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white h-7 px-2 text-xs">
+                {saving ? '...' : 'Save'}
+              </Button>
+            </div>
+          </div>
 
           {interval.next_due_date && (
             <Row label="Next Due Date">{format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}</Row>
