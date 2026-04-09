@@ -38,6 +38,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   const [groupBy, setGroupBy] = useState(preFilterVehicleId ? 'vehicle' : preFilterItemId ? 'item' : 'vehicle');
   // Multi-vehicle: set of selected vehicle IDs, or empty = all
   const [selectedVehicles, setSelectedVehicles] = useState(() => preFilterVehicleId ? new Set([preFilterVehicleId]) : new Set());
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const { data: intervals = [] } = useQuery({ queryKey: ['maintenanceIntervals'], queryFn: () => base44.entities.MaintenanceInterval.list(), enabled: open });
   const { data: vehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list(), enabled: open });
@@ -205,17 +206,73 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
             </Button>
           </div>
 
-          {/* Summary stats */}
-          <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-600 dark:text-slate-400">
-            <span><strong className="text-slate-900 dark:text-white">{rows.length}</strong> parts across <strong className="text-slate-900 dark:text-white">{grouped.length}</strong> groups</span>
-            <span><strong className="text-slate-900 dark:text-white">{totalNeeded}</strong> total units needed</span>
-            {totalShortage > 0 && (
-              <span className="text-red-600 flex items-center gap-1">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <strong>{totalShortage}</strong> units short
-              </span>
-            )}
+          {/* Filters toggle */}
+          <div className="flex items-center gap-3 mt-2">
+            <button
+              onClick={() => setFiltersOpen(p => !p)}
+              className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <span>{filtersOpen ? '▲' : '▼'}</span> {filtersOpen ? 'Hide Filters' : 'Show Filters'}
+            </button>
+            <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <span><strong className="text-slate-900 dark:text-white">{rows.length}</strong> parts · <strong className="text-slate-900 dark:text-white">{totalNeeded}</strong> needed</span>
+              {totalShortage > 0 && (
+                <span className="text-red-600 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" /><strong>{totalShortage}</strong> short
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Collapsible Filters */}
+          {filtersOpen && (
+            <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex flex-wrap gap-3">
+              {/* Status filter */}
+              <div>
+                <div className="text-xs text-slate-500 mb-1 font-medium">Status</div>
+                <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden text-xs">
+                  {STATUS_OPTIONS.map(opt => (
+                    <button key={opt.value} onClick={() => setStatusFilter(opt.value)}
+                      className={`px-2.5 py-1.5 font-medium transition-colors ${statusFilter === opt.value ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Group by */}
+              <div>
+                <div className="text-xs text-slate-500 mb-1 font-medium">Group By</div>
+                <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden text-xs">
+                  {GROUP_OPTIONS.map(opt => (
+                    <button key={opt.value} onClick={() => setGroupBy(opt.value)}
+                      className={`px-2.5 py-1.5 font-medium transition-colors ${groupBy === opt.value ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Vehicle multi-select */}
+              {!preFilterVehicleId && vehicles.length > 0 && (
+                <div>
+                  <div className="text-xs text-slate-500 mb-1 font-medium">Vehicles <span className="font-normal">(all if none selected)</span></div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {vehicles.map(v => (
+                      <button key={v.id} onClick={() => toggleVehicle(v.id)}
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                          selectedVehicles.has(v.id)
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-50'
+                        }`}>
+                        {v.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Report Body */}
