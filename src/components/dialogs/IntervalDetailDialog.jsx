@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
-import { Edit2, Clock, AlertCircle, Check, CalendarDays, X } from 'lucide-react';
+import { Edit2, Clock, AlertCircle, Check, CalendarDays, X, ChevronDown, ChevronRight, Package } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import ItemDetailDialog from './ItemDetailDialog';
 
-export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, onMarkComplete, currentMileage = {}, onViewRecord, onIntervalUpdated }) {
+export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, onMarkComplete, currentMileage = {}, onViewRecord, onIntervalUpdated, items = [] }) {
   const [scheduledDate, setScheduledDate] = useState(interval?.scheduled_date || '');
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [partsExpanded, setPartsExpanded] = useState(false);
+  const [viewingItem, setViewingItem] = useState(null);
 
   React.useEffect(() => {
     setScheduledDate(interval?.scheduled_date || '');
@@ -73,118 +76,165 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
   const canClickLastPerformed = !!interval.linked_record_id && !!onViewRecord;
 
   return (
-    <Dialog open={!!interval} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
-        <DialogHeader>
-          <DialogTitle className="text-slate-900 dark:text-white text-lg">{interval.interval_name}</DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={!!interval} onOpenChange={onClose}>
+        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-slate-900 dark:text-white text-lg">{interval.interval_name}</DialogTitle>
+          </DialogHeader>
 
-        <div className="space-y-3 mt-2">
-          {vehicle && (
-            <Row label="Vehicle">
-              {vehicle.name}{vehicle.year ? ` — ${vehicle.year} ${vehicle.make} ${vehicle.model}` : ''}
-            </Row>
-          )}
+          <div className="space-y-3 mt-2">
+            {vehicle && (
+              <Row label="Vehicle">
+                {vehicle.name}{vehicle.year ? ` — ${vehicle.year} ${vehicle.make} ${vehicle.model}` : ''}
+              </Row>
+            )}
 
-          <Row label="Interval">{intervalLabel}</Row>
+            <Row label="Interval">{intervalLabel}</Row>
 
-          {hasMiles && currentMiles !== undefined && (
-            <Row label="Current Mileage">{Math.round(currentMiles).toLocaleString()} mi</Row>
-          )}
+            {hasMiles && currentMiles !== undefined && (
+              <Row label="Current Mileage">{Math.round(currentMiles).toLocaleString()} mi</Row>
+            )}
 
-          {(interval.last_performed_date || lastPerformedMiles !== undefined) && (
-            <div className="flex justify-between items-center gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
-              <span className="text-slate-500 dark:text-slate-400 shrink-0">Last Performed</span>
-              <button
-                disabled={!canClickLastPerformed}
-                onClick={() => {
-                  if (canClickLastPerformed) {
-                    onClose();
-                    onViewRecord(interval.linked_record_id);
-                  }
-                }}
-                className={`font-medium text-right ${canClickLastPerformed ? 'text-blue-600 dark:text-blue-400 hover:underline cursor-pointer' : 'text-slate-900 dark:text-white cursor-default'}`}
-              >
-                {interval.last_performed_date ? format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy') : ''}
-                {interval.last_performed_date && lastPerformedMiles !== undefined ? ' · ' : ''}
-                {lastPerformedMiles !== undefined ? (
-                  <span>{lastPerformedMiles.toLocaleString()} mi</span>
-                ) : null}
-              </button>
-            </div>
-          )}
-
-          {milesRemaining !== undefined && (
-            <Row label="Miles Remaining">
-              <span className={milesRemaining <= 0 ? 'text-red-600 font-semibold' : ''}>
-                {Math.abs(milesRemaining).toLocaleString()} mi {milesRemaining <= 0 ? 'overdue' : 'left'}
-              </span>
-            </Row>
-          )}
-
-          {/* Shop Date row */}
-          <div className="flex justify-between items-center gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
-            <span className="text-slate-500 dark:text-slate-400 shrink-0 flex items-center gap-1">
-              <CalendarDays className="w-3.5 h-3.5" /> Shop Date
-            </span>
-            {editing ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={scheduledDate}
-                  onChange={e => setScheduledDate(e.target.value)}
-                  className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-0.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                />
-                <Button size="sm" onClick={handleSaveScheduledDate} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white h-7 px-2 text-xs">
-                  {saving ? '...' : 'Save'}
-                </Button>
-                <button onClick={handleCancelEdit} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
-              </div>
-            ) : interval.scheduled_date ? (
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-amber-600 dark:text-amber-400">
-                  {format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy')}
-                </span>
-                <button onClick={() => setEditing(true)} className="text-slate-400 hover:text-slate-600" title="Edit date">
-                  <Edit2 className="w-3.5 h-3.5" />
+            {(interval.last_performed_date || lastPerformedMiles !== undefined) && (
+              <div className="flex justify-between items-center gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                <span className="text-slate-500 dark:text-slate-400 shrink-0">Last Performed</span>
+                <button
+                  disabled={!canClickLastPerformed}
+                  onClick={() => {
+                    if (canClickLastPerformed) {
+                      onClose();
+                      onViewRecord(interval.linked_record_id);
+                    }
+                  }}
+                  className={`font-medium text-right ${canClickLastPerformed ? 'text-blue-600 dark:text-blue-400 hover:underline cursor-pointer' : 'text-slate-900 dark:text-white cursor-default'}`}
+                >
+                  {interval.last_performed_date ? format(new Date(interval.last_performed_date + 'T12:00:00'), 'MMM d, yyyy') : ''}
+                  {interval.last_performed_date && lastPerformedMiles !== undefined ? ' · ' : ''}
+                  {lastPerformedMiles !== undefined ? (
+                    <span>{lastPerformedMiles.toLocaleString()} mi</span>
+                  ) : null}
                 </button>
               </div>
-            ) : (
-              <Button size="sm" variant="outline" onClick={() => setEditing(true)} className="h-7 px-2 text-xs border-amber-400 text-amber-600 hover:bg-amber-50">
-                Schedule
-              </Button>
+            )}
+
+            {milesRemaining !== undefined && (
+              <Row label="Miles Remaining">
+                <span className={milesRemaining <= 0 ? 'text-red-600 font-semibold' : ''}>
+                  {Math.abs(milesRemaining).toLocaleString()} mi {milesRemaining <= 0 ? 'overdue' : 'left'}
+                </span>
+              </Row>
+            )}
+
+            {/* Shop Date row */}
+            <div className="flex justify-between items-center gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span className="text-slate-500 dark:text-slate-400 shrink-0 flex items-center gap-1">
+                <CalendarDays className="w-3.5 h-3.5" /> Shop Date
+              </span>
+              {editing ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    value={scheduledDate}
+                    onChange={e => setScheduledDate(e.target.value)}
+                    className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-0.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  />
+                  <Button size="sm" onClick={handleSaveScheduledDate} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white h-7 px-2 text-xs">
+                    {saving ? '...' : 'Save'}
+                  </Button>
+                  <button onClick={handleCancelEdit} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
+                </div>
+              ) : interval.scheduled_date ? (
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-amber-600 dark:text-amber-400">
+                    {format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy')}
+                  </span>
+                  <button onClick={() => setEditing(true)} className="text-slate-400 hover:text-slate-600" title="Edit date">
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <Button size="sm" variant="outline" onClick={() => setEditing(true)} className="h-7 px-2 text-xs border-amber-400 text-amber-600 hover:bg-amber-50">
+                  Schedule
+                </Button>
+              )}
+            </div>
+
+            {interval.next_due_date && (
+              <Row label="Next Due Date">{format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}</Row>
+            )}
+
+            {interval.notes && (
+              <div className="text-sm">
+                <p className="text-slate-500 dark:text-slate-400 mb-1">Notes</p>
+                <p className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg p-3">{interval.notes}</p>
+              </div>
+            )}
+
+            {interval.suggested_parts?.length > 0 && (
+              <div className="text-sm">
+                <button
+                  type="button"
+                  onClick={() => setPartsExpanded(prev => !prev)}
+                  className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white w-full text-left font-medium"
+                >
+                  {partsExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                  <Package className="w-3.5 h-3.5" />
+                  Suggested Parts ({interval.suggested_parts.length})
+                </button>
+                {partsExpanded && (
+                  <div className="mt-2 space-y-1 pl-1">
+                    {interval.suggested_parts.map((part, idx) => {
+                      const stockItem = part.item_id ? items.find(i => i.id === part.item_id) : null;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => stockItem && setViewingItem(stockItem)}
+                          className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 text-left ${
+                            stockItem ? 'hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer' : 'cursor-default'
+                          }`}
+                        >
+                          <span className={`font-medium ${stockItem ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                            {part.description}
+                          </span>
+                          <span className="text-slate-500 dark:text-slate-400 shrink-0 text-xs">
+                            x{part.quantity}{part.unit_price ? ` · $${part.unit_price.toFixed(2)}` : ''}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
-          {interval.next_due_date && (
-            <Row label="Next Due Date">{format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}</Row>
-          )}
+          <div className="flex justify-end gap-2 mt-4">
+            {onMarkComplete && (
+              <Button
+                onClick={() => { onClose(); onMarkComplete(interval); }}
+                className="gap-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white mr-auto"
+              >
+                <Check className="w-4 h-4" /> Complete Now
+              </Button>
+            )}
+            <Button variant="outline" onClick={onClose} className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300">Close</Button>
+            {onEdit && (
+              <Button onClick={() => { onClose(); onEdit(interval); }} className="gap-2 bg-amber-500 hover:bg-amber-600 text-white">
+                <Edit2 className="w-4 h-4" /> Edit
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
-          {interval.notes && (
-            <div className="text-sm">
-              <p className="text-slate-500 dark:text-slate-400 mb-1">Notes</p>
-              <p className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg p-3">{interval.notes}</p>
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-end gap-2 mt-4">
-          {onMarkComplete && (
-            <Button
-              onClick={() => { onClose(); onMarkComplete(interval); }}
-              className="gap-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white mr-auto"
-            >
-              <Check className="w-4 h-4" /> Complete Now
-            </Button>
-          )}
-          <Button variant="outline" onClick={onClose} className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300">Close</Button>
-          {onEdit && (
-            <Button onClick={() => { onClose(); onEdit(interval); }} className="gap-2 bg-amber-500 hover:bg-amber-600 text-white">
-              <Edit2 className="w-4 h-4" /> Edit
-            </Button>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+      {viewingItem && (
+        <ItemDetailDialog
+          item={viewingItem}
+          onClose={() => setViewingItem(null)}
+        />
+      )}
+    </>
   );
 }
