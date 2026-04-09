@@ -8,7 +8,6 @@ import { differenceInDays } from 'date-fns';
 import { ExternalLink, Download, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { getServiceReminderMiles } from '@/components/settings/ServiceReminderSettings';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All Upcoming' },
@@ -132,34 +131,39 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleDateString()} | Filter: ${STATUS_OPTIONS.find(o => o.value === statusFilter)?.label}`, 14, 30);
 
-    let y = 38;
+    let y = 42;
     grouped.forEach(group => {
+      if (y > 260) { doc.addPage(); y = 20; }
       doc.setFontSize(13);
       doc.setTextColor(30, 30, 30);
       doc.text(group.label, 14, y);
       y += 6;
 
-      const tableData = group.rows.map(r => [
-        groupBy === 'item' ? `${r.vehicleName} — ${r.intervalName}` : r.itemName,
-        r.itemNumber || '-',
-        r.needed,
-        r.inStock,
-        r.shortage > 0 ? r.shortage : '✓',
-        r.nextDueDate ? new Date(r.nextDueDate).toLocaleDateString() : '-',
-        r.unitPrice ? `$${r.unitPrice.toFixed(2)}` : '-',
-        r.itemUrl ? r.itemUrl : '',
-      ]);
+      // Header
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      const headers = ['Part / Interval', 'Item #', 'Needed', 'In Stock', 'Shortage', 'Due Date', 'Unit $'];
+      const colX = [14, 80, 105, 120, 137, 155, 175];
+      headers.forEach((h, i) => doc.text(h, colX[i], y));
+      y += 5;
+      doc.setDrawColor(200, 200, 200);
+      doc.line(14, y, 196, y);
+      y += 4;
 
-      doc.autoTable({
-        startY: y,
-        head: [['Part / Interval', 'Item #', 'Needed', 'In Stock', 'Shortage', 'Due Date', 'Unit $', 'URL']],
-        body: tableData,
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [30, 30, 30] },
-        columnStyles: { 7: { cellWidth: 40 } },
-        margin: { left: 14, right: 14 },
+      doc.setTextColor(30, 30, 30);
+      group.rows.forEach(r => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        const label = groupBy === 'item' ? `${r.vehicleName} — ${r.intervalName}` : r.itemName;
+        doc.text(doc.splitTextToSize(label, 62)[0], colX[0], y);
+        doc.text(r.itemNumber || '-', colX[1], y);
+        doc.text(String(r.needed), colX[2], y);
+        doc.text(String(r.inStock), colX[3], y);
+        doc.text(r.shortage > 0 ? `-${r.shortage}` : '✓', colX[4], y);
+        doc.text(r.nextDueDate ? new Date(r.nextDueDate).toLocaleDateString() : '-', colX[5], y);
+        doc.text(r.unitPrice ? `$${r.unitPrice.toFixed(2)}` : '-', colX[6], y);
+        y += 7;
       });
-      y = doc.lastAutoTable.finalY + 10;
+      y += 4;
     });
 
     doc.save('parts-needed-report.pdf');
