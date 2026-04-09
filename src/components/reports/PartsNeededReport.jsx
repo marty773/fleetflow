@@ -36,7 +36,8 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   const reminderMiles = getServiceReminderMiles();
   const [statusFilter, setStatusFilter] = useState('all');
   const [groupBy, setGroupBy] = useState(preFilterVehicleId ? 'vehicle' : preFilterItemId ? 'item' : 'vehicle');
-  const [vehicleFilter, setVehicleFilter] = useState(preFilterVehicleId || 'all');
+  // Multi-vehicle: set of selected vehicle IDs, or empty = all
+  const [selectedVehicles, setSelectedVehicles] = useState(() => preFilterVehicleId ? new Set([preFilterVehicleId]) : new Set());
 
   const { data: intervals = [] } = useQuery({ queryKey: ['maintenanceIntervals'], queryFn: () => base44.entities.MaintenanceInterval.list(), enabled: open });
   const { data: vehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list(), enabled: open });
@@ -45,14 +46,22 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   const vehicleMap = useMemo(() => Object.fromEntries(vehicles.map(v => [v.id, v])), [vehicles]);
   const itemMap = useMemo(() => Object.fromEntries(items.map(i => [i.id, i])), [items]);
 
+  const toggleVehicle = (id) => {
+    setSelectedVehicles(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
   // Build rows: one per (interval, suggested_part)
   const rows = useMemo(() => {
     return intervals.flatMap(interval => {
       if (!interval.suggested_parts?.length) return [];
 
       // Vehicle filter
-      if (vehicleFilter !== 'all' && interval.vehicle_id !== vehicleFilter) return [];
       if (preFilterVehicleId && interval.vehicle_id !== preFilterVehicleId) return [];
+      if (selectedVehicles.size > 0 && !selectedVehicles.has(interval.vehicle_id)) return [];
 
       const status = getIntervalStatus(interval, reminderMiles);
       if (statusFilter === 'overdue' && status !== 'overdue') return [];
@@ -86,7 +95,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
           };
         });
     });
-  }, [intervals, vehicleFilter, preFilterVehicleId, preFilterItemId, statusFilter, itemMap, vehicleMap, reminderMiles]);
+  }, [intervals, selectedVehicles, preFilterVehicleId, preFilterItemId, statusFilter, itemMap, vehicleMap, reminderMiles]);
 
   // Group rows
   const grouped = useMemo(() => {
@@ -202,16 +211,29 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
               ))}
             </div>
 
-            {/* Vehicle filter (only when not pre-filtered) */}
+            {/* Multi-vehicle filter (only when not pre-filtered) */}
             {!preFilterVehicleId && (
-              <select
-                value={vehicleFilter}
-                onChange={e => setVehicleFilter(e.target.value)}
-                className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
-              >
-                <option value="all">All Vehicles</option>
-                {vehicles.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
-              </select>
+              <div className="flex flex-wrap gap-1.5 items-center">
+                <span className="text-xs text-slate-500 dark:text-slate-400">Vehicles:</span>
+                <button
+                  onClick={() => setSelectedVehicles(new Set())}
+                  className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                    selectedVehicles.size === 0
+                      ? 'bg-slate-900 text-white border-slate-900 dark:bg-slate-100 dark:text-slate-900'
+                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600'
+                  }`}
+                >All</button>
+                {vehicles.map(v => (
+                  <button key={v.id}
+                    onClick={() => toggleVehicle(v.id)}
+                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                      selectedVehicles.has(v.id)
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600'
+                    }`}
+                  >{v.name}</button>
+                ))}
+              </div>
             )}
 
             <Button onClick={exportPDF} variant="outline" size="sm" className="ml-auto gap-2">
@@ -222,6 +244,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
           {/* Summary */}
           <div className="flex gap-4 mt-3 text-sm text-slate-600 dark:text-slate-400">
             <span><strong className="text-slate-900 dark:text-white">{rows.length}</strong> parts across <strong className="text-slate-900 dark:text-white">{grouped.length}</strong> groups</span>
+            <span><strong className="text-slate-900 dark:text-white">{totalNeeded}</strong> total units needed</span>
             {totalShortage > 0 && (
               <span className="text-red-600 flex items-center gap-1">
                 <AlertTriangle className="w-3.5 h-3.5" />
@@ -308,6 +331,41 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
           ))}
         </div>
 
+        {/* Order Summary Footer */}
+        {rows.length > 0 && (() => {
+          // Aggregate by item for order summary
+          const orderMap = {};
+          rows.forEach(r => {
+            const key = r.itemId || r.itemName;
+            if (!orderMap[key]) orderMap[key] = { name: r.itemName, itemNumber: r.itemNumber, itemUrl: r.itemUrl, unitPrice: r.unitPrice, totalNeeded: 0, totalInStock: r.inStock, totalShortage: 0 };
+            orderMap[key].totalNeeded += r.needed;
+            orderMap[key].totalShortage = Math.max(0, orderMap[key].totalNeeded - orderMap[key].totalInStock);
+          });
+          const orderItems = Object.values(orderMap).filter(o => o.totalShortage > 0);
+          const grandTotal = orderItems.reduce((s, o) => s + (o.totalShortage * (o.unitPrice || 0)), 0);
+          if (orderItems.length === 0) return null;
+          return (
+            <div className="border-t-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-4">
+              <h4 className="font-semibold text-slate-900 dark:text-white mb-2 text-sm">📋 Order Summary — Items to Purchase</h4>
+              <div className="space-y-1">
+                {orderItems.map((o, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <span className="flex-1 text-slate-800 dark:text-slate-200">{o.name}{o.itemNumber && <span className="text-slate-400 font-mono ml-1">#{o.itemNumber}</span>}</span>
+                    <span className="font-bold text-red-600">Qty: {o.totalShortage}</span>
+                    {o.unitPrice && <span className="text-slate-500">(${(o.totalShortage * o.unitPrice).toFixed(2)})</span>}
+                    {o.itemUrl && <a href={o.itemUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs flex items-center gap-0.5"><ExternalLink className="w-3 h-3" />Buy</a>}
+                  </div>
+                ))}
+              </div>
+              {grandTotal > 0 && (
+                <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-semibold text-slate-900 dark:text-white">
+                  <span>Estimated Total</span>
+                  <span>${grandTotal.toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
         <div className="p-4 border-t border-slate-200 dark:border-slate-700 shrink-0 flex justify-end">
           <Button variant="outline" onClick={onClose}>Close</Button>
         </div>

@@ -202,35 +202,41 @@ export default function Items() {
         await base44.entities.Item.update(item.id, { quantity_on_hand: 0 });
       }
 
-      // Step 2: Add quantities from bills
+      // Build running totals in memory to avoid race conditions
+      const totals = {};
+      items.forEach(item => { totals[item.id] = 0; });
+
+      // Step 2: Add quantities from bills (only line items NOT assigned to a vehicle = stock purchases)
       for (const bill of bills) {
-        if (bill.line_items && bill.line_items.length > 0) {
+        if (bill.line_items) {
           for (const lineItem of bill.line_items) {
-            if (lineItem.item_id && lineItem.item_quantity > 0) {
-              const currentItem = items.find(i => i.id === lineItem.item_id);
-              if (currentItem) {
-                const newQty = lineItem.item_quantity;
-                const existingQty = (await base44.entities.Item.list()).find(i => i.id === lineItem.item_id)?.quantity_on_hand || 0;
-                await base44.entities.Item.update(lineItem.item_id, { quantity_on_hand: existingQty + newQty });
+            if (lineItem.item_id && lineItem.item_quantity > 0 && totals[lineItem.item_id] !== undefined) {
+              if (!lineItem.vehicle_id) {
+                // Pure stock purchase — add to inventory
+                totals[lineItem.item_id] += lineItem.item_quantity;
+              } else {
+                // Direct vehicle usage via bill — subtract from inventory
+                totals[lineItem.item_id] = Math.max(0, totals[lineItem.item_id] - lineItem.item_quantity);
               }
             }
           }
         }
       }
 
-      // Step 3: Subtract quantities from maintenance records
+      // Step 3: Subtract quantities from maintenance records (parts_used)
       for (const record of maintenanceRecords) {
-        if (record.parts_used && record.parts_used.length > 0) {
+        if (record.parts_used) {
           for (const part of record.parts_used) {
-            if (part.item_id && part.quantity_used > 0) {
-              const currentItem = items.find(i => i.id === part.item_id);
-              if (currentItem) {
-                const existingQty = (await base44.entities.Item.list()).find(i => i.id === part.item_id)?.quantity_on_hand || 0;
-                await base44.entities.Item.update(part.item_id, { quantity_on_hand: Math.max(0, existingQty - part.quantity_used) });
-              }
+            if (part.item_id && part.quantity_used > 0 && totals[part.item_id] !== undefined) {
+              totals[part.item_id] = Math.max(0, totals[part.item_id] - part.quantity_used);
             }
           }
         }
+      }
+
+      // Step 4: Write all totals in one pass
+      for (const item of items) {
+        await base44.entities.Item.update(item.id, { quantity_on_hand: totals[item.id] });
       }
 
       // Refresh items
