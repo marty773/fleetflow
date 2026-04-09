@@ -181,68 +181,33 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   const totalShortage = rows.reduce((sum, r) => sum + r.shortage, 0);
   const totalNeeded = rows.reduce((sum, r) => sum + r.needed, 0);
 
+  const orderSummary = useMemo(() => {
+    const orderMap = {};
+    rows.forEach(r => {
+      const key = r.itemId || r.itemName;
+      if (!orderMap[key]) orderMap[key] = { name: r.itemName, itemNumber: r.itemNumber, itemUrl: r.itemUrl, unitPrice: r.unitPrice, totalNeeded: 0, totalInStock: r.inStock, totalShortage: 0 };
+      orderMap[key].totalNeeded += r.needed;
+      orderMap[key].totalShortage = Math.max(0, orderMap[key].totalNeeded - orderMap[key].totalInStock);
+    });
+    return Object.values(orderMap).filter(o => o.totalShortage > 0);
+  }, [rows]);
+
+  const grandTotal = orderSummary.reduce((s, o) => s + (o.totalShortage * (o.unitPrice || 0)), 0);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <div className="p-6 border-b border-slate-200 dark:border-slate-700 shrink-0">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Parts Needed Report</DialogTitle>
-          </DialogHeader>
-
-          {/* Filters */}
-          <div className="flex flex-wrap gap-3 mt-4">
-            {/* Status filter */}
-            <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-              {STATUS_OPTIONS.map(opt => (
-                <button key={opt.value} onClick={() => setStatusFilter(opt.value)}
-                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${statusFilter === opt.value ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Group by */}
-            <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-              {GROUP_OPTIONS.map(opt => (
-                <button key={opt.value} onClick={() => setGroupBy(opt.value)}
-                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${groupBy === opt.value ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Multi-vehicle filter (only when not pre-filtered) */}
-            {!preFilterVehicleId && (
-              <div className="flex flex-wrap gap-1.5 items-center">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Vehicles:</span>
-                <button
-                  onClick={() => setSelectedVehicles(new Set())}
-                  className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
-                    selectedVehicles.size === 0
-                      ? 'bg-slate-900 text-white border-slate-900 dark:bg-slate-100 dark:text-slate-900'
-                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600'
-                  }`}
-                >All</button>
-                {vehicles.map(v => (
-                  <button key={v.id}
-                    onClick={() => toggleVehicle(v.id)}
-                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
-                      selectedVehicles.has(v.id)
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600'
-                    }`}
-                  >{v.name}</button>
-                ))}
-              </div>
-            )}
-
-            <Button onClick={exportPDF} variant="outline" size="sm" className="ml-auto gap-2">
+      <DialogContent className="max-w-5xl w-[95vw] h-[92vh] flex flex-col p-0 overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <DialogTitle className="text-lg font-semibold">Parts Needed Report</DialogTitle>
+            <Button onClick={exportPDF} variant="outline" size="sm" className="gap-2">
               <Download className="w-4 h-4" /> Export PDF
             </Button>
           </div>
 
-          {/* Summary */}
-          <div className="flex gap-4 mt-3 text-sm text-slate-600 dark:text-slate-400">
+          {/* Filters */}
+          <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-600 dark:text-slate-400">
             <span><strong className="text-slate-900 dark:text-white">{rows.length}</strong> parts across <strong className="text-slate-900 dark:text-white">{grouped.length}</strong> groups</span>
             <span><strong className="text-slate-900 dark:text-white">{totalNeeded}</strong> total units needed</span>
             {totalShortage > 0 && (
@@ -332,40 +297,27 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
         </div>
 
         {/* Order Summary Footer */}
-        {rows.length > 0 && (() => {
-          // Aggregate by item for order summary
-          const orderMap = {};
-          rows.forEach(r => {
-            const key = r.itemId || r.itemName;
-            if (!orderMap[key]) orderMap[key] = { name: r.itemName, itemNumber: r.itemNumber, itemUrl: r.itemUrl, unitPrice: r.unitPrice, totalNeeded: 0, totalInStock: r.inStock, totalShortage: 0 };
-            orderMap[key].totalNeeded += r.needed;
-            orderMap[key].totalShortage = Math.max(0, orderMap[key].totalNeeded - orderMap[key].totalInStock);
-          });
-          const orderItems = Object.values(orderMap).filter(o => o.totalShortage > 0);
-          const grandTotal = orderItems.reduce((s, o) => s + (o.totalShortage * (o.unitPrice || 0)), 0);
-          if (orderItems.length === 0) return null;
-          return (
-            <div className="border-t-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-4">
-              <h4 className="font-semibold text-slate-900 dark:text-white mb-2 text-sm">📋 Order Summary — Items to Purchase</h4>
-              <div className="space-y-1">
-                {orderItems.map((o, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <span className="flex-1 text-slate-800 dark:text-slate-200">{o.name}{o.itemNumber && <span className="text-slate-400 font-mono ml-1">#{o.itemNumber}</span>}</span>
-                    <span className="font-bold text-red-600">Qty: {o.totalShortage}</span>
-                    {o.unitPrice && <span className="text-slate-500">(${(o.totalShortage * o.unitPrice).toFixed(2)})</span>}
-                    {o.itemUrl && <a href={o.itemUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs flex items-center gap-0.5"><ExternalLink className="w-3 h-3" />Buy</a>}
-                  </div>
-                ))}
-              </div>
-              {grandTotal > 0 && (
-                <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-semibold text-slate-900 dark:text-white">
-                  <span>Estimated Total</span>
-                  <span>${grandTotal.toFixed(2)}</span>
+        {orderSummary.length > 0 && (
+          <div className="border-t-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-4 shrink-0">
+            <h4 className="font-semibold text-slate-900 dark:text-white mb-2 text-sm">📋 Order Summary — Items to Purchase</h4>
+            <div className="space-y-1">
+              {orderSummary.map((o, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <span className="flex-1 text-slate-800 dark:text-slate-200">{o.name}{o.itemNumber && <span className="text-slate-400 font-mono ml-1">#{o.itemNumber}</span>}</span>
+                  <span className="font-bold text-red-600">Qty: {o.totalShortage}</span>
+                  {o.unitPrice && <span className="text-slate-500">(${(o.totalShortage * o.unitPrice).toFixed(2)})</span>}
+                  {o.itemUrl && <a href={o.itemUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs flex items-center gap-0.5"><ExternalLink className="w-3 h-3" />Buy</a>}
                 </div>
-              )}
+              ))}
             </div>
-          );
-        })()}
+            {grandTotal > 0 && (
+              <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-semibold text-slate-900 dark:text-white">
+                <span>Estimated Total</span>
+                <span>${grandTotal.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+        )}
         <div className="p-4 border-t border-slate-200 dark:border-slate-700 shrink-0 flex justify-end">
           <Button variant="outline" onClick={onClose}>Close</Button>
         </div>
