@@ -7,10 +7,12 @@ import { base44 } from '@/api/base44Client';
 
 export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdit, onMarkComplete, currentMileage = {}, onViewRecord, onIntervalUpdated }) {
   const [scheduledDate, setScheduledDate] = useState(interval?.scheduled_date || '');
+  const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
   React.useEffect(() => {
     setScheduledDate(interval?.scheduled_date || '');
+    setEditing(false);
   }, [interval?.id, interval?.scheduled_date]);
 
   if (!interval) return null;
@@ -19,7 +21,13 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
     setSaving(true);
     await base44.entities.MaintenanceInterval.update(interval.id, { scheduled_date: scheduledDate || null });
     setSaving(false);
+    setEditing(false);
     if (onIntervalUpdated) onIntervalUpdated({ ...interval, scheduled_date: scheduledDate || null });
+  };
+
+  const handleCancelEdit = () => {
+    setScheduledDate(interval?.scheduled_date || '');
+    setEditing(false);
   };
 
   const getStatus = () => {
@@ -80,12 +88,10 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
 
           <Row label="Interval">{intervalLabel}</Row>
 
-          {/* Current Mileage directly under Interval */}
           {hasMiles && currentMiles !== undefined && (
             <Row label="Current Mileage">{Math.round(currentMiles).toLocaleString()} mi</Row>
           )}
 
-          {/* Last Performed Date + Mileage on one line */}
           {(interval.last_performed_date || lastPerformedMiles !== undefined) && (
             <div className="flex justify-between items-center gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 shrink-0">Last Performed</span>
@@ -116,22 +122,38 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
             </Row>
           )}
 
+          {/* Shop Date row */}
           <div className="flex justify-between items-center gap-4 text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
-            <span className="text-slate-500 dark:text-slate-400 shrink-0 flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Shop Date</span>
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
-                value={scheduledDate}
-                onChange={e => setScheduledDate(e.target.value)}
-                className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-0.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-              />
-              {scheduledDate && (
-                <button onClick={() => setScheduledDate('')} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
-              )}
-              <Button size="sm" onClick={handleSaveScheduledDate} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white h-7 px-2 text-xs">
-                {saving ? '...' : 'Save'}
+            <span className="text-slate-500 dark:text-slate-400 shrink-0 flex items-center gap-1">
+              <CalendarDays className="w-3.5 h-3.5" /> Shop Date
+            </span>
+            {editing ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="date"
+                  value={scheduledDate}
+                  onChange={e => setScheduledDate(e.target.value)}
+                  className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-0.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+                <Button size="sm" onClick={handleSaveScheduledDate} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white h-7 px-2 text-xs">
+                  {saving ? '...' : 'Save'}
+                </Button>
+                <button onClick={handleCancelEdit} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
+              </div>
+            ) : interval.scheduled_date ? (
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-amber-600 dark:text-amber-400">
+                  {format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy')}
+                </span>
+                <button onClick={() => setEditing(true)} className="text-slate-400 hover:text-slate-600" title="Edit date">
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => setEditing(true)} className="h-7 px-2 text-xs border-amber-400 text-amber-600 hover:bg-amber-50">
+                Schedule
               </Button>
-            </div>
+            )}
           </div>
 
           {interval.next_due_date && (
