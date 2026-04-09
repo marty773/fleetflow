@@ -205,8 +205,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
             </Button>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2 items-center">
+          {/* Summary stats */}
           <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-600 dark:text-slate-400">
             <span><strong className="text-slate-900 dark:text-white">{rows.length}</strong> parts across <strong className="text-slate-900 dark:text-white">{grouped.length}</strong> groups</span>
             <span><strong className="text-slate-900 dark:text-white">{totalNeeded}</strong> total units needed</span>
