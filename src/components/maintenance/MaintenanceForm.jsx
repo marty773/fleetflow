@@ -494,6 +494,46 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
             </div>
           </div>
 
+          {/* Link to Interval */}
+          <div id="linked-interval">
+            <Label htmlFor="linked_interval_id">
+              Link to Maintenance Interval <span className="text-slate-400 font-normal">(optional — marks interval as completed)</span>
+            </Label>
+            <Select
+              value={linkedIntervalId || 'none'}
+              onValueChange={handleLinkedIntervalChange}
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue placeholder="Select an interval..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No interval</SelectItem>
+                {intervals
+                  .filter(i => !formData.vehicle_id || i.vehicle_id === formData.vehicle_id)
+                  .map(i => (
+                    <SelectItem key={i.id} value={i.id}>
+                      {i.interval_name}
+                      {i.next_due_date ? ` — due ${format(new Date(i.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}` : ''}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            {suggestedPartsConfirm && (
+              <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-lg">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">Suggested Parts Available</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
+                  This interval has {suggestedPartsConfirm.suggested_parts.length} suggested part{suggestedPartsConfirm.suggested_parts.length > 1 ? 's' : ''}:
+                  {' '}{suggestedPartsConfirm.suggested_parts.map(p => `${p.description} (x${p.quantity})`).join(', ')}.
+                  Add them to the work items?
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleAcceptSuggestedParts} className="bg-amber-600 hover:bg-amber-700 text-white h-7 px-3 text-xs">Yes, add parts</Button>
+                  <Button size="sm" variant="outline" onClick={() => setSuggestedPartsConfirm(null)} className="h-7 px-3 text-xs">No thanks</Button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Work Items */}
           <div>
             <Label className="mb-3 block">Work Performed</Label>
