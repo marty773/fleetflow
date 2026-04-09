@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
-import { Edit2, Clock, AlertCircle, Check, CalendarDays, X, ChevronDown, ChevronRight, Package } from 'lucide-react';
+import { Edit2, Clock, AlertCircle, Check, CalendarDays, X, ChevronDown, ChevronRight, Package, ClipboardList } from 'lucide-react';
+import PartsNeededReport from '@/components/reports/PartsNeededReport';
 import { base44 } from '@/api/base44Client';
 import ItemDetailDialog from './ItemDetailDialog';
 
@@ -13,6 +14,7 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
   const [partsExpanded, setPartsExpanded] = useState(true);
   const [notesExpanded, setNotesExpanded] = useState(false);
   const [viewingItem, setViewingItem] = useState(null);
+  const [partsReportOpen, setPartsReportOpen] = useState(false);
 
   React.useEffect(() => {
     setScheduledDate(interval?.scheduled_date || '');
@@ -229,6 +231,9 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
                 <Check className="w-4 h-4" /> Complete Now
               </Button>
             )}
+            <Button variant="outline" onClick={() => setPartsReportOpen(true)} className="gap-2 border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400">
+              <ClipboardList className="w-4 h-4" /> Parts Report
+            </Button>
             <Button variant="outline" onClick={onClose} className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300">Close</Button>
             {onEdit && (
               <Button onClick={() => { onClose(); onEdit(interval); }} className="gap-2 bg-amber-500 hover:bg-amber-600 text-white">
@@ -245,6 +250,11 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
           onClose={() => setViewingItem(null)}
         />
       )}
+      <PartsNeededReport
+        open={partsReportOpen}
+        onClose={() => setPartsReportOpen(false)}
+        preFilterVehicleId={interval?.vehicle_id}
+      />
     </>
   );
 }
