@@ -9,6 +9,10 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
   const [scheduledDate, setScheduledDate] = useState(interval?.scheduled_date || '');
   const [saving, setSaving] = useState(false);
 
+  React.useEffect(() => {
+    setScheduledDate(interval?.scheduled_date || '');
+  }, [interval?.id, interval?.scheduled_date]);
+
   if (!interval) return null;
 
   const handleSaveScheduledDate = async () => {
