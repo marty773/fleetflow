@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PartsNeededReport from '@/components/reports/PartsNeededReport';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import MotiveLivePanel from './MotiveLivePanel';
 
 export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit }) {
   const navigate = useNavigate();
+  const [showPartsReport, setShowPartsReport] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch motive live data for this vehicle
@@ -385,11 +387,11 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
             Close
             </Button>
-            <Button onClick={() => onEdit(vehicle)} className="flex-1 bg-slate-900 hover:bg-slate-800">
-            <Edit2 className="w-4 h-4 mr-2" />
-            Edit Vehicle
+            <Button variant="outline" onClick={() => setShowPartsReport(true)} className="flex-1">
+            Parts Report
             </Button>
             </div>
+            <PartsNeededReport open={showPartsReport} onClose={() => setShowPartsReport(false)} preFilterVehicleId={vehicle?.id} />
             </DialogContent>
             </Dialog>
             );

@@ -1,13 +1,16 @@
 import React from 'react';
+import PartsNeededReport from '@/components/reports/PartsNeededReport';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 
 export default function ItemDetailDialog({ item, transactions = [], onClose, onEdit, onDelete, onViewBill, onViewMaintenance }) {
+  const [showPartsReport, setShowPartsReport] = useState(false);
   if (!item) return null;
 
-  return (
+  return (<>
     <Dialog open={!!item} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
         <div className="overflow-y-auto flex-1 p-6">
@@ -42,6 +45,15 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
               <p className="font-medium text-slate-900 dark:text-white">{item.vendor || '-'}</p>
             </div>
           </div>
+          {item.item_url && (
+            <div className="md:col-span-2">
+              <Label className="text-slate-500 dark:text-slate-400">Vendor URL</Label>
+              <a href={item.item_url} target="_blank" rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-sm flex items-center gap-1 mt-1 break-all">
+                {item.item_url}
+              </a>
+            </div>
+          )}
           {item.description && (
             <div>
               <Label className="text-slate-500 dark:text-slate-400">Description</Label>
@@ -92,6 +104,9 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           </div>
           </div>
           <div className="sticky bottom-0 flex gap-2 p-6 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 flex-wrap sm:flex-nowrap">
+          <Button variant="outline" onClick={() => setShowPartsReport(true)} className="flex-1">
+            Parts Report
+          </Button>
           <Button variant="outline" onClick={onClose} className="flex-1">
            Close
           </Button>
@@ -117,5 +132,10 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           </div>
           </DialogContent>
           </Dialog>
-          );
+          <PartsNeededReport
+            open={showPartsReport}
+            onClose={() => setShowPartsReport(false)}
+            preFilterItemId={item?.id}
+          />
+          </>);
           }

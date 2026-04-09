@@ -1,0 +1,56 @@
+{
+  "name": "Item",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "default": "Fisher's Enterprise",
+      "description": "Company this item belongs to"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the item"
+    },
+    "vendor": {
+      "type": "string",
+      "description": "Vendor or supplier name"
+    },
+    "price": {
+      "type": "number",
+      "description": "Price of the item"
+    },
+    "quantity_on_hand": {
+      "type": "number",
+      "default": 0,
+      "description": "Current inventory quantity"
+    },
+    "low_stock_threshold": {
+      "type": "number",
+      "default": 2,
+      "description": "Alert when quantity falls below this number"
+    },
+    "item_number": {
+      "type": "string",
+      "description": "Item number or SKU"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the item"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "URL of the item photo"
+    },
+    "item_url": {
+      "type": "string",
+      "description": "Link to the item on the vendor's website (e.g. NAPA ProLink)"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

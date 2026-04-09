@@ -8,10 +8,12 @@ import PullToRefresh from '@/components/PullToRefresh';
 import VehicleCostReport from '../components/reports/VehicleCostReport';
 import InventoryReport from '../components/reports/InventoryReport';
 import VendorReport from '../components/reports/VendorReport';
+import PartsNeededReport from '../components/reports/PartsNeededReport';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function Reports() {
   const [selectedReport, setSelectedReport] = useState('vehicle-costs');
+  const [showPartsReport, setShowPartsReport] = useState(false);
   const [highlightItemId, setHighlightItemId] = useState(null);
   const queryClient = useQueryClient();
 
@@ -49,13 +51,26 @@ export default function Reports() {
                   <SelectItem value="vehicle-costs">Vehicle Costs</SelectItem>
                   <SelectItem value="inventory">Inventory</SelectItem>
                   <SelectItem value="vendors">Vendors</SelectItem>
-                </ResponsiveSelect>
+                  <SelectItem value="parts-needed">Parts Needed</SelectItem>
+                  </ResponsiveSelect>
               </div>
             </div>
 
             {selectedReport === 'vehicle-costs' && <VehicleCostReport />}
             {selectedReport === 'inventory' && <InventoryReport highlightItemId={highlightItemId} />}
             {selectedReport === 'vendors' && <VendorReport />}
+            {selectedReport === 'parts-needed' && (
+              <div className="flex flex-col items-center justify-center py-16 gap-4">
+                <p className="text-slate-600 dark:text-slate-400">View which parts are needed for upcoming maintenance based on current inventory.</p>
+                <button
+                  onClick={() => setShowPartsReport(true)}
+                  className="px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 font-medium"
+                >
+                  Open Parts Needed Report
+                </button>
+              </div>
+            )}
+            <PartsNeededReport open={showPartsReport} onClose={() => setShowPartsReport(false)} />
           </div>
         </div>
       </PullToRefresh>

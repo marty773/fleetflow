@@ -91,6 +91,18 @@ export default function ItemForm({ item, onSubmit, onCancel, isLoading }) {
                 className="mt-2 select-text"
               />
             </div>
+
+            <div className="md:col-span-2">
+              <Label htmlFor="item_url">Vendor URL <span className="text-slate-400 font-normal">(optional)</span></Label>
+              <Input
+                id="item_url"
+                type="url"
+                placeholder="https://pro.napaprolink.com/..."
+                value={formData.item_url || ''}
+                onChange={(e) => handleChange('item_url', e.target.value)}
+                className="mt-2 select-text"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">

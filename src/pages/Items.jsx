@@ -20,7 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw, ArrowUpDown } from 'lucide-react';
+import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw, ClipboardList } from 'lucide-react';
+import PartsNeededReport from '@/components/reports/PartsNeededReport';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
 import ItemDetailDialog from '@/components/dialogs/ItemDetailDialog';
@@ -42,6 +43,7 @@ export default function Items() {
   const [sortBy, setSortBy] = useState('name'); // 'name', 'price_asc', 'price_desc', 'stock'
   const [viewingMaintenanceRecord, setViewingMaintenanceRecord] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
+  const [showPartsReport, setShowPartsReport] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -328,6 +330,14 @@ export default function Items() {
           </Button>
 
           <Button
+            onClick={() => setShowPartsReport(true)}
+            variant="outline"
+            className="h-9 hidden sm:flex gap-2"
+          >
+            <ClipboardList className="h-4 w-4" />
+            Parts Report
+          </Button>
+          <Button
             onClick={handleAddNew}
             className="h-9 shadow-sm hidden sm:flex"
             style={{ backgroundColor: 'var(--color-primary)' }}
@@ -419,6 +429,8 @@ export default function Items() {
           ))}
         </div>
       )}
+
+      <PartsNeededReport open={showPartsReport} onClose={() => setShowPartsReport(false)} />
 
       {/* ItemFormDialog removed — now handled by ItemFormPage */}
 
