@@ -101,6 +101,12 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
             </Row>
           )}
 
+          {interval.scheduled_date && (
+            <Row label="Scheduled Shop Date">
+              <span className="text-amber-600 dark:text-amber-400 font-semibold">{format(new Date(interval.scheduled_date + 'T12:00:00'), 'MMM d, yyyy')}</span>
+            </Row>
+          )}
+
           {interval.next_due_date && (
             <Row label="Next Due Date">{format(new Date(interval.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}</Row>
           )}
