@@ -14,6 +14,7 @@ export default function MaintenanceIntervalFormPage() {
   const editId = urlParams.get('edit');
 
   const { data: allVehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list() });
+  const { data: allItems = [] } = useQuery({ queryKey: ['items'], queryFn: () => base44.entities.Item.list() });
   const { data: allIntervals = [] } = useQuery({ queryKey: ['maintenanceIntervals'], queryFn: () => base44.entities.MaintenanceInterval.list(), enabled: !!editId });
 
   const vehicles = allVehicles;
@@ -69,6 +70,7 @@ export default function MaintenanceIntervalFormPage() {
           <IntervalForm
             interval={editingInterval}
             vehicles={vehicles}
+            items={allItems}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/Maintenance?tab=intervals')}
             isLoading={createMutation.isPending || updateMutation.isPending}

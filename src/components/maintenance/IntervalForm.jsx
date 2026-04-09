@@ -5,11 +5,19 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ResponsiveSelect from '@/components/ResponsiveSelect';
 import { SelectItem } from '@/components/ui/select';
-import { X } from 'lucide-react';
+import { X, Plus, Trash2, Edit, Package, Check, ChevronsUpDown } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { useServiceTypes } from '@/components/useServiceTypes';
 
-export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, isLoading }) {
+export default function IntervalForm({ interval, vehicles, items = [], onSubmit, onCancel, isLoading }) {
   const serviceTypes = useServiceTypes(null, 'records');
+  const [suggestedParts, setSuggestedParts] = useState(interval?.suggested_parts || []);
+  const [newPart, setNewPart] = useState({ item_id: '', description: '', quantity: 1, unit_price: 0 });
+  const [partSearchOpen, setPartSearchOpen] = useState(false);
+  const [editingPartIdx, setEditingPartIdx] = useState(null);
   const [formData, setFormData] = useState({
     vehicle_id: interval?.vehicle_id || '',
     interval_name: interval?.interval_name || '',
@@ -35,6 +43,7 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
         scheduled_date: interval.scheduled_date || '',
         notes: interval.notes || '',
       });
+      setSuggestedParts(interval.suggested_parts || []);
     }
   }, [interval]);
 
@@ -66,6 +75,27 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     return data;
   };
 
+  const handleAddPart = () => {
+    if (!newPart.description) return;
+    if (editingPartIdx !== null) {
+      setSuggestedParts(prev => prev.map((p, i) => i === editingPartIdx ? { ...newPart } : p));
+      setEditingPartIdx(null);
+    } else {
+      setSuggestedParts(prev => [...prev, { ...newPart }]);
+    }
+    setNewPart({ item_id: '', description: '', quantity: 1, unit_price: 0 });
+  };
+
+  const handleEditPart = (idx) => {
+    setNewPart({ ...suggestedParts[idx] });
+    setEditingPartIdx(idx);
+  };
+
+  const handleRemovePart = (idx) => {
+    setSuggestedParts(prev => prev.filter((_, i) => i !== idx));
+    if (editingPartIdx === idx) { setEditingPartIdx(null); setNewPart({ item_id: '', description: '', quantity: 1, unit_price: 0 }); }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -76,11 +106,11 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
     }
     
     const submissionData = calculateNextDue();
-    // Convert empty strings to null for optional number fields
     if (submissionData.interval_months === '') submissionData.interval_months = null;
     if (submissionData.interval_miles === '') submissionData.interval_miles = null;
     if (submissionData.last_performed_mileage === '') submissionData.last_performed_mileage = null;
     if (submissionData.next_due_mileage === '') submissionData.next_due_mileage = null;
+    submissionData.suggested_parts = suggestedParts;
     onSubmit(submissionData);
   };
 
@@ -215,6 +245,88 @@ export default function IntervalForm({ interval, vehicles, onSubmit, onCancel, i
                 </button>
               )}
             </p>
+          </div>
+
+          {/* Suggested Parts */}
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold">Suggested Parts <span className="text-slate-400 font-normal">(optional — auto-populated when completing this interval)</span></Label>
+            <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg space-y-2">
+              {items.length > 0 && (
+                <Popover open={partSearchOpen} onOpenChange={setPartSearchOpen}>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" role="combobox" className="w-full justify-between text-sm">
+                      <span className="truncate flex items-center gap-1">
+                        {newPart.item_id ? <><Package className="w-3 h-3" />{items.find(i => i.id === newPart.item_id)?.name}</> : 'Select stock item...'}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[280px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search items..." />
+                      <CommandList>
+                        <CommandEmpty>No item found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem value="none" onSelect={() => { setNewPart(p => ({ ...p, item_id: '', description: '', unit_price: 0 })); setPartSearchOpen(false); }}>
+                            <Check className={cn('mr-2 h-4 w-4', !newPart.item_id ? 'opacity-100' : 'opacity-0')} /> None
+                          </CommandItem>
+                          {items.map(item => (
+                            <CommandItem key={item.id} value={`${item.name} ${item.item_number || ''}`}
+                              onSelect={() => {
+                                setNewPart(p => ({ ...p, item_id: item.id, description: item.name, unit_price: item.price || 0 }));
+                                setPartSearchOpen(false);
+                              }}>
+                              <Check className={cn('mr-2 h-4 w-4', newPart.item_id === item.id ? 'opacity-100' : 'opacity-0')} />
+                              {item.name} — ${item.price?.toFixed(2) || '0.00'}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              )}
+              <Input placeholder="Part description" value={newPart.description} onChange={e => setNewPart(p => ({ ...p, description: e.target.value }))} />
+              <div className="grid grid-cols-2 gap-2">
+                <Input type="number" placeholder="Qty" value={newPart.quantity} onChange={e => setNewPart(p => ({ ...p, quantity: parseFloat(e.target.value) || 1 }))} />
+                <Input type="number" placeholder="Unit Price" value={newPart.unit_price} onChange={e => setNewPart(p => ({ ...p, unit_price: parseFloat(e.target.value) || 0 }))} />
+              </div>
+              <Button type="button" variant="outline" size="sm" className="w-full" onClick={handleAddPart} disabled={!newPart.description}>
+                <Plus className="w-4 h-4 mr-1" /> {editingPartIdx !== null ? 'Update Part' : 'Add Part'}
+              </Button>
+            </div>
+            {suggestedParts.length > 0 && (
+              <div className="border dark:border-slate-700 rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50 dark:bg-slate-800">
+                      <TableHead>Part</TableHead>
+                      <TableHead>Qty</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead className="w-16"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {suggestedParts.map((part, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="flex items-center gap-1 text-sm">
+                          {part.item_id && <Package className="w-3 h-3 text-slate-400 shrink-0" />}
+                          {part.description}
+                        </TableCell>
+                        <TableCell className="text-sm">{part.quantity}</TableCell>
+                        <TableCell className="text-sm">${(part.unit_price || 0).toFixed(2)}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <button type="button" onClick={() => handleEditPart(idx)} className="text-blue-600 hover:text-blue-700"><Edit className="w-3.5 h-3.5" /></button>
+                            <button type="button" onClick={() => handleRemovePart(idx)} className="text-red-600 hover:text-red-700"><Trash2 className="w-3.5 h-3.5" /></button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </div>
 
           <div>

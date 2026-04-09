@@ -43,6 +43,7 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingOdometer, setLoadingOdometer] = useState(false);
+  const [suggestedPartsConfirm, setSuggestedPartsConfirm] = useState(false);
 
   const fetchOdometerFromMotive = () => {
     const vehicle = vehicles.find(v => v.id === interval?.vehicle_id);
@@ -78,8 +79,27 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
       setAttachBill(false);
       setBillAmount('');
       setBillVendor('');
+      // Show confirmation if interval has suggested parts
+      if (interval.suggested_parts?.length > 0) {
+        setSuggestedPartsConfirm(true);
+      } else {
+        setSuggestedPartsConfirm(false);
+      }
     }
   }, [interval?.id]);
+
+  const handleAcceptSuggestedParts = () => {
+    if (!interval?.suggested_parts?.length) return;
+    const partsToAdd = interval.suggested_parts.map(part => ({
+      description: part.description,
+      quantity: part.quantity || 1,
+      unit_price: part.unit_price || 0,
+      total: (part.quantity || 1) * (part.unit_price || 0),
+      ...(part.item_id && { item_id: part.item_id }),
+    }));
+    setWorkItems(partsToAdd);
+    setSuggestedPartsConfirm(false);
+  };
 
 
   if (!interval) return null;
@@ -295,6 +315,22 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
                     <Input placeholder="Vendor name" value={newRecordVendor} onChange={e => setNewRecordVendor(e.target.value)} />
                   )}
                 </div>
+
+                {/* Suggested Parts Confirmation */}
+                {suggestedPartsConfirm && interval?.suggested_parts?.length > 0 && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-lg">
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">Suggested Parts Available</p>
+                    <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
+                      This interval suggests {interval.suggested_parts.length} part{interval.suggested_parts.length > 1 ? 's' : ''}:
+                      {' '}{interval.suggested_parts.map(p => `${p.description} (x${p.quantity})`).join(', ')}.
+                      Add them to the work items?
+                    </p>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={handleAcceptSuggestedParts} className="bg-amber-600 hover:bg-amber-700 text-white h-7 px-3 text-xs">Yes, add parts</Button>
+                      <Button size="sm" variant="outline" onClick={() => setSuggestedPartsConfirm(false)} className="h-7 px-3 text-xs">No thanks</Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Work Items */}
                 <div className="space-y-2">

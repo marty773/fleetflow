@@ -1,0 +1,113 @@
+{
+  "name": "MaintenanceInterval",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "default": "Fisher's Enterprise",
+      "description": "Company this maintenance interval belongs to"
+    },
+    "vehicle_id": {
+      "type": "string",
+      "description": "Vehicle ID"
+    },
+    "maintenance_type": {
+      "type": "string",
+      "enum": [
+        "oil_change",
+        "filter_change",
+        "tire_rotation",
+        "inspection",
+        "repair",
+        "cleaning",
+        "other"
+      ],
+      "default": "oil_change",
+      "description": "Type of maintenance"
+    },
+    "interval_name": {
+      "type": "string",
+      "description": "Name of the maintenance interval"
+    },
+    "interval_months": {
+      "type": "number",
+      "description": "Interval in months"
+    },
+    "interval_miles": {
+      "type": "number",
+      "description": "Interval in miles"
+    },
+    "last_performed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date last performed"
+    },
+    "last_performed_mileage": {
+      "type": "number",
+      "description": "Mileage when last performed"
+    },
+    "next_due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Next due date (auto-calculated)"
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Manual override: actual scheduled shop date for this service. Overrides next_due_date on the calendar when set."
+    },
+    "next_due_mileage": {
+      "type": "number",
+      "description": "Next due mileage"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "suggested_parts": {
+      "type": "array",
+      "description": "Suggested inventory parts to use when completing this interval",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "Stock item ID"
+          },
+          "description": {
+            "type": "string",
+            "description": "Part description"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Suggested quantity"
+          },
+          "unit_price": {
+            "type": "number",
+            "description": "Unit price at time of suggestion"
+          }
+        }
+      }
+    },
+    "google_event_id": {
+      "type": "string",
+      "description": "Google Calendar event ID for syncing"
+    },
+    "linked_record_id": {
+      "type": "string",
+      "description": "ID of the MaintenanceRecord that last completed this interval"
+    },
+    "linked_bill_id": {
+      "type": "string",
+      "description": "ID of the Bill associated with the last completion of this interval"
+    }
+  },
+  "required": [
+    "vehicle_id",
+    "interval_name"
+  ]
+}

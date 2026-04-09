@@ -110,6 +110,7 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
   const [createRecurringInterval, setCreateRecurringInterval] = useState(false);
   const [intervalMonths, setIntervalMonths] = useState('');
   const [intervalMiles, setIntervalMiles] = useState('');
+  const [suggestedPartsConfirm, setSuggestedPartsConfirm] = useState(null); // interval with suggested parts pending confirmation
   const [vehicleSearchOpen, setVehicleSearchOpen] = useState(false);
   const [vendorSearchOpen, setVendorSearchOpen] = useState(false);
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
@@ -159,6 +160,30 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
   React.useEffect(() => {
     setLinkedIntervalId(record?.linked_interval_id || '');
   }, [record?.id]);
+
+  const handleLinkedIntervalChange = (val) => {
+    const newId = val === 'none' ? '' : val;
+    setLinkedIntervalId(newId);
+    if (newId) {
+      const selectedInterval = intervals.find(i => i.id === newId);
+      if (selectedInterval?.suggested_parts?.length > 0) {
+        setSuggestedPartsConfirm(selectedInterval);
+      }
+    }
+  };
+
+  const handleAcceptSuggestedParts = () => {
+    if (!suggestedPartsConfirm) return;
+    const partsToAdd = suggestedPartsConfirm.suggested_parts.map(part => ({
+      description: part.description,
+      quantity: part.quantity || 1,
+      unit_price: part.unit_price || 0,
+      total: (part.quantity || 1) * (part.unit_price || 0),
+      ...(part.item_id && { item_id: part.item_id }),
+    }));
+    setFormData(prev => ({ ...prev, work_items: [...prev.work_items, ...partsToAdd] }));
+    setSuggestedPartsConfirm(null);
+  };
 
   // Update form data when record prop changes (important for editing)
   React.useEffect(() => {
@@ -626,32 +651,6 @@ export default function MaintenanceForm({ record, vehicles, items = [], vendors 
                 </Table>
               </div>
             )}
-          </div>
-
-          {/* Link to Interval */}
-          <div id="linked-interval">
-            <Label htmlFor="linked_interval_id">
-              Link to Maintenance Interval <span className="text-slate-400 font-normal">(optional — marks interval as completed)</span>
-            </Label>
-            <Select
-              value={linkedIntervalId || 'none'}
-              onValueChange={(val) => setLinkedIntervalId(val === 'none' ? '' : val)}
-            >
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select an interval..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No interval</SelectItem>
-                {intervals
-                  .filter(i => !formData.vehicle_id || i.vehicle_id === formData.vehicle_id)
-                  .map(i => (
-                    <SelectItem key={i.id} value={i.id}>
-                      {i.interval_name}
-                      {i.next_due_date ? ` — due ${format(new Date(i.next_due_date + 'T12:00:00'), 'MMM d, yyyy')}` : ''}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Link to Bill */}
