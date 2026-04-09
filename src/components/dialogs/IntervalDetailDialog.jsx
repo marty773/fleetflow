@@ -10,7 +10,8 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
   const [scheduledDate, setScheduledDate] = useState(interval?.scheduled_date || '');
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [partsExpanded, setPartsExpanded] = useState(false);
+  const [partsExpanded, setPartsExpanded] = useState(true);
+  const [notesExpanded, setNotesExpanded] = useState(false);
   const [viewingItem, setViewingItem] = useState(null);
 
   React.useEffect(() => {
@@ -78,12 +79,12 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
   return (
     <>
       <Dialog open={!!interval} onOpenChange={onClose}>
-        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-slate-900 dark:text-white text-lg">{interval.interval_name}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-3 mt-2">
+          <div className="space-y-3 mt-2 overflow-y-auto flex-1 pr-1">
             {vehicle && (
               <Row label="Vehicle">
                 {vehicle.name}{vehicle.year ? ` — ${vehicle.year} ${vehicle.make} ${vehicle.model}` : ''}
@@ -166,8 +167,17 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
 
             {interval.notes && (
               <div className="text-sm">
-                <p className="text-slate-500 dark:text-slate-400 mb-1">Notes</p>
-                <p className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg p-3">{interval.notes}</p>
+                <button
+                  type="button"
+                  onClick={() => setNotesExpanded(prev => !prev)}
+                  className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white w-full text-left font-medium"
+                >
+                  {notesExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                  Notes
+                </button>
+                {notesExpanded && (
+                  <p className="mt-1.5 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg p-3">{interval.notes}</p>
+                )}
               </div>
             )}
 
@@ -210,7 +220,7 @@ export default function IntervalDetailDialog({ interval, vehicle, onClose, onEdi
             )}
           </div>
 
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 shrink-0">
             {onMarkComplete && (
               <Button
                 onClick={() => { onClose(); onMarkComplete(interval); }}
