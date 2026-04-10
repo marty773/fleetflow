@@ -42,26 +42,28 @@ export default function BillFormPage() {
 
   const handleSubmit = async (data) => {
 
-    // Reverse old inventory if editing
+    // Reverse old inventory if editing (undo previous inventory changes)
     if (editingBill) {
       const oldMap = {};
       (editingBill.line_items || [])
-        .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
+        .filter(item => item.item_id && item.item_quantity && !item.vehicle_id)
         .forEach(item => { oldMap[item.item_id] = (oldMap[item.item_id] || 0) + item.item_quantity; });
       for (const [item_id, qty] of Object.entries(oldMap)) {
         const cur = filteredItems.find(i => i.id === item_id);
-        if (cur) await base44.entities.Item.update(item_id, { quantity_on_hand: Math.max(0, (cur.quantity_on_hand || 0) - qty) });
+        // Reverse: if qty was positive (purchase), subtract it back; if negative (return), add it back
+        if (cur) await base44.entities.Item.update(item_id, { quantity_on_hand: (cur.quantity_on_hand || 0) - qty });
       }
     }
 
     // Apply new inventory
+    // Positive item_quantity = stock purchase (add). Negative = credit/return (subtract).
     const newMap = {};
     data.line_items
-      .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
+      .filter(item => item.item_id && item.item_quantity && !item.vehicle_id)
       .forEach(item => { newMap[item.item_id] = (newMap[item.item_id] || 0) + item.item_quantity; });
     for (const [item_id, qty] of Object.entries(newMap)) {
       const cur = filteredItems.find(i => i.id === item_id);
-      if (cur) await base44.entities.Item.update(item_id, { quantity_on_hand: (cur.quantity_on_hand || 0) + qty });
+      if (cur) await base44.entities.Item.update(item_id, { quantity_on_hand: Math.max(0, (cur.quantity_on_hand || 0) + qty) });
     }
     if (Object.keys(newMap).length > 0 || editingBill) queryClient.invalidateQueries({ queryKey: ['items'] });
 

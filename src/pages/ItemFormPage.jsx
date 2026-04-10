@@ -33,7 +33,7 @@ export default function ItemFormPage() {
 
   const [formData, setFormData] = useState({
     name: '', vendor: '', price: '', quantity_on_hand: '0',
-    low_stock_threshold: '2', item_number: '', description: '', photo_url: '',
+    low_stock_threshold: '2', item_number: '', description: '', photo_url: '', item_url: ''
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -49,6 +49,7 @@ export default function ItemFormPage() {
         item_number: editingItem.item_number || '',
         description: editingItem.description || '',
         photo_url: editingItem.photo_url || '',
+        item_url: editingItem.item_url || ''
       });
     }
   }, [editingItem?.id]);
@@ -74,6 +75,7 @@ export default function ItemFormPage() {
       item_number: formData.item_number || null,
       description: formData.description || null,
       photo_url: formData.photo_url || null,
+      item_url: formData.item_url || null,
     };
     if (editingItem?.id) {
       await base44.entities.Item.update(editingItem.id, data);
@@ -177,6 +179,11 @@ export default function ItemFormPage() {
               <div className="space-y-2">
                 <Label>Description</Label>
                 <Textarea value={formData.description} onChange={e => setFormData(p => ({ ...p, description: e.target.value }))} placeholder="Item description..." rows={3} />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Vendor URL <span className="text-slate-400 font-normal text-sm">(optional — e.g. NAPA ProLink)</span></Label>
+                <Input type="url" value={formData.item_url} onChange={e => setFormData(p => ({ ...p, item_url: e.target.value }))} placeholder="https://pro.napaprolink.com/..." className="h-11 select-text" />
               </div>
 
               <div className="flex gap-3 pt-2">
