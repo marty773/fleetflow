@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Check, Zap, Save, Loader2, History } from 'lucide-react';
+import { Copy, Check, Zap, Save, Loader2, History, Bot, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import PendingChangesList from '@/components/systemupdates/PendingChangesList';
 import VersionHistoryList from '@/components/systemupdates/VersionHistoryList';
@@ -38,6 +38,8 @@ export default function SystemUpdates() {
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [copied, setCopied] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [aiInput, setAiInput] = useState('');
+  const [aiParsing, setAiParsing] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(user => {
@@ -131,6 +133,50 @@ export default function SystemUpdates() {
     toast.success(`v${version} published to history`);
   };
 
+  const handleImportFromAI = async () => {
+    if (!aiInput.trim()) return;
+    setAiParsing(true);
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `You are a changelog parser. Given the following description of changes made to a fleet management web app called FleetFlow, extract individual changes and classify each one.
+
+Text to parse:
+${aiInput}
+
+Return a JSON array of change objects. Each object must have:
+- "description": concise 1-sentence description of the change (start with a verb, e.g. "Added", "Fixed", "Updated")
+- "category": one of: "feature", "bugfix", "schema", "ui", "other"
+
+Only include actual changes to the app (ignore meta-commentary). Return 3-15 items max.`,
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          changes: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                description: { type: 'string' },
+                category: { type: 'string' }
+              }
+            }
+          }
+        }
+      }
+    });
+    const parsed = result?.changes || [];
+    const newEntries = parsed.map(c => ({
+      timestamp: new Date().toISOString(),
+      description: c.description,
+      category: ['feature', 'bugfix', 'schema', 'ui', 'other'].includes(c.category) ? c.category : 'other',
+    }));
+    const merged = [...pendingChanges, ...newEntries];
+    setPendingChanges(merged);
+    await saveToDb({ pending_changes: merged });
+    setAiInput('');
+    setAiParsing(false);
+    toast.success(`Imported ${newEntries.length} change${newEntries.length !== 1 ? 's' : ''} from AI session`);
+  };
+
   const handleRollback = async (entry) => {
     const confirmed = window.confirm(
       `Restore settings to v${entry.version}? This will set the current version and summary back to that snapshot. No data will be deleted.`
@@ -214,6 +260,37 @@ export default function SystemUpdates() {
               Publish & Generate Prompt
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Import from AI Chat */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Bot className="w-4 h-4 text-blue-500" />
+            Import from AI Chat
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Paste the AI assistant's response or a description of the changes made in this session. The AI will parse it into categorized change entries automatically.
+          </p>
+          <textarea
+            className="w-full min-h-[120px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+            placeholder="Paste AI response here, e.g.: 'Map markers now show a green rotating arrow for moving vehicles. The Moving badge was removed. Fault codes badge is now clickable and opens a detail dialog...'"
+            value={aiInput}
+            onChange={e => setAiInput(e.target.value)}
+          />
+          <Button
+            onClick={handleImportFromAI}
+            disabled={aiParsing || !aiInput.trim()}
+            className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+          >
+            {aiParsing
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing...</>
+              : <><Sparkles className="w-4 h-4" /> Parse & Add to Pending Changes</>
+            }
+          </Button>
         </CardContent>
       </Card>
 
