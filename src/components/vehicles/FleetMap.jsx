@@ -23,27 +23,52 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-function createTruckIcon(isSelected = false) {
+function createTruckIcon(isSelected = false, bearing = null, isMoving = false) {
+  if (isMoving) {
+    // Green directional arrow rotated to bearing
+    const deg = bearing != null ? bearing : 0;
+    return L.divIcon({
+      className: '',
+      html: `<div style="
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: rotate(${deg}deg);
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+      ">
+        <svg viewBox="0 0 20 20" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="10" fill="${isSelected ? '#f59e0b' : '#22c55e'}" />
+          <polygon points="10,3 14,14 10,11 6,14" fill="white" />
+        </svg>
+      </div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
+  }
+  // Parked: dark circle with truck icon
   return L.divIcon({
     className: '',
     html: `<div style="
-      background: ${isSelected ? '#f59e0b' : '#1e293b'};
+      background: ${isSelected ? '#f59e0b' : '#64748b'};
       border: 2px solid white;
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     ">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
         <path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
       </svg>
     </div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-    popupAnchor: [0, -16],
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
   });
 }
 
@@ -92,7 +117,11 @@ export default function FleetMap({ motiveVehicles = [], selectedMotiveId = null,
           <Marker
             key={v.motive_id}
             position={[v.lat, v.lon]}
-            icon={createTruckIcon(String(v.motive_id) === String(selectedMotiveId))}
+            icon={createTruckIcon(
+              String(v.motive_id) === String(selectedMotiveId),
+              v.bearing,
+              v.speed != null && v.speed > 0
+            )}
             eventHandlers={{ click: () => onSelectVehicle && onSelectVehicle(v) }}
           >
             <Tooltip permanent={false} direction="top" offset={[0, -18]} opacity={1}>

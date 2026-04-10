@@ -128,9 +128,7 @@ function VehicleRow({ motiveVehicle, localVehicle, isSelected, isExpanded, onCli
             <p className={`font-semibold text-sm truncate ${isSelected ? 'text-amber-700 dark:text-amber-400' : 'text-slate-900 dark:text-white'}`}>
               {name}
             </p>
-            {isMoving && (
-              <span className="hidden sm:inline text-xs bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded font-medium">Moving</span>
-            )}
+
           </div>
           {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{subtitle}</p>}
           {current_driver && (
