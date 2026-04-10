@@ -22,15 +22,35 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json'
     };
 
-    // v1/vehicle_locations returns vehicles with current_location embedded — single call needed
-    const locRes = await fetch('https://api.gomotive.com/v1/vehicle_locations?per_page=100', { headers });
+    // Fetch vehicle locations and fault codes in parallel
+    const [locRes, faultRes] = await Promise.all([
+      fetch('https://api.gomotive.com/v1/vehicle_locations?per_page=100', { headers }),
+      fetch('https://api.gomotive.com/v1/fault_codes?per_page=100&status=active', { headers }),
+    ]);
+
     const locData = locRes.ok ? await locRes.json() : { vehicles: [] };
+    const faultData = faultRes.ok ? await faultRes.json() : {};
+
+    // Build fault code map keyed by vehicle_id
+    const faultCodesByVehicle = {};
+    const rawFaultCodes = faultData.fault_codes || [];
+    rawFaultCodes.forEach(fc => {
+      const vid = fc.vehicle_id || fc.vehicle?.id;
+      if (!vid) return;
+      if (!faultCodesByVehicle[vid]) faultCodesByVehicle[vid] = [];
+      faultCodesByVehicle[vid].push(fc);
+    });
 
     const rawList = locData.vehicles || locData.vehicle_locations || [];
 
     const vehicles = rawList.map(entry => {
       const v = entry.vehicle || entry;
       const loc = v.current_location || entry.current_location || {};
+      const dedicatedFaultCodes = faultCodesByVehicle[v.id] || [];
+      // Prefer dedicated fault code endpoint; fall back to vehicle field
+      const fault_codes = dedicatedFaultCodes.length > 0
+        ? dedicatedFaultCodes
+        : (v.active_fault_codes || []);
       return {
         motive_id: v.id,
         number: v.number,
@@ -53,8 +73,8 @@ Deno.serve(async (req) => {
         odometer: loc.odometer || loc.true_odometer,
         fuel_level: loc.fuel_primary_remaining_percentage,
         engine_hours: loc.engine_hours || loc.true_engine_hours,
-        // Fault codes
-        fault_codes: v.active_fault_codes || [],
+        // Fault codes (from dedicated endpoint)
+        fault_codes,
       };
     });
 
