@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw, ClipboardList } from 'lucide-react';
+import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw, ClipboardList, Archive, ArchiveRestore } from 'lucide-react';
 import PartsNeededReport from '@/components/reports/PartsNeededReport';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
@@ -44,6 +44,7 @@ export default function Items() {
   const [viewingMaintenanceRecord, setViewingMaintenanceRecord] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [showPartsReport, setShowPartsReport] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -172,7 +173,24 @@ export default function Items() {
     },
   });
 
-  const filteredItems = items
+  const archiveMutation = useMutation({
+    mutationFn: (id) => base44.entities.Item.update(id, { is_archived: true }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['items'] });
+      setViewingItem(null);
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: (id) => base44.entities.Item.update(id, { is_archived: false }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['items'] }),
+  });
+
+  const activeItems = allItems.filter(i => !i.is_archived);
+  const archivedItems = allItems.filter(i => i.is_archived);
+  const displayItems = showArchived ? archivedItems : activeItems;
+
+  const filteredItems = displayItems
     .filter(item => {
       const query = searchQuery.toLowerCase();
       return (
@@ -209,13 +227,13 @@ export default function Items() {
     setRecalculating(true);
     try {
       // Step 1: Reset all item quantities to 0
-      for (const item of items) {
+      for (const item of activeItems) {
         await base44.entities.Item.update(item.id, { quantity_on_hand: 0 });
       }
 
       // Build running totals in memory to avoid race conditions
       const totals = {};
-      items.forEach(item => { totals[item.id] = 0; });
+      activeItems.forEach(item => { totals[item.id] = 0; });
 
       // Step 2: Add/subtract quantities from bills
       for (const bill of bills) {
@@ -250,7 +268,7 @@ export default function Items() {
       }
 
       // Step 4: Write all totals in one pass
-      for (const item of items) {
+      for (const item of activeItems) {
         await base44.entities.Item.update(item.id, { quantity_on_hand: totals[item.id] });
       }
 
@@ -350,31 +368,76 @@ export default function Items() {
             )}
           </Button>
 
-          <Button
-            onClick={() => setShowPartsReport(true)}
-            variant="outline"
-            className="h-9 hidden sm:flex gap-2"
-          >
-            <ClipboardList className="h-4 w-4" />
-            Parts Report
-          </Button>
-          <Button
-            onClick={handleAddNew}
-            className="h-9 shadow-sm hidden sm:flex"
-            style={{ backgroundColor: 'var(--color-primary)' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Add Item
-          </Button>
+          {!showArchived && (
+            <Button
+              onClick={() => setShowPartsReport(true)}
+              variant="outline"
+              className="h-9 hidden sm:flex gap-2"
+            >
+              <ClipboardList className="h-4 w-4" />
+              Parts Report
+            </Button>
+          )}
+          {!showArchived && (
+            <Button
+              onClick={handleAddNew}
+              className="h-9 shadow-sm hidden sm:flex"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Add Item
+            </Button>
+          )}
         </div>
       </div>
+
+      {showArchived && (
+        <div className="mb-4 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2">
+          <Archive className="w-4 h-4" />
+          Showing archived items — these are hidden from dropdowns and the main list.
+        </div>
+      )}
 
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin" style={{ color: 'var(--color-primary)' }} />
+        </div>
+      ) : showArchived ? (
+        <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+          {filteredItems.length === 0 ? (
+            <div className="py-16 text-center text-slate-500">
+              <Archive className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+              <p>No archived items</p>
+            </div>
+          ) : filteredItems.map(item => (
+            <div key={item.id} className="flex items-center gap-4 p-4">
+              <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-900 overflow-hidden flex-shrink-0">
+                {item.photo_url
+                  ? <img src={item.photo_url} alt={item.name} className="w-full h-full object-cover opacity-60" />
+                  : <div className="w-full h-full flex items-center justify-center"><Package className="h-5 w-5 text-slate-300" /></div>
+                }
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-slate-500 dark:text-slate-400 truncate">{item.name}</h3>
+                <div className="flex items-center gap-3 text-xs text-slate-400">
+                  {item.item_number && <span className="font-mono">#{item.item_number}</span>}
+                  {item.vendor && <span>{item.vendor}</span>}
+                </div>
+              </div>
+              <Button
+                onClick={() => restoreMutation.mutate(item.id)}
+                variant="outline"
+                size="sm"
+                disabled={restoreMutation.isPending}
+                className="gap-1.5 text-green-700 border-green-300 hover:bg-green-50"
+              >
+                <ArchiveRestore className="w-3.5 h-3.5" /> Restore
+              </Button>
+            </div>
+          ))}
         </div>
       ) : filteredItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -385,12 +448,10 @@ export default function Items() {
             {searchQuery ? 'No items found' : 'No items yet'}
           </h3>
           <p className="text-slate-600 dark:text-slate-400 mb-4">
-            {searchQuery
-              ? 'Try adjusting your search'
-              : 'Add your first item to get started'}
+            {searchQuery ? 'Try adjusting your search' : 'Add your first item to get started'}
           </p>
           {!searchQuery && (
-            <Button 
+            <Button
               onClick={handleAddNew}
               style={{ backgroundColor: 'var(--color-primary)' }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
@@ -489,6 +550,7 @@ export default function Items() {
           setViewingItem(null);
           setDeleteItem(item);
         }}
+        onArchive={(item) => archiveMutation.mutate(item.id)}
         onViewBill={(billId) => {
           const bill = bills.find(b => b.id === billId);
           if (bill) setViewingBill(bill);
