@@ -89,23 +89,34 @@ export default function Items() {
     bills.forEach((bill) => {
       if (bill.line_items) {
         bill.line_items.forEach((lineItem) => {
-          if (lineItem.item_id === itemId && lineItem.item_quantity > 0) {
-            // Item added to inventory (not assigned to vehicle)
-            if (!lineItem.vehicle_id) {
+          if (lineItem.item_id === itemId && lineItem.item_quantity !== 0 && lineItem.item_quantity != null) {
+            const qty = lineItem.item_quantity;
+            if (qty < 0) {
+              // Negative quantity = return/credit — decreases inventory
+              transactions.push({
+                type: 'return',
+                date: bill.bill_date,
+                quantity: qty,
+                vendor: bill.vendor,
+                reference: `Bill #${bill.bill_number || 'N/A'} (Return/Credit)`,
+                billId: bill.id,
+              });
+            } else if (!lineItem.vehicle_id) {
+              // Positive, no vehicle = stock purchase — adds to inventory
               transactions.push({
                 type: 'purchase',
                 date: bill.bill_date,
-                quantity: lineItem.item_quantity,
+                quantity: qty,
                 vendor: bill.vendor,
                 reference: `Bill #${bill.bill_number || 'N/A'}`,
                 billId: bill.id,
               });
             } else {
-              // Item used on a vehicle (deducted from inventory)
+              // Positive, with vehicle = direct vehicle usage via bill
               transactions.push({
                 type: 'usage',
                 date: bill.bill_date,
-                quantity: lineItem.item_quantity,
+                quantity: qty,
                 vehicle: vehicleMap[lineItem.vehicle_id]?.name || 'Unknown',
                 reference: `Bill #${bill.bill_number || 'N/A'}`,
                 billId: bill.id,
@@ -206,17 +217,21 @@ export default function Items() {
       const totals = {};
       items.forEach(item => { totals[item.id] = 0; });
 
-      // Step 2: Add quantities from bills (only line items NOT assigned to a vehicle = stock purchases)
+      // Step 2: Add/subtract quantities from bills
       for (const bill of bills) {
         if (bill.line_items) {
           for (const lineItem of bill.line_items) {
-            if (lineItem.item_id && lineItem.item_quantity > 0 && totals[lineItem.item_id] !== undefined) {
-              if (!lineItem.vehicle_id) {
-                // Pure stock purchase — add to inventory
-                totals[lineItem.item_id] += lineItem.item_quantity;
+            if (lineItem.item_id && lineItem.item_quantity != null && lineItem.item_quantity !== 0 && totals[lineItem.item_id] !== undefined) {
+              const qty = lineItem.item_quantity;
+              if (qty < 0) {
+                // Negative = return/credit — subtract from inventory (but don't go below 0)
+                totals[lineItem.item_id] = Math.max(0, totals[lineItem.item_id] + qty);
+              } else if (!lineItem.vehicle_id) {
+                // Positive, no vehicle = stock purchase — add to inventory
+                totals[lineItem.item_id] += qty;
               } else {
-                // Direct vehicle usage via bill — subtract from inventory
-                totals[lineItem.item_id] = Math.max(0, totals[lineItem.item_id] - lineItem.item_quantity);
+                // Positive, with vehicle = direct usage — subtract
+                totals[lineItem.item_id] = Math.max(0, totals[lineItem.item_id] - qty);
               }
             }
           }

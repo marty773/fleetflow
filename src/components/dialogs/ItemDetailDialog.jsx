@@ -82,19 +82,29 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
                     <div className="flex items-center gap-3">
                       {txn.type === 'purchase' ? (
                         <TrendingUp className="h-4 w-4 text-green-500" />
+                      ) : txn.type === 'return' ? (
+                        <TrendingDown className="h-4 w-4 text-orange-500" />
                       ) : (
                         <TrendingDown className="h-4 w-4 text-red-500" />
                       )}
                       <div>
                         <p className="font-medium text-slate-900 dark:text-slate-100">{new Date(txn.date).toLocaleDateString()}</p>
                         <p className="text-xs text-slate-600 dark:text-slate-400">
-                          {txn.type === 'purchase' ? `Purchased from ${txn.vendor}` : `Used on ${txn.vehicle}`}
+                          {txn.type === 'purchase'
+                            ? `Purchased from ${txn.vendor}`
+                            : txn.type === 'return'
+                            ? `Return/Credit — ${txn.vendor}`
+                            : `Used on ${txn.vehicle}`}
                         </p>
+                        <p className="text-xs text-slate-400">{txn.reference}</p>
                       </div>
                     </div>
-                    <span className={`font-semibold ${txn.type === 'purchase' ? 'text-green-500' : 'text-red-500'}`}>
-                      {txn.type === 'purchase' ? '+' : '-'}
-                      {txn.quantity}
+                    <span className={`font-semibold ${
+                      txn.type === 'purchase' ? 'text-green-500'
+                      : txn.type === 'return' ? 'text-orange-500'
+                      : 'text-red-500'
+                    }`}>
+                      {txn.type === 'purchase' ? '+' : ''}{txn.quantity}
                     </span>
                   </div>
                 ))}
