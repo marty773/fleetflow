@@ -48,6 +48,11 @@
     "item_url": {
       "type": "string",
       "description": "Link to the item on the vendor's website (e.g. NAPA ProLink)"
+    },
+    "is_archived": {
+      "type": "boolean",
+      "default": false,
+      "description": "Archived items are hidden from dropdowns and the main list but preserved in transaction history"
     }
   },
   "required": [

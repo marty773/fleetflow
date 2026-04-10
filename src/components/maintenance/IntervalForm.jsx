@@ -270,7 +270,7 @@ export default function IntervalForm({ interval, vehicles, items = [], onSubmit,
                           <CommandItem value="none" onSelect={() => { setNewPart(p => ({ ...p, item_id: '', description: '', unit_price: 0 })); setPartSearchOpen(false); }}>
                             <Check className={cn('mr-2 h-4 w-4', !newPart.item_id ? 'opacity-100' : 'opacity-0')} /> None
                           </CommandItem>
-                          {items.map(item => (
+                          {items.filter(i => !i.is_archived).map(item => (
                             <CommandItem key={item.id} value={`${item.name} ${item.item_number || ''}`}
                               onSelect={() => {
                                 setNewPart(p => ({ ...p, item_id: item.id, description: item.name, unit_price: item.price || 0 }));

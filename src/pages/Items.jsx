@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw, ClipboardList } from 'lucide-react';
+import { Plus, Search, Package, Grid3X3, List, Loader2, RotateCw, ClipboardList, Archive, RotateCcw } from 'lucide-react';
 import PartsNeededReport from '@/components/reports/PartsNeededReport';
 import ItemCard from '@/components/items/ItemCard';
 import ItemFormDialog from '@/components/items/ItemFormDialog';
@@ -44,6 +44,7 @@ export default function Items() {
   const [viewingMaintenanceRecord, setViewingMaintenanceRecord] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [showPartsReport, setShowPartsReport] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -172,7 +173,18 @@ export default function Items() {
     },
   });
 
+  const archiveMutation = useMutation({
+    mutationFn: (id) => base44.entities.Item.update(id, { is_archived: true }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['items'] }),
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: (id) => base44.entities.Item.update(id, { is_archived: false }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['items'] }),
+  });
+
   const filteredItems = items
+    .filter(item => showArchived ? item.is_archived : !item.is_archived)
     .filter(item => {
       const query = searchQuery.toLowerCase();
       return (
@@ -351,6 +363,16 @@ export default function Items() {
           </Button>
 
           <Button
+            onClick={() => setShowArchived(p => !p)}
+            variant={showArchived ? 'secondary' : 'outline'}
+            className="h-9 hidden sm:flex gap-2"
+            title={showArchived ? 'Showing archived items' : 'Show archived items'}
+          >
+            <Archive className="h-4 w-4" />
+            {showArchived ? 'Archived' : 'Archived'}
+          </Button>
+
+          <Button
             onClick={() => setShowPartsReport(true)}
             variant="outline"
             className="h-9 hidden sm:flex gap-2"
@@ -382,14 +404,15 @@ export default function Items() {
             <Package className="h-10 w-10 text-slate-400 dark:text-slate-500" />
           </div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
-            {searchQuery ? 'No items found' : 'No items yet'}
+            {searchQuery ? 'No items found' : showArchived ? 'No archived items' : 'No items yet'}
           </h3>
           <p className="text-slate-600 dark:text-slate-400 mb-4">
             {searchQuery
               ? 'Try adjusting your search'
+              : showArchived ? 'Archived items will appear here'
               : 'Add your first item to get started'}
           </p>
-          {!searchQuery && (
+          {!searchQuery && !showArchived && (
             <Button 
               onClick={handleAddNew}
               style={{ backgroundColor: 'var(--color-primary)' }}
@@ -481,10 +504,18 @@ export default function Items() {
         item={viewingItem}
         transactions={viewingItem ? getItemTransactions(viewingItem.id) : []}
         onClose={() => setViewingItem(null)}
-        onEdit={(item) => {
+        onEdit={showArchived ? undefined : (item) => {
           setViewingItem(null);
           navigate(`/ItemFormPage?edit=${item.id}`);
         }}
+        onArchive={showArchived ? undefined : (item) => {
+          setViewingItem(null);
+          archiveMutation.mutate(item.id);
+        }}
+        onRestore={showArchived ? (item) => {
+          setViewingItem(null);
+          restoreMutation.mutate(item.id);
+        } : undefined}
         onDelete={(item) => {
           setViewingItem(null);
           setDeleteItem(item);

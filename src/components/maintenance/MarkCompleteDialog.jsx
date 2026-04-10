@@ -363,7 +363,7 @@ export default function MarkCompleteDialog({ interval, records, bills, vendors, 
                                 <CommandItem value="none" onSelect={() => { setNewWorkItem(p => ({ ...p, item_id: '' })); setItemSearchOpen(false); }}>
                                   <Check className={cn('mr-2 h-4 w-4', !newWorkItem.item_id ? 'opacity-100' : 'opacity-0')} /> None
                                 </CommandItem>
-                                {items.map(item => (
+                                {items.filter(i => !i.is_archived).map(item => (
                                   <CommandItem key={item.id} value={`${item.name} ${item.item_number || ''}`}
                                     onSelect={() => {
                                       setNewWorkItem(p => ({ ...p, item_id: item.id, description: item.name, unit_price: item.price || 0 }));

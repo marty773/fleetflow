@@ -4,9 +4,15 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Trash2, Archive, ChevronDown, RotateCcw } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-export default function ItemDetailDialog({ item, transactions = [], onClose, onEdit, onDelete, onViewBill, onViewMaintenance }) {
+export default function ItemDetailDialog({ item, transactions = [], onClose, onEdit, onDelete, onArchive, onRestore, onViewBill, onViewMaintenance }) {
   const [showPartsReport, setShowPartsReport] = useState(false);
   if (!item) return null;
 
@@ -129,15 +135,41 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           >
            Edit
           </Button>
-          {onDelete && (
-           <Button
-             variant="outline"
-             onClick={() => onDelete?.(item)}
-             className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-           >
-             <Trash2 className="w-4 h-4 mr-2" />
-             Delete
-           </Button>
+          {item.is_archived ? (
+            <>
+              {onRestore && (
+                <Button variant="outline" onClick={() => onRestore?.(item)} className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200">
+                  <RotateCcw className="w-4 h-4 mr-2" /> Restore
+                </Button>
+              )}
+              {onDelete && (
+                <Button variant="outline" onClick={() => onDelete?.(item)} className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                </Button>
+              )}
+            </>
+          ) : (
+            (onDelete || onArchive) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                    <Trash2 className="w-4 h-4 mr-1" /> Delete <ChevronDown className="w-3 h-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {onArchive && (
+                    <DropdownMenuItem onClick={() => onArchive?.(item)} className="gap-2 cursor-pointer">
+                      <Archive className="w-4 h-4 text-amber-500" /> Archive
+                    </DropdownMenuItem>
+                  )}
+                  {onDelete && (
+                    <DropdownMenuItem onClick={() => onDelete?.(item)} className="gap-2 text-red-600 cursor-pointer focus:text-red-600">
+                      <Trash2 className="w-4 h-4" /> Delete Permanently
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )
           )}
           </div>
           </DialogContent>

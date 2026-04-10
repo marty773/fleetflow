@@ -587,7 +587,7 @@ export default function BillForm({ bill, vehicles, items = [], vendors = [], onS
                                 />
                                 None
                               </CommandItem>
-                              {items.map((item) => (
+                              {items.filter(item => !item.is_archived).map((item) => (
                                 <CommandItem
                                   key={item.id}
                                   value={`${item.name} ${item.item_number || ''}`}
