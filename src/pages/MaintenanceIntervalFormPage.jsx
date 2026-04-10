@@ -70,7 +70,7 @@ export default function MaintenanceIntervalFormPage() {
           <IntervalForm
             interval={editingInterval}
             vehicles={vehicles}
-            items={allItems.filter(i => !i.is_archived)}
+            items={allItems}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/Maintenance?tab=intervals')}
             isLoading={createMutation.isPending || updateMutation.isPending}

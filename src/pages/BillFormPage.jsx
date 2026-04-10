@@ -24,7 +24,7 @@ export default function BillFormPage() {
 
   const vehicles = allVehicles;
   const vendors = allVendors;
-  const filteredItems = allItems.filter(i => !i.is_archived);
+  const filteredItems = allItems;
   const editingBill = editId ? allBills.find(b => b.id === editId) || null : null;
 
   const createMutation = useMutation({

@@ -92,7 +92,7 @@ export default function Maintenance() {
   const vendors = allVendors;
   const records = allRecords;
   const intervals = allIntervals;
-  const filteredItems = items.filter(i => !i.is_archived);
+  const filteredItems = items;
   const bills = allBills;
 
   // Fetch current vehicle mileage from Motive on mount
