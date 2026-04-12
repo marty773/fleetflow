@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SelectItem } from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import { defaultPermissions } from '@/hooks/usePagePermissions.jsx';
 
 export default function UserManagement() {
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('user');
+  const [inviteRole, setInviteRole] = useState('');
   const [inviting, setInviting] = useState(false);
   const [invitePermissions, setInvitePermissions] = useState(defaultPermissions());
   const [editingUserId, setEditingUserId] = useState(null);
@@ -112,19 +113,19 @@ export default function UserManagement() {
                   </div>
                   <div>
                     <Label htmlFor="role" className="text-slate-700 dark:text-slate-300">Role</Label>
+                    <div className="mt-2">
                     <ResponsiveSelect
                       value={inviteRole}
                       onValueChange={(v) => {
                         setInviteRole(v);
-                        if (v === 'admin') setInvitePermissions(defaultPermissions());
+                        if (v !== 'user') setInvitePermissions(defaultPermissions());
                       }}
                       placeholder="Select role"
-                      options={[
-                        { value: 'user', label: 'User' },
-                        { value: 'admin', label: 'Admin' }
-                      ]}
-                      className="mt-2"
-                    />
+                    >
+                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </ResponsiveSelect>
+                    </div>
                   </div>
                 </div>
 
