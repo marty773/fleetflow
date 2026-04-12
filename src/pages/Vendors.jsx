@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { usePagePermissions } from '@/hooks/usePagePermissions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,6 +17,8 @@ import VendorCard from '../components/vendors/VendorCard';
 
 export default function Vendors() {
   const navigate = useNavigate();
+  const { canEdit } = usePagePermissions();
+  const canEditVendors = canEdit('vendors');
   const [viewingVendor, setViewingVendor] = useState(null);
   const queryClient = useQueryClient();
 
@@ -39,12 +42,12 @@ export default function Vendors() {
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Vendors</h1>
             <p className="text-slate-600 dark:text-slate-400 mt-2">Manage vendor information and contacts</p>
           </div>
-          <Button
+          {canEditVendors && <Button
             onClick={() => navigate('/VendorFormPage')}
             className="bg-blue-600 hover:bg-blue-700 hidden sm:flex"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Vendor
-          </Button>
+          </Button>}
         </div>
 
         {vendors.length === 0 ? (
@@ -66,8 +69,8 @@ export default function Vendors() {
                 key={vendor.id}
                 vendor={vendor}
                 onView={setViewingVendor}
-                onEdit={(v) => navigate(`/VendorFormPage?edit=${v.id}`)}
-                onDelete={(id) => deleteMutation.mutate(id)}
+                onEdit={canEditVendors ? (v) => navigate(`/VendorFormPage?edit=${v.id}`) : undefined}
+                onDelete={canEditVendors ? (id) => deleteMutation.mutate(id) : undefined}
                 isDeleting={deleteMutation.isPending}
               />
             ))}
@@ -75,13 +78,13 @@ export default function Vendors() {
         )}
 
         {/* Mobile FAB */}
-        <button
+        {canEditVendors && <button
           onClick={() => navigate('/VendorFormPage')}
           aria-label="Add Vendor"
           className="fixed bottom-24 right-6 sm:hidden z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation bg-blue-600"
         >
           <Plus className="w-6 h-6" />
-        </button>
+        </button>}
 
         {/* View Vendor Dialog */}
         {viewingVendor && (
@@ -150,16 +153,16 @@ export default function Vendors() {
                 >
                   Close
                 </Button>
-                <Button 
-                  onClick={() => {
-                    const v = viewingVendor;
-                    setViewingVendor(null);
-                    navigate(`/VendorFormPage?edit=${v.id}`);
-                  }}
+                {canEditVendors && <Button 
+                 onClick={() => {
+                   const v = viewingVendor;
+                   setViewingVendor(null);
+                   navigate(`/VendorFormPage?edit=${v.id}`);
+                 }}
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
                 >
                   Edit
-                </Button>
+                </Button>}
               </div>
             </DialogContent>
           </Dialog>

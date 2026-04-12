@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { usePagePermissions } from '@/hooks/usePagePermissions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,6 +28,8 @@ import MaintenanceRecordDetailDialog from '../components/dialogs/MaintenanceReco
 
 export default function Bills() {
   const navigate = useNavigate();
+  const { canEdit } = usePagePermissions();
+  const canEditBills = canEdit('bills');
   const [viewingBill, setViewingBill] = useState(null);
   const [viewingRecord, setViewingRecord] = useState(null);
   const [activeTab, setActiveTab] = useState('list');
@@ -137,9 +140,9 @@ export default function Bills() {
                 <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Bills & Expenses</h1>
                 <p className="text-slate-600 dark:text-slate-300 mt-2">Scan and track all your fleet expenses</p>
               </div>
-              <Button onClick={() => navigate('/BillFormPage')} className="hidden sm:flex" style={{ backgroundColor: 'var(--color-primary)' }}>
+              {canEditBills && <Button onClick={() => navigate('/BillFormPage')} className="hidden sm:flex" style={{ backgroundColor: 'var(--color-primary)' }}>
                 <Plus className="w-4 h-4 mr-2" /> New Bill
-              </Button>
+              </Button>}
             </div>
 
             {/* Search & Filters */}
@@ -206,7 +209,7 @@ export default function Bills() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="list" className="mt-6">
-                <BillList bills={filteredBills} vehicles={vehicles} items={filteredItems} records={maintenanceRecords} onView={setViewingBill} onEdit={(bill) => navigate(`/BillFormPage?edit=${bill.id}`)} onDelete={(id) => deleteMutation.mutate(id)} isDeleting={deleteMutation.isPending} />
+                <BillList bills={filteredBills} vehicles={vehicles} items={filteredItems} records={maintenanceRecords} onView={setViewingBill} onEdit={canEditBills ? (bill) => navigate(`/BillFormPage?edit=${bill.id}`) : undefined} onDelete={canEditBills ? (id) => deleteMutation.mutate(id) : undefined} isDeleting={deleteMutation.isPending} />
               </TabsContent>
               <TabsContent value="gallery" className="mt-6">
                 {billsWithPhotos.length > 0 ? <BillGallery bills={billsWithPhotos} vehicles={vehicles} /> : <Card className="border-2 border-dashed"><CardContent className="p-12 text-center"><ImageIcon className="w-12 h-12 mx-auto text-slate-300 mb-3" /><p className="text-slate-600 dark:text-slate-400">No bill photos yet</p></CardContent></Card>}
@@ -221,14 +224,14 @@ export default function Bills() {
         vehicles={vehicles}
         records={maintenanceRecords}
         onClose={() => setViewingBill(null)}
-        onEdit={(bill) => {
+        onEdit={canEditBills ? (bill) => {
           setViewingBill(null);
           navigate(`/BillFormPage?edit=${bill.id}`);
-        }}
-        onDelete={(id) => {
+        } : undefined}
+        onDelete={canEditBills ? (id) => {
           setDeletingBill(bills.find(b => b.id === id));
           setViewingBill(null);
-        }}
+        } : undefined}
         onViewPhoto={() => setViewingBill(null)}
         onViewRecord={(record) => { setViewingBill(null); setViewingRecord(record); }}
       />
@@ -271,14 +274,14 @@ export default function Bills() {
       </AlertDialog>
 
       {/* Mobile FAB */}
-      <button
+      {canEditBills && <button
         onClick={() => navigate('/BillFormPage')}
         aria-label="New Bill"
         className="fixed bottom-24 right-6 sm:hidden z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all active:scale-95 touch-manipulation"
         style={{ backgroundColor: 'var(--color-primary)' }}
       >
         <Plus className="w-6 h-6" />
-      </button>
+      </button>}
     </PageTransition>
   );
 }

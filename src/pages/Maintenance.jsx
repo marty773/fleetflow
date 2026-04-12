@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePagePermissions } from '@/hooks/usePagePermissions';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,8 @@ import PartsNeededReport from '../components/reports/PartsNeededReport';
 
 export default function Maintenance() {
   const navigate = useNavigate();
+  const { canEdit } = usePagePermissions();
+  const canEditMaint = canEdit('maintenance');
   const [viewingRecord, setViewingRecord] = useState(null);
   const [viewingBill, setViewingBill] = useState(null);
   const [viewingInterval, setViewingInterval] = useState(null);
@@ -292,7 +295,7 @@ export default function Maintenance() {
             <p className="text-slate-600 dark:text-slate-400 mt-2">Track maintenance records and scheduled intervals</p>
           </div>
           <div className="flex flex-wrap gap-2 justify-end">
-            {activeTab === 'upcoming' && (
+            {activeTab === 'upcoming' && canEditMaint && (
               <>
                 <Button onClick={() => setShowPartsReport(true)} variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-50 gap-2">
                   <Package className="w-4 h-4" /> Parts Needed
@@ -308,7 +311,7 @@ export default function Maintenance() {
                 </Button>
               </>
             )}
-            {activeTab === 'history' && (
+            {activeTab === 'history' && canEditMaint && (
               <Button onClick={() => navigate('/MaintenanceRecordFormPage')} size="sm" className="bg-blue-600 hover:bg-blue-700 hidden sm:flex">
                 <Plus className="w-4 h-4 mr-1" /> Log Maintenance
               </Button>
@@ -339,8 +342,8 @@ export default function Maintenance() {
               vehicles={vehicles}
               reminderMiles={reminderMiles}
               currentMileage={motiveVehicles}
-              onEdit={(interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`)}
-              onDelete={(id) => deleteIntervalMutation.mutate(id)}
+              onEdit={canEditMaint ? (interval) => navigate(`/MaintenanceIntervalFormPage?edit=${interval.id}`) : undefined}
+              onDelete={canEditMaint ? (id) => deleteIntervalMutation.mutate(id) : undefined}
               onMarkComplete={setCompletingInterval}
               onView={setViewingInterval}
               isDeleting={deleteIntervalMutation.isPending}
@@ -361,22 +364,22 @@ export default function Maintenance() {
               onSortOrderChange={setHistorySortOrder}
               onSearchChange={setHistorySearch}
               onView={setViewingRecord}
-              onEdit={(record) => {
+              onEdit={canEditMaint ? (record) => {
                 const params = new URLSearchParams({ edit: record.id });
                 const returnParams = new URLSearchParams({ tab: 'history' });
                 if (historyVehicleFilter !== 'all') returnParams.set('vehicle', historyVehicleFilter);
                 if (historySortOrder !== 'desc') returnParams.set('sort', historySortOrder);
                 if (historySearch) returnParams.set('search', historySearch);
                 navigate(`/MaintenanceRecordFormPage?${params.toString()}&returnTo=${encodeURIComponent('/Maintenance?' + returnParams.toString())}`);
-              }}
-              onDelete={(id) => deleteRecordMutation.mutate(id)}
+              } : undefined}
+              onDelete={canEditMaint ? (id) => deleteRecordMutation.mutate(id) : undefined}
               isDeleting={deleteRecordMutation.isPending}
             />
           </TabsContent>
           </Tabs>
 
           {/* Mobile FAB */}
-          <button
+          {canEditMaint && <button
             onClick={() => activeTab === 'history'
               ? navigate('/MaintenanceRecordFormPage')
               : navigate('/MaintenanceIntervalFormPage')
@@ -385,7 +388,7 @@ export default function Maintenance() {
             className="fixed bottom-24 right-6 sm:hidden z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation bg-blue-600"
           >
             <Plus className="w-6 h-6" />
-          </button>
+          </button>}
 
           <AIIntervalGenerator
             vehicles={vehicles}

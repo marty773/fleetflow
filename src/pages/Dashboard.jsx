@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { usePagePermissions } from '@/hooks/usePagePermissions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +18,8 @@ import { getServiceReminderMiles } from '../components/settings/ServiceReminderS
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { canEdit } = usePagePermissions();
+  const canEditDashboard = canEdit('dashboard');
   const queryClient = useQueryClient();
   const [selectedInterval, setSelectedInterval] = useState(null);
   const [serviceListFilter, setServiceListFilter] = useState(null); // 'upcoming' | 'overdue'
@@ -226,7 +229,7 @@ export default function Dashboard() {
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">Fleet Dashboard</h1>
           <p className="text-slate-600 dark:text-slate-400">Manage your truck and trailer fleet</p>
         </div>
-        <div className="hidden sm:flex flex-wrap gap-2 shrink-0">
+        {canEditDashboard && <div className="hidden sm:flex flex-wrap gap-2 shrink-0">
           <Button
             onClick={() => navigate('/BillFormPage')}
             style={{ backgroundColor: 'var(--color-primary)' }}
@@ -243,11 +246,11 @@ export default function Dashboard() {
           >
             <Plus className="w-4 h-4 mr-2" /> New Maintenance
           </Button>
-        </div>
+        </div>}
       </div>
 
       {/* Mobile-only buttons */}
-      <div className="flex sm:hidden flex-wrap gap-2 mb-8">
+      {canEditDashboard && <div className="flex sm:hidden flex-wrap gap-2 mb-8">
         <Button
           onClick={() => navigate('/BillFormPage')}
           className="flex-1"
@@ -266,7 +269,7 @@ export default function Dashboard() {
         >
           <Plus className="w-4 h-4 mr-2" /> New Maintenance
         </Button>
-      </div>
+      </div>}
 
       {/* Stats — clickable */}
       <DashboardStats

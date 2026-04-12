@@ -1,0 +1,93 @@
+{
+  "name": "UserPagePermissions",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user these permissions apply to"
+    },
+    "dashboard": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Dashboard page"
+    },
+    "vehicles": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Vehicles page"
+    },
+    "bills": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Bills page"
+    },
+    "maintenance": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Maintenance page"
+    },
+    "items": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Items page"
+    },
+    "calendar": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Calendar page"
+    },
+    "reports": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Reports page"
+    },
+    "vendors": {
+      "type": "string",
+      "enum": [
+        "none",
+        "view",
+        "edit"
+      ],
+      "default": "edit",
+      "description": "Access level for Vendors page"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}

@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import { useState, useEffect, useCallback } from 'react';
 
 import BottomTabs from '@/components/mobile/BottomTabs';
+import { usePagePermissions } from '@/hooks/usePagePermissions';
 
 function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -63,6 +64,7 @@ function LayoutContent({ children, currentPageName }) {
   const mobilePages = ['Dashboard', 'Vehicles', 'Bills', 'Maintenance'];
 
   const [currentUser, setCurrentUser] = React.useState(null);
+  const { canView, isAdmin } = usePagePermissions();
 
   React.useEffect(() => {
     base44.auth.me().then(setCurrentUser).catch(() => {});
@@ -149,7 +151,11 @@ function LayoutContent({ children, currentPageName }) {
 
 
           <nav className="space-y-2">
-                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), { name: 'Settings', path: 'Settings', icon: Settings }, ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].map(item => {
+                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), { name: 'Settings', path: 'Settings', icon: Settings }, ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].filter(item => {
+              const keyMap = { Dashboard: 'dashboard', Vehicles: 'vehicles', Bills: 'bills', Maintenance: 'maintenance', Items: 'items', Calendar: 'calendar', Reports: 'reports', Vendors: 'vendors' };
+              const key = keyMap[item.name];
+              return !key || canView(key);
+            }).map(item => {
               const Icon = item.icon;
               const isActive = currentPageName === item.name;
               return (
