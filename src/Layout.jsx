@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Wrench, FileText, Calendar, Truck, Menu, X, Package, DollarSign, Users, Settings, ArrowLeft } from 'lucide-react';
+import { usePagePermissions } from '@/hooks/usePagePermissions.jsx';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -63,6 +64,7 @@ function LayoutContent({ children, currentPageName }) {
   const mobilePages = ['Dashboard', 'Vehicles', 'Bills', 'Maintenance'];
 
   const [currentUser, setCurrentUser] = React.useState(null);
+  const { canView, isAdmin } = usePagePermissions();
 
   React.useEffect(() => {
     base44.auth.me().then(setCurrentUser).catch(() => {});
@@ -149,7 +151,11 @@ function LayoutContent({ children, currentPageName }) {
 
 
           <nav className="space-y-2">
-                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), { name: 'Settings', path: 'Settings', icon: Settings }, ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].map(item => {
+                    {[...navItems.slice(0, 4), { name: 'Vendors', path: 'Vendors', icon: Truck }, ...navItems.slice(4), { name: 'Settings', path: 'Settings', icon: Settings }, ...(currentUser?.role === 'admin' ? [{ name: 'Users', path: 'UserManagement', icon: Users }] : [])].filter(item => {
+                      const permPages = ['Dashboard','Vehicles','Bills','Maintenance','Items','Calendar','Reports','Vendors'];
+                      if (!permPages.includes(item.name)) return true;
+                      return canView(item.name);
+                    }).map(item => {
               const Icon = item.icon;
               const isActive = currentPageName === item.name;
               return (

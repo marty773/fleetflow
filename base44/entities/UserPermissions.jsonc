@@ -1,0 +1,17 @@
+{
+  "name": "UserPermissions",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user these permissions apply to"
+    },
+    "page_permissions": {
+      "type": "object",
+      "description": "Map of page name to {view: boolean, edit: boolean}"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}

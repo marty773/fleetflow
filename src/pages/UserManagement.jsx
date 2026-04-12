@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ResponsiveSelect from '@/components/ResponsiveSelect';
 import { Badge } from '@/components/ui/badge';
-import { Users, Plus, UserPlus } from 'lucide-react';
+import { Users, Plus, UserPlus, Settings2 } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
+import UserPermissionsEditor from '@/components/UserPermissionsEditor';
+import { defaultPermissions } from '@/hooks/usePagePermissions.jsx';
 
 export default function UserManagement() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('user');
   const [inviting, setInviting] = useState(false);
+  const [invitePermissions, setInvitePermissions] = useState(defaultPermissions());
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [editingPermissions, setEditingPermissions] = useState(null);
+  const [savingPermissions, setSavingPermissions] = useState(false);
 
   const { data: users = [] } = useQuery({
     queryKey: ['users'],
@@ -28,14 +34,49 @@ export default function UserManagement() {
     setInviting(true);
     try {
       await base44.users.inviteUser(inviteEmail, inviteRole);
+      if (inviteRole === 'user') {
+        const existing = await base44.entities.UserPermissions.filter({ user_email: inviteEmail });
+        if (existing.length > 0) {
+          await base44.entities.UserPermissions.update(existing[0].id, { page_permissions: invitePermissions });
+        } else {
+          await base44.entities.UserPermissions.create({ user_email: inviteEmail, page_permissions: invitePermissions });
+        }
+      }
       setInviteEmail('');
       setInviteRole('user');
+      setInvitePermissions(defaultPermissions());
       alert('User invited successfully!');
     } catch (error) {
       alert('Failed to invite user: ' + error.message);
     } finally {
       setInviting(false);
     }
+  };
+
+  const handleEditPermissions = async (user) => {
+    if (editingUserId?.startsWith(user.id)) {
+      setEditingUserId(null);
+      setEditingPermissions(null);
+      return;
+    }
+    const records = await base44.entities.UserPermissions.filter({ user_email: user.email });
+    setEditingPermissions(records.length > 0 ? (records[0].page_permissions || defaultPermissions()) : defaultPermissions());
+    setEditingUserId(user.id + '|' + user.email);
+  };
+
+  const handleSavePermissions = async () => {
+    const [, userEmail] = editingUserId.split('|');
+    setSavingPermissions(true);
+    const existing = await base44.entities.UserPermissions.filter({ user_email: userEmail });
+    if (existing.length > 0) {
+      await base44.entities.UserPermissions.update(existing[0].id, { page_permissions: editingPermissions });
+    } else {
+      await base44.entities.UserPermissions.create({ user_email: userEmail, page_permissions: editingPermissions });
+    }
+    setSavingPermissions(false);
+    setEditingUserId(null);
+    setEditingPermissions(null);
+    alert('Permissions saved!');
   };
 
   return (
@@ -73,7 +114,10 @@ export default function UserManagement() {
                     <Label htmlFor="role" className="text-slate-700 dark:text-slate-300">Role</Label>
                     <ResponsiveSelect
                       value={inviteRole}
-                      onValueChange={setInviteRole}
+                      onValueChange={(v) => {
+                        setInviteRole(v);
+                        if (v === 'admin') setInvitePermissions(defaultPermissions());
+                      }}
                       placeholder="Select role"
                       options={[
                         { value: 'user', label: 'User' },
@@ -83,6 +127,14 @@ export default function UserManagement() {
                     />
                   </div>
                 </div>
+
+                {inviteRole === 'user' && (
+                  <div>
+                    <Label className="text-slate-700 dark:text-slate-300 block mb-2">Page Permissions</Label>
+                    <UserPermissionsEditor permissions={invitePermissions} onChange={setInvitePermissions} />
+                  </div>
+                )}
+
                 <Button
                   onClick={handleInviteUser}
                   disabled={inviting}
@@ -106,14 +158,39 @@ export default function UserManagement() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 {users.map(user => (
-                  <div key={user.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-slate-900 dark:text-white">{user.full_name}</p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">{user.email}</p>
+                  <div key={user.id} className="bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <div className="p-4 flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-slate-900 dark:text-white">{user.full_name}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{user.email}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>
+                        {user.role === 'user' && (
+                          <button
+                            onClick={() => handleEditPermissions(user)}
+                            className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500"
+                            title="Edit permissions"
+                          >
+                            <Settings2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                      {user.role}
-                    </Badge>
+                    {editingUserId?.startsWith(user.id) && editingPermissions && (
+                      <div className="px-4 pb-4 space-y-3 border-t border-slate-200 dark:border-slate-700 pt-3">
+                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Page Permissions for {user.full_name}</p>
+                        <UserPermissionsEditor permissions={editingPermissions} onChange={setEditingPermissions} />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={handleSavePermissions} disabled={savingPermissions} className="bg-amber-500 hover:bg-amber-600">
+                            {savingPermissions ? 'Saving...' : 'Save Permissions'}
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setEditingUserId(null); setEditingPermissions(null); }}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
