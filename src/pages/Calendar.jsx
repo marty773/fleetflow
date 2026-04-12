@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
-import { usePagePermissions } from '@/hooks/usePagePermissions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +21,6 @@ import MarkCompleteDialog from '../components/maintenance/MarkCompleteDialog';
 
 export default function Calendar() {
   const queryClient = useQueryClient();
-  const { canEdit } = usePagePermissions();
-  const canEditCalendar = canEdit('calendar');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState('all');
   const [selectedDay, setSelectedDay] = useState(null);
@@ -336,7 +333,7 @@ export default function Calendar() {
                 <CalendarIcon className="w-4 h-4 mr-2" />
                 Sync to Google Calendar
               </Button>
-              {canEditCalendar && <Button
+              <Button
                 size="sm"
                 onClick={() => {
                   setEditingAppointment(null);
@@ -345,7 +342,7 @@ export default function Calendar() {
                 className="bg-blue-600 hover:bg-blue-700 hidden sm:flex"
               >
                 <Plus className="w-4 h-4 mr-2" /> New Appointment
-              </Button>}
+              </Button>
             </div>
           </div>
           
@@ -569,13 +566,13 @@ export default function Calendar() {
         </div>
 
         {/* Mobile FAB */}
-        {canEditCalendar && <button
+        <button
           onClick={() => { setEditingAppointment(null); setShowAppointmentForm(true); }}
           aria-label="New Appointment"
           className="fixed bottom-24 right-6 sm:hidden z-40 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all hover:scale-110 touch-manipulation bg-blue-600"
         >
           <Plus className="w-6 h-6" />
-        </button>}
+        </button>
 
         {/* Mark Complete Dialog */}
         <MarkCompleteDialog
@@ -684,7 +681,7 @@ export default function Calendar() {
                           {event.notes && (
                             <p className="text-xs text-slate-500 mt-2">{event.notes}</p>
                           )}
-                          {canEditCalendar && <div className="flex gap-2 mt-3">
+                          <div className="flex gap-2 mt-3">
                             <Button
                               size="sm"
                               variant="outline"
@@ -708,7 +705,7 @@ export default function Calendar() {
                             >
                               Delete
                             </Button>
-                            </div>}
+                          </div>
                         </div>
                       );
                     } else {
@@ -751,15 +748,15 @@ export default function Calendar() {
                            </div>
                          )}
                          {/* Complete Now button */}
-                          {canEditCalendar && <Button
-                            size="sm"
-                            className="mt-3 mr-2 bg-green-600 hover:bg-green-700 text-white gap-1"
-                            onClick={() => { setSelectedDay(null); setCompletingInterval(event); }}
-                          >
+                         <Button
+                           size="sm"
+                           className="mt-3 mr-2 bg-green-600 hover:bg-green-700 text-white gap-1"
+                           onClick={() => { setSelectedDay(null); setCompletingInterval(event); }}
+                         >
                            ✓ Complete Now
-                           </Button>}
-                           {/* Reschedule control */}
-                         {canEditCalendar && isRescheduling ? (
+                         </Button>
+                         {/* Reschedule control */}
+                         {isRescheduling ? (
                            <div className="mt-3 flex items-center gap-2">
                              <input
                                type="date"
@@ -780,11 +777,11 @@ export default function Calendar() {
                                </Button>
                              )}
                            </div>
-                         ) : canEditCalendar ? (
+                         ) : (
                            <Button size="sm" variant="outline" className="mt-3 text-xs" onClick={() => handleReschedule(event)}>
                              📌 {event.scheduled_date ? 'Change scheduled date' : 'Pin to a date'}
-                             </Button>
-                             ) : null}
+                           </Button>
+                         )}
                        </div>
                       );
                     }
@@ -797,7 +794,7 @@ export default function Calendar() {
                 )}
               </div>
               <div className="flex gap-2 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
-                {canEditCalendar && <Button
+                <Button
                   onClick={() => {
                     setEditingAppointment(null);
                     setShowAppointmentForm(true);
@@ -810,7 +807,7 @@ export default function Calendar() {
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Appointment
-                </Button>}
+                </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setSelectedDay(null)}

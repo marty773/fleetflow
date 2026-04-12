@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usePagePermissions } from '@/hooks/usePagePermissions';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -33,8 +32,6 @@ import PullToRefresh from '@/components/PullToRefresh';
 
 export default function Items() {
   const navigate = useNavigate();
-  const { canEdit } = usePagePermissions();
-  const canEditItems = canEdit('items');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('itemsViewMode') || 'list';
@@ -336,7 +333,7 @@ export default function Items() {
             {recalculating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCw className="h-4 w-4" />}
           </Button>
 
-          {canEditItems && <Button
+          <Button
             onClick={handleAddNew}
             className="h-9 shadow-sm hidden sm:flex shrink-0"
             style={{ backgroundColor: 'var(--color-primary)' }}
@@ -345,7 +342,7 @@ export default function Items() {
           >
             <Plus className="h-4 w-4 mr-1" />
             Add Item
-          </Button>}
+          </Button>
 
           <Button
             onClick={() => setShowMore(p => !p)}
@@ -445,11 +442,11 @@ export default function Items() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredItems.map(item => (
             <ItemCard
-             key={item.id}
-             item={item}
-             onView={() => setViewingItem(item)}
-             onEdit={canEditItems ? handleEdit : undefined}
-             onDelete={canEditItems ? setDeleteItem : undefined}
+              key={item.id}
+              item={item}
+              onView={() => setViewingItem(item)}
+              onEdit={handleEdit}
+              onDelete={setDeleteItem}
             />
           ))}
         </div>
@@ -521,22 +518,22 @@ export default function Items() {
         item={viewingItem}
         transactions={viewingItem ? getItemTransactions(viewingItem.id) : []}
         onClose={() => setViewingItem(null)}
-        onEdit={canEditItems && !showArchived ? (item) => {
+        onEdit={showArchived ? undefined : (item) => {
           setViewingItem(null);
           navigate(`/ItemFormPage?edit=${item.id}`);
-        } : undefined}
-        onArchive={canEditItems && !showArchived ? (item) => {
+        }}
+        onArchive={showArchived ? undefined : (item) => {
           setViewingItem(null);
           archiveMutation.mutate(item.id);
-        } : undefined}
-        onRestore={canEditItems && showArchived ? (item) => {
+        }}
+        onRestore={showArchived ? (item) => {
           setViewingItem(null);
           restoreMutation.mutate(item.id);
         } : undefined}
-        onDelete={canEditItems ? (item) => {
+        onDelete={(item) => {
           setViewingItem(null);
           setDeleteItem(item);
-        } : undefined}
+        }}
         onViewBill={(billId) => {
           const bill = bills.find(b => b.id === billId);
           if (bill) setViewingBill(bill);
@@ -611,14 +608,14 @@ export default function Items() {
       </PullToRefresh>
 
       {/* Mobile FAB */}
-      {canEditItems && <button
+      <button
         onClick={handleAddNew}
         aria-label="Add Item"
         className="fixed bottom-24 right-6 sm:hidden z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all active:scale-95 touch-manipulation"
         style={{ backgroundColor: 'var(--color-primary)' }}
       >
         <Plus className="w-6 h-6" />
-      </button>}
+      </button>
     </PageTransition>
   );
 }

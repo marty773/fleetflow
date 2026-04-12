@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { usePagePermissions } from '@/hooks/usePagePermissions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,8 +13,6 @@ import PullToRefresh from '../components/PullToRefresh';
 import PageTransition from '../components/PageTransition';
 export default function Vehicles() {
   const navigate = useNavigate();
-  const { canEdit } = usePagePermissions();
-  const canEditVehicles = canEdit('vehicles');
   const [viewingVehicle, setViewingVehicle] = useState(null);
   const [sortBy, setSortBy] = useState('name');
   const [filterType, setFilterType] = useState('all');
@@ -67,12 +64,12 @@ export default function Vehicles() {
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Fleet Vehicles</h1>
             <p className="text-slate-600 dark:text-slate-400 mt-2">Manage your trucks and trailers</p>
           </div>
-          {canEditVehicles && <Button
+          <Button
             onClick={() => navigate('/VehicleForm')}
             className="bg-slate-900 hover:bg-slate-800 hidden sm:flex"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Vehicle
-          </Button>}
+          </Button>
         </div>
 
         {/* Search + Filter Controls */}
@@ -128,8 +125,8 @@ export default function Vehicles() {
                 key={vehicle.id}
                 vehicle={vehicle}
                 onView={() => setViewingVehicle(vehicle)}
-                onEdit={canEditVehicles ? (v) => navigate(`/VehicleForm?edit=${v.id}`) : undefined}
-                onDelete={canEditVehicles ? () => deleteMutation.mutate(vehicle.id) : undefined}
+                onEdit={(v) => navigate(`/VehicleForm?edit=${v.id}`)}
+                onDelete={() => deleteMutation.mutate(vehicle.id)}
                 isDeleting={deleteMutation.isPending}
               />
             ))
@@ -148,23 +145,23 @@ export default function Vehicles() {
           vehicle={viewingVehicle}
           open={!!viewingVehicle}
           onOpenChange={(open) => !open && setViewingVehicle(null)}
-          onEdit={canEditVehicles ? (vehicle) => {
+          onEdit={(vehicle) => {
             setViewingVehicle(null);
             navigate(`/VehicleForm?edit=${vehicle.id}`);
-          } : undefined}
+          }}
         />
           </div>
         </div>
       </PullToRefresh>
 
       {/* Mobile FAB */}
-      {canEditVehicles && <button
+      <button
         onClick={() => navigate('/VehicleForm')}
         aria-label="Add Vehicle"
         className="fixed bottom-24 right-6 sm:hidden z-50 w-14 h-14 flex items-center justify-center rounded-full text-white shadow-2xl transition-all active:scale-95 touch-manipulation bg-slate-900 dark:bg-slate-100 dark:text-slate-900"
       >
         <Plus className="w-6 h-6" />
-      </button>}
+      </button>
     </PageTransition>
   );
 }
