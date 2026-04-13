@@ -57,7 +57,7 @@ export default function BillFormPage() {
     // Apply new inventory
     const newMap = {};
     data.line_items
-      .filter(item => item.item_id && item.item_quantity > 0 && !item.vehicle_id)
+      .filter(item => item.item_id && item.item_quantity && item.item_quantity !== 0 && !item.vehicle_id)
       .forEach(item => { newMap[item.item_id] = (newMap[item.item_id] || 0) + item.item_quantity; });
     for (const [item_id, qty] of Object.entries(newMap)) {
       const cur = filteredItems.find(i => i.id === item_id);
