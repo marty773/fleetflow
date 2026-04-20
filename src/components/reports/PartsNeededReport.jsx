@@ -220,6 +220,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   const grandTotal = orderSummary.reduce((s, o) => s + (o.totalShortage * (o.unitPrice || 0)), 0);
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl w-[95vw] h-[92vh] flex flex-col p-0 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
@@ -419,5 +420,6 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
         onClose={() => setViewingInterval(null)}
       />
     )}
+    </>
   );
 }
