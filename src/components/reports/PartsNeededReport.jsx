@@ -450,7 +450,6 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
                 </div>
               ))}
             </div>
-            </div>
             )}
           </div>
         )}
