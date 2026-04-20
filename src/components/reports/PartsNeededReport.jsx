@@ -8,6 +8,7 @@ import { differenceInDays } from 'date-fns';
 import { ExternalLink, Download, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { getServiceReminderMiles } from '@/components/settings/ServiceReminderSettings';
 import jsPDF from 'jspdf';
+import IntervalDetailDialog from '@/components/dialogs/IntervalDetailDialog';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All Upcoming' },
@@ -36,6 +37,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   const reminderMiles = getServiceReminderMiles();
   const [statusFilter, setStatusFilter] = useState('all');
   const [groupBy, setGroupBy] = useState(preFilterVehicleId ? 'vehicle' : preFilterItemId ? 'item' : 'vehicle');
+  const [viewingInterval, setViewingInterval] = useState(null);
   // Multi-vehicle: set of selected vehicle IDs, or empty = all
   const [selectedVehicles, setSelectedVehicles] = useState(() => preFilterVehicleId ? new Set([preFilterVehicleId]) : new Set());
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -78,12 +80,17 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
           const inStock = item?.quantity_on_hand || 0;
           const needed = sp.quantity || 1;
           const shortage = Math.max(0, needed - inStock);
+          const isMileageBased = (!interval.interval_months || parseFloat(interval.interval_months) === 0) && interval.interval_miles;
           return {
+            interval,
             intervalId: interval.id,
             intervalName: interval.interval_name,
             vehicleId: interval.vehicle_id,
             vehicleName: vehicleMap[interval.vehicle_id]?.name || 'Unknown',
+            vehicle: vehicleMap[interval.vehicle_id],
             nextDueDate: interval.next_due_date,
+            nextDueMileage: interval.next_due_mileage,
+            isMileageBased,
             status,
             itemId: sp.item_id,
             itemName: item?.name || sp.description || 'Unknown Part',
@@ -161,6 +168,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
       y += 4;
 
       doc.setTextColor(30, 30, 30);
+      let groupNeeded = 0, groupShortage = 0;
       group.rows.forEach(r => {
         if (y > 270) { doc.addPage(); y = 20; }
         const label = groupBy === 'item' ? `${r.vehicleName} — ${r.intervalName}` : r.itemName;
@@ -169,11 +177,27 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
         doc.text(String(r.needed), colX[2], y);
         doc.text(String(r.inStock), colX[3], y);
         doc.text(r.shortage > 0 ? `-${r.shortage}` : '✓', colX[4], y);
-        doc.text(r.nextDueDate ? new Date(r.nextDueDate).toLocaleDateString() : '-', colX[5], y);
+        const dueText = r.isMileageBased && r.nextDueMileage
+          ? `${Number(r.nextDueMileage).toLocaleString()} mi`
+          : r.nextDueDate ? new Date(r.nextDueDate).toLocaleDateString() : '-';
+        doc.text(dueText, colX[5], y);
         doc.text(r.unitPrice ? `$${r.unitPrice.toFixed(2)}` : '-', colX[6], y);
         y += 7;
+        groupNeeded += r.needed;
+        groupShortage += r.shortage;
       });
+      // Group total row
+      doc.setDrawColor(200, 200, 200);
+      doc.line(14, y, 196, y);
       y += 4;
+      doc.setFontSize(8);
+      doc.setTextColor(60, 60, 60);
+      doc.text('Total', colX[0], y);
+      doc.text(String(groupNeeded), colX[2], y);
+      doc.text(groupShortage > 0 ? `-${groupShortage}` : '✓', colX[4], y);
+      doc.setFontSize(8);
+      doc.setTextColor(30, 30, 30);
+      y += 8;
     });
 
     doc.save('parts-needed-report.pdf');
@@ -304,16 +328,20 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
                       <th className="text-center px-3 py-2 font-medium text-slate-600 dark:text-slate-300">Needed</th>
                       <th className="text-center px-3 py-2 font-medium text-slate-600 dark:text-slate-300">In Stock</th>
                       <th className="text-center px-3 py-2 font-medium text-slate-600 dark:text-slate-300">Shortage</th>
-                      <th className="text-left px-3 py-2 font-medium text-slate-600 dark:text-slate-300">Due Date</th>
+                      <th className="text-left px-3 py-2 font-medium text-slate-600 dark:text-slate-300">Due</th>
                       <th className="text-left px-3 py-2 font-medium text-slate-600 dark:text-slate-300">Status</th>
                       <th className="text-left px-3 py-2 font-medium text-slate-600 dark:text-slate-300"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {group.rows.map((row, ri) => (
-                      <tr key={ri} className={row.shortage > 0 ? 'bg-red-50 dark:bg-red-950/20' : 'bg-white dark:bg-slate-900'}>
+                      <tr
+                        key={ri}
+                        onClick={() => setViewingInterval(row.interval)}
+                        className={`cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors ${row.shortage > 0 ? 'bg-red-50 dark:bg-red-950/20' : 'bg-white dark:bg-slate-900'}`}
+                      >
                         <td className="px-4 py-3">
-                          <div className="font-medium text-slate-900 dark:text-white">
+                          <div className="font-medium text-blue-700 dark:text-blue-400 hover:underline">
                             {groupBy === 'item' ? `${row.vehicleName} — ${row.intervalName}` : row.itemName}
                           </div>
                           {groupBy !== 'item' && row.itemNumber && (
@@ -332,10 +360,13 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
                           }
                         </td>
                         <td className="px-3 py-3 text-slate-600 dark:text-slate-400 text-xs">
-                          {row.nextDueDate ? new Date(row.nextDueDate).toLocaleDateString() : '—'}
+                          {row.isMileageBased && row.nextDueMileage
+                            ? <span className="font-medium text-slate-800 dark:text-slate-200">{Number(row.nextDueMileage).toLocaleString()} mi</span>
+                            : row.nextDueDate ? new Date(row.nextDueDate).toLocaleDateString() : '—'
+                          }
                         </td>
                         <td className="px-3 py-3">{statusBadge(row.status)}</td>
-                        <td className="px-3 py-3">
+                        <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
                           {row.itemUrl && (
                             <a href={row.itemUrl} target="_blank" rel="noopener noreferrer"
                               className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-xs whitespace-nowrap">
@@ -379,5 +410,14 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
         </div>
       </DialogContent>
     </Dialog>
+
+    {viewingInterval && (
+      <IntervalDetailDialog
+        interval={viewingInterval}
+        vehicle={vehicleMap[viewingInterval.vehicle_id]}
+        items={items}
+        onClose={() => setViewingInterval(null)}
+      />
+    )}
   );
 }
