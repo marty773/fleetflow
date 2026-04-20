@@ -43,6 +43,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortByShortage, setSortByShortage] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState(new Set());
+  const [orderSummaryCollapsed, setOrderSummaryCollapsed] = useState(false);
 
   const { data: intervals = [] } = useQuery({ queryKey: ['maintenanceIntervals'], queryFn: () => base44.entities.MaintenanceInterval.list(), enabled: open });
   const { data: vehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list(), enabled: open });
@@ -428,9 +429,18 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
 
         {/* Order Summary Footer */}
         {orderSummary.length > 0 && (
-          <div className="border-t-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-4 shrink-0">
-            <h4 className="font-semibold text-slate-900 dark:text-white mb-2 text-sm">📋 Order Summary — Items to Purchase</h4>
-            <div className="space-y-1">
+          <div className="border-t-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 shrink-0">
+            <button
+              onClick={() => setOrderSummaryCollapsed(p => !p)}
+              className="w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              {orderSummaryCollapsed ? <ChevronRight className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+              <h4 className="font-semibold text-slate-900 dark:text-white text-sm">📋 Order Summary — Items to Purchase</h4>
+              <span className="text-xs text-slate-500 ml-1">({orderSummary.length} item{orderSummary.length !== 1 ? 's' : ''})</span>
+              {grandTotal > 0 && <span className="ml-auto text-sm font-semibold text-slate-900 dark:text-white">${grandTotal.toFixed(2)}</span>}
+            </button>
+            {!orderSummaryCollapsed && (
+            <div className="px-4 pb-4 space-y-1">
               {orderSummary.map((o, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm">
                   <span className="flex-1 text-slate-800 dark:text-slate-200">{o.name}{o.itemNumber && <span className="text-slate-400 font-mono ml-1">#{o.itemNumber}</span>}</span>
@@ -440,11 +450,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
                 </div>
               ))}
             </div>
-            {grandTotal > 0 && (
-              <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-semibold text-slate-900 dark:text-white">
-                <span>Estimated Total</span>
-                <span>${grandTotal.toFixed(2)}</span>
-              </div>
+            </div>
             )}
           </div>
         )}
