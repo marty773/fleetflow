@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { differenceInDays } from 'date-fns';
-import { ExternalLink, Download, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { ExternalLink, Download, AlertTriangle, CheckCircle, Clock, ChevronDown, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { getServiceReminderMiles } from '@/components/settings/ServiceReminderSettings';
 import jsPDF from 'jspdf';
 import IntervalDetailDialog from '@/components/dialogs/IntervalDetailDialog';
@@ -41,6 +41,8 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
   // Multi-vehicle: set of selected vehicle IDs, or empty = all
   const [selectedVehicles, setSelectedVehicles] = useState(() => preFilterVehicleId ? new Set([preFilterVehicleId]) : new Set());
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortByShortage, setSortByShortage] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState(new Set());
 
   const { data: intervals = [] } = useQuery({ queryKey: ['maintenanceIntervals'], queryFn: () => base44.entities.MaintenanceInterval.list(), enabled: open });
   const { data: vehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => base44.entities.Vehicle.list(), enabled: open });
@@ -105,6 +107,18 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
     });
   }, [intervals, selectedVehicles, preFilterVehicleId, preFilterItemId, statusFilter, itemMap, vehicleMap, reminderMiles]);
 
+  const toggleGroup = (gi) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(gi)) next.delete(gi); else next.add(gi);
+      return next;
+    });
+  };
+
+  const sortRows = (rows) => sortByShortage
+    ? [...rows].sort((a, b) => b.shortage - a.shortage)
+    : rows;
+
   // Group rows
   const grouped = useMemo(() => {
     if (groupBy === 'vehicle') {
@@ -135,6 +149,11 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
     return order.filter(s => map[s]).map(s => map[s]);
   }, [rows, groupBy]);
 
+  // Apply sort to each group's rows
+  const sortedGrouped = useMemo(() =>
+    grouped.map(g => ({ ...g, rows: sortRows(g.rows) })),
+  [grouped, sortByShortage]);
+
   const statusBadge = (status) => {
     if (status === 'overdue') return <Badge className="bg-red-100 text-red-700 border-red-200">Overdue</Badge>;
     if (status === 'due_soon') return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Due Soon</Badge>;
@@ -149,7 +168,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
     doc.text(`Generated: ${new Date().toLocaleDateString()} | Filter: ${STATUS_OPTIONS.find(o => o.value === statusFilter)?.label}`, 14, 30);
 
     let y = 42;
-    grouped.forEach(group => {
+    sortedGrouped.forEach(group => {
       if (y > 260) { doc.addPage(); y = 20; }
       doc.setFontSize(13);
       doc.setTextColor(30, 30, 30);
@@ -232,7 +251,7 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
           </div>
 
           {/* Filters toggle */}
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
             <button
               onClick={() => setFiltersOpen(p => !p)}
               className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
@@ -248,6 +267,14 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
               )}
             </div>
           </div>
+
+          {/* Sort toggle */}
+          <button
+            onClick={() => setSortByShortage(p => !p)}
+            className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${sortByShortage ? 'text-red-600' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            <ArrowUpDown className="w-3 h-3" /> Sort by Shortage
+          </button>
 
           {/* Collapsible Filters */}
           {filtersOpen && (
@@ -308,17 +335,30 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
               <p className="font-medium">No parts found for this filter</p>
               <p className="text-sm mt-1">Try changing the status or vehicle filter</p>
             </div>
-          ) : grouped.map((group, gi) => (
+          ) : sortedGrouped.map((group, gi) => {
+            const isCollapsed = collapsedGroups.has(gi);
+            const groupShortage = group.rows.reduce((s, r) => s + r.shortage, 0);
+            return (
             <div key={gi}>
-              <div className="flex items-center gap-2 mb-2">
+              <button
+                onClick={() => toggleGroup(gi)}
+                className="flex items-center gap-2 mb-2 w-full text-left hover:opacity-80 transition-opacity"
+              >
+                {isCollapsed ? <ChevronRight className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                 <h3 className="font-semibold text-slate-900 dark:text-white text-base">{group.label}</h3>
+                <span className="text-xs text-slate-500">({group.rows.length} part{group.rows.length !== 1 ? 's' : ''})</span>
+                {groupShortage > 0 && (
+                  <span className="text-xs font-bold text-red-600 ml-1">−{groupShortage} short</span>
+                )}
                 {group.itemUrl && (
                   <a href={group.itemUrl} target="_blank" rel="noopener noreferrer"
-                    className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                    onClick={e => e.stopPropagation()}
+                    className="text-xs text-blue-600 hover:underline flex items-center gap-1 ml-auto">
                     <ExternalLink className="w-3 h-3" /> View on site
                   </a>
                 )}
-              </div>
+              </button>
+              {!isCollapsed && (
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50 dark:bg-slate-800">
@@ -380,8 +420,10 @@ export default function PartsNeededReport({ open, onClose, preFilterVehicleId = 
                   </tbody>
                 </table>
               </div>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Order Summary Footer */}
