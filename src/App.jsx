@@ -12,6 +12,7 @@ import BillFormPageComp from './pages/BillFormPage';
 import MaintenanceRecordFormPageComp from './pages/MaintenanceRecordFormPage';
 import MaintenanceIntervalFormPageComp from './pages/MaintenanceIntervalFormPage';
 import SystemUpdatesPage from './pages/SystemUpdates';
+import FleetExportPage from './pages/FleetExport';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { PermissionsProvider } from '@/hooks/usePagePermissions.jsx';
@@ -73,6 +74,7 @@ const AuthenticatedApp = () => {
       <Route path="/MaintenanceRecordFormPage" element={<LayoutWrapper currentPageName="MaintenanceRecordFormPage"><MaintenanceRecordFormPageComp /></LayoutWrapper>} />
       <Route path="/MaintenanceIntervalFormPage" element={<LayoutWrapper currentPageName="MaintenanceIntervalFormPage"><MaintenanceIntervalFormPageComp /></LayoutWrapper>} />
       <Route path="/SystemUpdates" element={<LayoutWrapper currentPageName="SystemUpdates"><SystemUpdatesPage /></LayoutWrapper>} />
+      <Route path="/FleetExport" element={<LayoutWrapper currentPageName="FleetExport"><FleetExportPage /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
