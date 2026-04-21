@@ -280,7 +280,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
                 onOpenChange(false);
                 navigate(`/MaintenanceRecordFormPage?vehicle=${vehicle.id}`);
               }}
-              className="w-full bg-slate-900 hover:bg-slate-800"
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Maintenance Record
@@ -390,7 +390,7 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             <Button variant="outline" onClick={() => setShowPartsReport(true)} className="flex-1">
             Parts Report
             </Button>
-            <Button onClick={() => { onOpenChange(false); onEdit && onEdit(vehicle); }} className="flex-1 bg-slate-900 hover:bg-slate-800 text-white">
+            <Button onClick={() => { onOpenChange(false); onEdit && onEdit(vehicle); }} className="flex-1 bg-amber-500 hover:bg-amber-600 text-white dark:bg-amber-500 dark:hover:bg-amber-600">
               <Edit2 className="w-4 h-4 mr-2" />
               Edit
             </Button>

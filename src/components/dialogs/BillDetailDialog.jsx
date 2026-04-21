@@ -163,7 +163,7 @@ export default function BillDetailDialog({ bill, vehicles = [], records = [], on
           >
             Delete
           </Button>
-          <Button onClick={() => onEdit?.(bill)} className="flex-1" style={{ backgroundColor: 'var(--color-primary)' }}>
+          <Button onClick={() => onEdit?.(bill)} className="flex-1 bg-amber-500 hover:bg-amber-600 text-white dark:bg-amber-500 dark:hover:bg-amber-600">
             Edit
           </Button>
         </div>
