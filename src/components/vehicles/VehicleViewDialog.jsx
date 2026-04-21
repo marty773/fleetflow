@@ -390,6 +390,10 @@ export default function VehicleViewDialog({ vehicle, open, onOpenChange, onEdit 
             <Button variant="outline" onClick={() => setShowPartsReport(true)} className="flex-1">
             Parts Report
             </Button>
+            <Button onClick={() => { onOpenChange(false); onEdit && onEdit(vehicle); }} className="flex-1 bg-slate-900 hover:bg-slate-800 text-white">
+              <Edit2 className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
             </div>
             <PartsNeededReport open={showPartsReport} onClose={() => setShowPartsReport(false)} preFilterVehicleId={vehicle?.id} />
             </DialogContent>
