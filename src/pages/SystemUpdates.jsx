@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Check, Zap, Save, Loader2, History, Bot, Sparkles } from 'lucide-react';
+import { Copy, Check, Zap, Save, Loader2, History, Bot, Sparkles, PackageCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import PendingChangesList from '@/components/systemupdates/PendingChangesList';
 import VersionHistoryList from '@/components/systemupdates/VersionHistoryList';
 
-// Auto-populated build version: uses Vite build timestamp as an integer (YYYYMMDDHHMI)
+// Build version derived from Vite build timestamp (YYYYMMDDHHMI integer)
 const BUILD_VERSION = parseInt(
   (import.meta.env.VITE_BUILD_TIME || new Date().toISOString())
     .replace(/[-T:Z.]/g, '')
@@ -40,28 +40,73 @@ export default function SystemUpdates() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [aiInput, setAiInput] = useState('');
   const [aiParsing, setAiParsing] = useState(false);
+  const [autoPublished, setAutoPublished] = useState(false);
+  const initDone = useRef(false);
 
   useEffect(() => {
-    base44.auth.me().then(user => {
+    if (initDone.current) return;
+    initDone.current = true;
+
+    base44.auth.me().then(async user => {
       if (user?.role !== 'admin') {
         setIsAdmin(false);
         setLoading(false);
         return;
       }
       setIsAdmin(true);
-      base44.entities.AppMetadata.list().then(records => {
-        if (records.length > 0) {
-          const rec = records[0];
-          setMetadataId(rec.id);
-          setVersionNumber(rec.version_number || BUILD_VERSION);
-          setFeaturesSummary(rec.latest_features_summary ?? '');
-          setPendingChanges(rec.pending_changes ?? []);
-          setVersionHistory(rec.version_history ?? []);
+
+      const records = await base44.entities.AppMetadata.list();
+      let rec = records[0] || null;
+      let recId = rec?.id || null;
+      let storedVersion = rec?.version_number || 0;
+      let history = rec?.pending_changes ? [...(rec.version_history ?? [])] : [];
+      let pending = rec?.pending_changes ?? [];
+      let summary = rec?.latest_features_summary ?? '';
+
+      // AUTO-PUBLISH: if this build is newer than what's stored, auto-create a version entry
+      if (BUILD_VERSION > storedVersion) {
+        const autoEntry = {
+          version: BUILD_VERSION,
+          published_at: new Date().toISOString(),
+          summary: `Auto-published on deploy (build ${BUILD_VERSION})`,
+          changes: [...pending], // carry over any pending changes from previous session
+        };
+
+        // Also catch up any missed versions between storedVersion and BUILD_VERSION
+        // (in practice there's usually just one gap, but we log it clearly)
+        const updatedHistory = [
+          ...(rec?.version_history ?? []).filter(h => h.version !== BUILD_VERSION),
+          autoEntry,
+        ];
+
+        const newData = {
+          version_number: BUILD_VERSION,
+          latest_features_summary: summary,
+          pending_changes: [], // clear pending after auto-publish
+          version_history: updatedHistory,
+        };
+
+        if (recId) {
+          await base44.entities.AppMetadata.update(recId, newData);
         } else {
-          setVersionNumber(BUILD_VERSION);
+          const created = await base44.entities.AppMetadata.create(newData);
+          recId = created.id;
+          setMetadataId(created.id);
         }
-        setLoading(false);
-      });
+
+        history = updatedHistory;
+        pending = [];
+        storedVersion = BUILD_VERSION;
+        setAutoPublished(true);
+        toast.success(`Auto-published v${BUILD_VERSION} on new deploy`);
+      }
+
+      setMetadataId(recId);
+      setVersionNumber(storedVersion);
+      setFeaturesSummary(summary);
+      setPendingChanges(pending);
+      setVersionHistory(history);
+      setLoading(false);
     });
   }, []);
 
@@ -97,7 +142,6 @@ export default function SystemUpdates() {
     const itemFieldList = ITEM_FIELDS.join(', ');
     const vendorFieldList = VENDOR_FIELDS.join(', ');
 
-    // Build change log section from pending changes
     const changeLog = pendingChanges.length > 0
       ? '\n\nDetailed changes in this version:\n' +
         pendingChanges.map(c => `- [${c.category}] ${c.description}`).join('\n')
@@ -106,7 +150,6 @@ export default function SystemUpdates() {
     const prompt = `I am updating Fisher's Operations to version ${version}. Please implement these new features from FleetFlow: ${featuresSummary || '[FEATURES]'}.${changeLog}\n\nAlso, ensure the API mapping for 'Items' and 'Vendors' includes these specific fields:\n\nItems: ${itemFieldList}\n\nVendors: ${vendorFieldList}`;
     setGeneratedPrompt(prompt);
 
-    // Publish this as a new version in history
     const newEntry = {
       version,
       published_at: new Date().toISOString(),
@@ -114,15 +157,14 @@ export default function SystemUpdates() {
       changes: [...pendingChanges],
     };
 
-    // Avoid duplicate versions — replace if same version number exists
     const updatedHistory = [
       ...versionHistory.filter(h => h.version !== version),
       newEntry,
     ];
 
     setVersionHistory(updatedHistory);
-    setPendingChanges([]); // Clear pending after publishing
-    setVersionNumber(version + 1); // Bump version for next update
+    setPendingChanges([]);
+    setVersionNumber(version + 1);
 
     await saveToDb({
       version_number: version + 1,
@@ -221,12 +263,22 @@ Only include actual changes to the app (ignore meta-commentary). Return 3-15 ite
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-white">System Updates</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">System Updates</h1>
+        <div className="text-xs text-slate-400 dark:text-slate-500 font-mono">Build: {BUILD_VERSION}</div>
+      </div>
+
+      {autoPublished && (
+        <div className="flex items-center gap-2 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg px-4 py-3 text-sm text-green-800 dark:text-green-300">
+          <PackageCheck className="w-4 h-4 shrink-0" />
+          New build detected — v{BUILD_VERSION} was automatically published to version history.
+        </div>
+      )}
 
       {/* App Metadata */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">App Metadata</CardTitle>
+          <CardTitle className="text-base">Release Notes Draft</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -251,7 +303,7 @@ Only include actual changes to the app (ignore meta-commentary). Return 3-15 ite
             />
           </div>
           <div className="flex gap-3">
-            <Button onClick={handleSave} disabled={saving} variant="outline">
+            <Button onClick={handleSave} disabled={saving} variant="outline" className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
               Save Draft
             </Button>
@@ -275,8 +327,8 @@ Only include actual changes to the app (ignore meta-commentary). Return 3-15 ite
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Paste the AI assistant's response or a description of the changes made in this session. The AI will parse it into categorized change entries automatically.
           </p>
-          <textarea
-            className="w-full min-h-[120px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+          <Textarea
+            className="min-h-[120px]"
             placeholder="Paste AI response here, e.g.: 'Map markers now show a green rotating arrow for moving vehicles. The Moving badge was removed. Fault codes badge is now clickable and opens a detail dialog...'"
             value={aiInput}
             onChange={e => setAiInput(e.target.value)}
@@ -284,7 +336,7 @@ Only include actual changes to the app (ignore meta-commentary). Return 3-15 ite
           <Button
             onClick={handleImportFromAI}
             disabled={aiParsing || !aiInput.trim()}
-            className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white gap-2 disabled:bg-blue-300 dark:disabled:bg-blue-900 disabled:text-white"
           >
             {aiParsing
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing...</>
@@ -305,7 +357,7 @@ Only include actual changes to the app (ignore meta-commentary). Return 3-15 ite
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base">Generated Prompt</CardTitle>
-            <Button size="sm" variant="outline" onClick={handleCopy}>
+            <Button size="sm" variant="outline" onClick={handleCopy} className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300">
               {copied ? <Check className="w-4 h-4 mr-1 text-green-600" /> : <Copy className="w-4 h-4 mr-1" />}
               {copied ? 'Copied!' : 'Copy'}
             </Button>
