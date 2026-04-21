@@ -128,7 +128,10 @@ export default function ItemDetailDialog({ item, transactions = [], onClose, onE
           </Button>
           <Button
            onClick={() => onEdit?.(item)}
-           className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+           className="flex-1"
+           style={{ backgroundColor: 'var(--color-primary)' }}
+           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
           >
            Edit
           </Button>
