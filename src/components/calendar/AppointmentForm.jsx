@@ -4,10 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import ResponsiveSelect from '@/components/ResponsiveSelect';
-import { X } from 'lucide-react';
+import { X, Check, ChevronsUpDown } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 export default function AppointmentForm({ appointment, vehicles, onSubmit, onCancel, isLoading }) {
+  const [vehicleSearchOpen, setVehicleSearchOpen] = useState(false);
   const [formData, setFormData] = useState(appointment || {
     vehicle_id: '',
     title: '',
@@ -38,18 +41,54 @@ export default function AppointmentForm({ appointment, vehicles, onSubmit, onCan
       <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+            <div className="w-full min-w-0">
               <Label htmlFor="vehicle_id">Vehicle *</Label>
-              <ResponsiveSelect
-                value={formData.vehicle_id}
-                onValueChange={(value) => handleChange('vehicle_id', value)}
-                placeholder="Select vehicle"
-                options={vehicles.map(v => ({
-                  value: v.id,
-                  label: `${v.name} (${v.license_plate})`
-                }))}
-                className="mt-2"
-              />
+              <Popover open={vehicleSearchOpen} onOpenChange={setVehicleSearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={vehicleSearchOpen}
+                    className="w-full justify-between mt-2"
+                  >
+                    <span className="truncate">
+                      {formData.vehicle_id
+                        ? vehicles.find((v) => v.id === formData.vehicle_id)?.name
+                        : "Select vehicle"}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search vehicles..." />
+                    <CommandList>
+                      <CommandEmpty>No vehicle found.</CommandEmpty>
+                      <CommandGroup>
+                        {vehicles.map((v) => (
+                          <CommandItem
+                            key={v.id}
+                            value={`${v.name} ${v.license_plate}`}
+                            onSelect={() => {
+                              handleChange('vehicle_id', v.id);
+                              setVehicleSearchOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.vehicle_id === v.id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {v.name} ({v.license_plate})
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
