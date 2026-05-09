@@ -1,0 +1,36 @@
+{
+  "name": "ServiceType",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "description": "Company this service type belongs to"
+    },
+    "label": {
+      "type": "string",
+      "description": "Display name of the service type"
+    },
+    "value": {
+      "type": "string",
+      "description": "Slug/key value used in records and bills"
+    },
+    "applies_to": {
+      "type": "string",
+      "enum": [
+        "both",
+        "bills",
+        "records"
+      ],
+      "default": "both",
+      "description": "Whether this type applies to bills, maintenance records, or both"
+    }
+  },
+  "required": [
+    "label",
+    "value"
+  ]
+}
