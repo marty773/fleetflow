@@ -43,7 +43,11 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const data = { ...formData };
+    // Strip empty strings from numeric fields to avoid validation errors
+    if (data.gvw === '' || data.gvw === null) delete data.gvw;
+    if (data.year === '' || data.year === null) delete data.year;
+    onSubmit(data);
   };
 
   const handleVinLookup = async () => {
