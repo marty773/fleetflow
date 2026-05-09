@@ -43,10 +43,10 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const data = { ...formData };
-    // Strip empty strings from numeric fields to avoid validation errors
-    if (data.gvw === '' || data.gvw === null) delete data.gvw;
-    if (data.year === '' || data.year === null) delete data.year;
+    // Strip empty strings so optional fields don't fail server validation
+    const data = Object.fromEntries(
+      Object.entries(formData).filter(([, v]) => v !== '' && v !== null && v !== undefined)
+    );
     onSubmit(data);
   };
 
