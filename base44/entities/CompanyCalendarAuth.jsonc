@@ -1,0 +1,34 @@
+{
+  "name": "CompanyCalendarAuth",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "description": "Company this calendar belongs to"
+    },
+    "calendar_access_token": {
+      "type": "string",
+      "description": "Google Calendar access token"
+    },
+    "calendar_refresh_token": {
+      "type": "string",
+      "description": "Google Calendar refresh token"
+    },
+    "token_expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the access token expires"
+    },
+    "calendar_id": {
+      "type": "string",
+      "description": "Google Calendar ID to sync to"
+    }
+  },
+  "required": [
+    "company_id"
+  ]
+}

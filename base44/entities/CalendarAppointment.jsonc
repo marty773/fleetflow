@@ -1,0 +1,53 @@
+{
+  "name": "CalendarAppointment",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "default": "Fisher's Enterprise",
+      "description": "Company this appointment belongs to"
+    },
+    "vehicle_id": {
+      "type": "string",
+      "description": "Vehicle ID"
+    },
+    "title": {
+      "type": "string",
+      "description": "Appointment title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Appointment description"
+    },
+    "appointment_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of appointment"
+    },
+    "appointment_time": {
+      "type": "string",
+      "description": "Time of appointment (HH:MM)"
+    },
+    "location": {
+      "type": "string",
+      "description": "Location of appointment"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "google_event_id": {
+      "type": "string",
+      "description": "Google Calendar event ID for syncing"
+    }
+  },
+  "required": [
+    "vehicle_id",
+    "title",
+    "appointment_date"
+  ]
+}

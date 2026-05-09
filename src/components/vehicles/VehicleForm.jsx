@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 
 export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(vehicle || {
+    company_id: "Fisher's Enterprise",
     name: '',
     type: 'truck',
     make: '',
@@ -43,6 +44,10 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.name || !formData.make || !formData.model || !formData.year) {
+      toast.error('Please fill in all required fields (Name, Make, Model, Year)');
+      return;
+    }
     onSubmit(formData);
   };
 
@@ -96,6 +101,21 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
       <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <Label htmlFor="company_id">Company *</Label>
+              <div className="mt-2">
+                <ResponsiveSelect
+                  value={formData.company_id}
+                  onValueChange={(value) => handleChange('company_id', value)}
+                  placeholder="Select company"
+                  label="Company"
+                >
+                  <SelectItem value="Fisher's Enterprise">Fisher's Enterprise</SelectItem>
+                  <SelectItem value="Pencroft Structures">Pencroft Structures</SelectItem>
+                </ResponsiveSelect>
+              </div>
+            </div>
+
             <div>
               <Label htmlFor="name">Vehicle Name *</Label>
               <Input
@@ -103,7 +123,6 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 placeholder="e.g., Truck #1, Trailer A"
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                required
                 className="mt-2 select-text"
               />
             </div>
@@ -130,7 +149,6 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 placeholder="e.g., Volvo, Peterbilt"
                 value={formData.make}
                 onChange={(e) => handleChange('make', e.target.value)}
-                required
                 className="mt-2"
               />
             </div>
@@ -142,7 +160,6 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 placeholder="e.g., FH16, 379"
                 value={formData.model}
                 onChange={(e) => handleChange('model', e.target.value)}
-                required
                 className="mt-2"
               />
             </div>
@@ -154,7 +171,6 @@ export default function VehicleForm({ vehicle, onSubmit, onCancel, isLoading }) 
                 type="number"
                 value={formData.year}
                 onChange={(e) => handleChange('year', parseInt(e.target.value))}
-                required
                 className="mt-2"
               />
             </div>

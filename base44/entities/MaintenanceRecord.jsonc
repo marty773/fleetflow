@@ -1,0 +1,103 @@
+{
+  "name": "MaintenanceRecord",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "default": "Fisher's Enterprise",
+      "description": "Company this maintenance record belongs to"
+    },
+    "vehicle_id": {
+      "type": "string",
+      "description": "Vehicle ID"
+    },
+    "maintenance_type": {
+      "type": "string",
+      "enum": [
+        "oil_change",
+        "filter_change",
+        "tire_rotation",
+        "inspection",
+        "repair",
+        "cleaning",
+        "other"
+      ],
+      "default": "other",
+      "description": "Type of maintenance"
+    },
+    "title": {
+      "type": "string",
+      "description": "Maintenance title"
+    },
+    "performed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date performed"
+    },
+    "vendor": {
+      "type": "string",
+      "description": "Service provider name"
+    },
+    "odometer_reading": {
+      "type": "string",
+      "description": "Odometer reading at time of service"
+    },
+    "work_items": {
+      "type": "array",
+      "description": "Work performed",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "parts_used": {
+      "type": "array",
+      "description": "Stock parts consumed in this maintenance",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "quantity_used": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "total_cost": {
+      "type": "number",
+      "description": "Total cost"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "linked_bill_id": {
+      "type": "string",
+      "description": "ID of the Bill associated with this maintenance record"
+    }
+  },
+  "required": [
+    "vehicle_id",
+    "title",
+    "performed_date"
+  ]
+}

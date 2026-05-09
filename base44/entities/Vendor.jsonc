@@ -1,0 +1,67 @@
+{
+  "name": "Vendor",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "default": "Fisher's Enterprise",
+      "description": "Company this vendor belongs to"
+    },
+    "name": {
+      "type": "string",
+      "description": "Vendor name"
+    },
+    "contact_person": {
+      "type": "string",
+      "description": "Primary contact person"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "address": {
+      "type": "string",
+      "description": "Physical address"
+    },
+    "city": {
+      "type": "string",
+      "description": "City"
+    },
+    "state": {
+      "type": "string",
+      "description": "State/Province"
+    },
+    "zip": {
+      "type": "string",
+      "description": "Zip/Postal code"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "fuel",
+        "maintenance",
+        "repairs",
+        "insurance",
+        "parts",
+        "labor",
+        "other"
+      ],
+      "description": "Vendor category"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "UserCalendarAuth",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "calendar_access_token": {
+      "type": "string",
+      "description": "Google Calendar access token"
+    },
+    "calendar_refresh_token": {
+      "type": "string",
+      "description": "Google Calendar refresh token"
+    },
+    "token_expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the access token expires"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}

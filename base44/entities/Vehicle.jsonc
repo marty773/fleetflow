@@ -1,0 +1,114 @@
+{
+  "name": "Vehicle",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "enum": [
+        "Fisher's Enterprise",
+        "Pencroft Structures"
+      ],
+      "default": "Fisher's Enterprise",
+      "description": "Company that owns this vehicle"
+    },
+    "name": {
+      "type": "string",
+      "description": "Vehicle name or identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "truck",
+        "trailer"
+      ],
+      "default": "truck",
+      "description": "Type of vehicle"
+    },
+    "make": {
+      "type": "string",
+      "description": "Vehicle manufacturer"
+    },
+    "model": {
+      "type": "string",
+      "description": "Vehicle model"
+    },
+    "year": {
+      "type": "number",
+      "description": "Year of manufacture"
+    },
+    "license_plate": {
+      "type": "string",
+      "description": "License plate number"
+    },
+    "vin": {
+      "type": "string",
+      "description": "Vehicle Identification Number"
+    },
+    "engine_type": {
+      "type": "string",
+      "enum": [
+        "gas",
+        "diesel",
+        "electric",
+        "hybrid",
+        "unknown"
+      ],
+      "default": "unknown",
+      "description": "Engine fuel type"
+    },
+    "engine_description": {
+      "type": "string",
+      "description": "Full engine description, e.g. 6.7L I6 Cummins Diesel"
+    },
+    "gvw": {
+      "type": "number",
+      "description": "Gross Vehicle Weight in lbs"
+    },
+    "purchase_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of purchase"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the vehicle is actively in use"
+    },
+    "hydraulic_dump": {
+      "type": "boolean",
+      "default": false,
+      "description": "Trailer has hydraulic dump"
+    },
+    "chain_drive": {
+      "type": "boolean",
+      "default": false,
+      "description": "Trailer has chain drive"
+    },
+    "center_tie_down_only": {
+      "type": "boolean",
+      "default": false,
+      "description": "Trailer has center tie down only"
+    },
+    "three_tie_down_bars": {
+      "type": "boolean",
+      "default": false,
+      "description": "Trailer has three tie down bars"
+    },
+    "front_load_extension": {
+      "type": "boolean",
+      "default": false,
+      "description": "Trailer has front load extension"
+    },
+    "self_adjusting_brakes": {
+      "type": "boolean",
+      "default": false,
+      "description": "Trailer has self adjusting brakes"
+    }
+  },
+  "required": [
+    "name",
+    "make",
+    "model",
+    "year"
+  ]
+}
