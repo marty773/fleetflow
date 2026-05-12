@@ -95,6 +95,7 @@ export default function FleetExport() {
   const [progress, setProgress] = useState(0);
   const [exportingData, setExportingData] = useState(false);
   const [exportingPhotos, setExportingPhotos] = useState(false);
+  const [exportingInventoryPhotos, setExportingInventoryPhotos] = useState(false);
   const [owner, setOwner] = useState("");
 
   const fetchRepos = useCallback(async () => {
@@ -271,6 +272,42 @@ export default function FleetExport() {
     }
   };
 
+  const handleExportInventoryPhotos = async () => {
+    setExportingInventoryPhotos(true);
+    try {
+      const { appId, appBaseUrl, token } = appParams;
+      const base = appBaseUrl || "";
+      const v = appParams.functionsVersion || "v3";
+      const url = `${base}/api/${v}/apps/${appId}/functions/exportInventoryPhotos`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+        body: JSON.stringify({}),
+      });
+      if (!response.ok) {
+        let msg = "Export failed";
+        try { const j = await response.json(); msg = j.error || msg; } catch {}
+        throw new Error(msg);
+      }
+      const blob = await response.blob();
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = dlUrl;
+      a.download = `inventory-photos-${new Date().toISOString().split("T")[0]}.zip`;
+      a.click();
+      URL.revokeObjectURL(dlUrl);
+      toast.success("Inventory photos ZIP downloaded!");
+    } catch (err) {
+      toast.error("Export failed: " + err.message);
+    } finally {
+      setExportingInventoryPhotos(false);
+    }
+  };
+
   const handleExportData = async () => {
     setExportingData(true);
     try {
@@ -358,14 +395,14 @@ export default function FleetExport() {
         </CardContent>
       </Card>
 
-      {/* Bill Photos Export - always visible */}
+      {/* Photo Exports - always visible */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Download className="w-4 h-4" /> Bill Photos Export
+            <Download className="w-4 h-4" /> Photo Exports
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-sm text-slate-500 dark:text-slate-400">Download all bill photos as a ZIP archive.</p>
             <Button
@@ -375,7 +412,19 @@ export default function FleetExport() {
               className="gap-2"
             >
               {exportingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-              {exportingPhotos ? "Zipping Photos…" : "Export Bill Photos (ZIP)"}
+              {exportingPhotos ? "Zipping…" : "Export Bill Photos (ZIP)"}
+            </Button>
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Download all inventory item photos as a ZIP archive.</p>
+            <Button
+              variant="outline"
+              onClick={handleExportInventoryPhotos}
+              disabled={exportingInventoryPhotos}
+              className="gap-2"
+            >
+              {exportingInventoryPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {exportingInventoryPhotos ? "Zipping…" : "Export Inventory Photos (ZIP)"}
             </Button>
           </div>
         </CardContent>
