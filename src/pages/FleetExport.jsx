@@ -358,6 +358,29 @@ export default function FleetExport() {
         </CardContent>
       </Card>
 
+      {/* Bill Photos Export - always visible */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Download className="w-4 h-4" /> Bill Photos Export
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Download all bill photos as a ZIP archive.</p>
+            <Button
+              variant="outline"
+              onClick={handleExportPhotos}
+              disabled={exportingPhotos}
+              className="gap-2"
+            >
+              {exportingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {exportingPhotos ? "Zipping Photos…" : "Export Bill Photos (ZIP)"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {connected && (
         <>
           {/* Repository & Target Path */}
@@ -470,15 +493,6 @@ export default function FleetExport() {
               {exportingData ? "Exporting…" : "Export Entity Data (JSON)"}
             </Button>
 
-            <Button
-              variant="outline"
-              onClick={handleExportPhotos}
-              disabled={exportingPhotos}
-              className="gap-2 flex-1 sm:flex-none"
-            >
-              {exportingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-              {exportingPhotos ? "Zipping Photos…" : "Export Bill Photos (ZIP)"}
-            </Button>
           </div>
 
           {/* Instructions */}
