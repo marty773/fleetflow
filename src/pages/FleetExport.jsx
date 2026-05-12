@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { appParams } from "@/lib/app-params";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -93,6 +94,7 @@ export default function FleetExport() {
   const [pushing, setPushing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exportingData, setExportingData] = useState(false);
+  const [exportingPhotos, setExportingPhotos] = useState(false);
   const [owner, setOwner] = useState("");
 
   const fetchRepos = useCallback(async () => {
@@ -230,6 +232,42 @@ export default function FleetExport() {
       toast.error("Push failed: " + err.message);
     } finally {
       setPushing(false);
+    }
+  };
+
+  const handleExportPhotos = async () => {
+    setExportingPhotos(true);
+    try {
+      const { appId, appBaseUrl, token } = appParams;
+      const base = appBaseUrl || "";
+      const v = appParams.functionsVersion || "v3";
+      const url = `${base}/api/${v}/apps/${appId}/functions/exportBillPhotos`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+        body: JSON.stringify({}),
+      });
+      if (!response.ok) {
+        let msg = "Export failed";
+        try { const j = await response.json(); msg = j.error || msg; } catch {}
+        throw new Error(msg);
+      }
+      const blob = await response.blob();
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = dlUrl;
+      a.download = `bill-photos-${new Date().toISOString().split("T")[0]}.zip`;
+      a.click();
+      URL.revokeObjectURL(dlUrl);
+      toast.success("Bill photos ZIP downloaded!");
+    } catch (err) {
+      toast.error("Export failed: " + err.message);
+    } finally {
+      setExportingPhotos(false);
     }
   };
 
@@ -430,6 +468,16 @@ export default function FleetExport() {
             >
               {exportingData ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               {exportingData ? "Exporting…" : "Export Entity Data (JSON)"}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handleExportPhotos}
+              disabled={exportingPhotos}
+              className="gap-2 flex-1 sm:flex-none"
+            >
+              {exportingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {exportingPhotos ? "Zipping Photos…" : "Export Bill Photos (ZIP)"}
             </Button>
           </div>
 
