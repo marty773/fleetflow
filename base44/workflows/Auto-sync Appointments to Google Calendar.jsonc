@@ -1,0 +1,39 @@
+{
+  "name": "Auto-sync Appointments to Google Calendar",
+  "description": "Automatically syncs calendar appointments to Google Calendar when created, updated, or deleted",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update",
+        "delete"
+      ],
+      "entity_name": "CalendarAppointment"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_sync_appointments_to_google_calendar",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoSyncAppointmentToCalendar",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "autoSyncAppointmentToCalendar"
+  }
+}

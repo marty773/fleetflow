@@ -1,0 +1,39 @@
+{
+  "name": "Auto-sync Maintenance Intervals to Google Calendar",
+  "description": "Automatically syncs maintenance intervals to Google Calendar when created, updated, or deleted",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update",
+        "delete"
+      ],
+      "entity_name": "MaintenanceInterval"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_sync_maintenance_intervals_to_google_calendar",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoSyncIntervalToCalendar",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "autoSyncIntervalToCalendar"
+  }
+}
